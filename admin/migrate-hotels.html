@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Hotel Migration</title>
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
+
+<body>
+
+<div class="main">
+
+<h1>Hotel Migration Tool</h1>
+
+<p>
+This will copy every hotel from the <strong>holidays</strong> table into the
+<strong>hotels</strong> table.
+</p>
+
+<button id="migrateBtn">
+🚀 Import Hotels
+</button>
+
+<pre id="output"></pre>
+
+</div>
+
+<script src="../js/migrate-hotels.js"></script>
+
+</body>
+</html>

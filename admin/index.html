@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PackageHolidayCompare Admin</title>
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+<aside class="sidebar">
+
+<div class="logo">
+
+PackageHolidayCompare
+
+</div>
+
+<nav>
+
+<a class="active" href="index.html">
+📊 Dashboard
+</a>
+
+<a href="hotels.html">
+🏨 Hotels
+</a>
+
+<a href="holiday-offers.html">
+🌴 Holiday Offers
+</a>
+
+<a href="images.html">
+🖼 Images
+</a>
+
+<a href="suppliers.html">
+✈ Suppliers
+</a>
+
+<a href="settings.html">
+⚙ Settings
+</a>
+
+</nav>
+
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+
+<div>
+
+<h1>Dashboard</h1>
+
+<p>Welcome back.</p>
+
+</div>
+
+<a class="btn btn-primary" href="add-hotel.html">
+
++ Add Hotel
+
+</a>
+
+</header>
+
+<div class="page">
+
+<div class="stats-grid">
+
+<div class="stat-card">
+
+<h3>🏨 Hotels</h3>
+
+<div class="value" id="hotelCount">
+
+0
+
+</div>
+
+</div>
+
+<div class="stat-card">
+
+<h3>🌴 Holiday Offers</h3>
+
+<div class="value" id="holidayCount">
+
+0
+
+</div>
+
+</div>
+
+<div class="stat-card">
+
+<h3>🌍 Countries</h3>
+
+<div class="value" id="countryCount">
+
+0
+
+</div>
+
+</div>
+
+<div class="stat-card">
+
+<h3>⭐ Rating</h3>
+
+<div class="value" id="ratingAverage">
+
+0.0
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="flex-between mb-20">
+
+<h2>Recent Hotels</h2>
+
+<a class="btn btn-primary btn-small"
+href="hotels.html">
+
+View All
+
+</a>
+
+</div>
+
+<div class="table-container">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Hotel</th>
+<th>Country</th>
+<th>Stars</th>
+<th>Rating</th>
+
+</tr>
+
+</thead>
+
+<tbody id="recentHotels">
+
+<tr>
+
+<td colspan="4" class="text-center">
+
+Loading...
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<div class="card mt-20">
+
+<h2>Quick Actions</h2>
+
+<div class="action-buttons">
+
+<a href="add-hotel.html" class="btn btn-primary">
+➕ Add Hotel
+</a>
+
+<a href="holiday-offers.html" class="btn btn-success">
+🌴 Holiday Offers
+</a>
+
+<a href="images.html" class="btn">
+🖼 Images
+</a>
+
+<a href="suppliers.html" class="btn">
+✈ Suppliers
+</a>
+
+<a href="settings.html" class="btn">
+⚙ Settings
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="../js/dashboard.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Holiday Offers</title>
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+<aside class="sidebar">
+
+<div class="logo">
+PackageHolidayCompare
+</div>
+
+<nav>
+
+<a href="index.html">📊 Dashboard</a>
+
+<a href="hotels.html">🏨 Hotels</a>
+
+<a class="active" href="holiday-offers.html">🌴 Holiday Offers</a>
+
+<a href="images.html">🖼 Images</a>
+
+<a href="suppliers.html">✈ Suppliers</a>
+
+<a href="settings.html">⚙ Settings</a>
+
+</nav>
+
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+
+<div>
+
+<h1>Holiday Offers</h1>
+
+<p>Manage supplier prices.</p>
+
+</div>
+
+<a class="btn btn-primary"
+href="add-offer.html">
+
++ Add Offer
+
+</a>
+
+</header>
+
+<div class="card">
+
+<input
+id="searchOffer"
+type="text"
+placeholder="Search offers...">
+
+<div class="table-container">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Hotel</th>
+<th>Supplier</th>
+<th>Price</th>
+<th>Departure</th>
+<th>Airport</th>
+<th>Nights</th>
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="offerTable">
+
+<tr>
+
+<td colspan="7">
+
+Loading...
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="../js/holiday-offers.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Holiday Details - PackageHolidayCompare</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="style.css">
+
+
+<style>
+
+body{
+background:#f5f8fb;
+}
+
+
+.container{
+
+max-width:1000px;
+margin:30px auto;
+padding:20px;
+
+}
+
+
+.card{
+
+background:white;
+border-radius:20px;
+padding:25px;
+box-shadow:0 5px 20px #ddd;
+
+}
+
+
+.hero-image{
+
+width:100%;
+height:400px;
+object-fit:cover;
+border-radius:15px;
+
+}
+
+
+.rating{
+
+font-size:22px;
+
+}
+
+
+.score-box{
+
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+
+}
+
+
+.score{
+
+background:#00a86b;
+color:white;
+padding:15px;
+border-radius:10px;
+
+}
+
+
+.info{
+
+background:#eef5ff;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+
+}
+
+
+.supplier{
+
+background:#f7f7f7;
+padding:20px;
+border-radius:12px;
+margin-top:15px;
+
+}
+
+
+button{
+
+background:#00a86b;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:8px;
+cursor:pointer;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<div class="logo">
+
+✈ PackageHolidayCompare
+
+</div>
+
+</header>
+
+
+
+
+
+<div class="container">
+
+
+<div class="card" id="holiday">
+
+
+Loading holiday...
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+<script>
+
+
+let holiday = JSON.parse(
+localStorage.getItem("selectedHoliday")
+);
+
+
+
+let box=document.getElementById("holiday");
+
+
+
+
+
+if(!holiday){
+
+
+box.innerHTML=
+
+"<h2>Holiday not found</h2>";
+
+
+}
+
+else{
+
+
+
+let cheapest = holiday.suppliers.sort(function(a,b){
+
+return a.price-b.price;
+
+});
+
+
+
+
+
+box.innerHTML = `
+
+
+
+<img class="hero-image" src="${holiday.image}">
+
+
+
+<h1>
+
+${holiday.name}
+
+</h1>
+
+
+
+<h3>
+
+📍 ${holiday.location}, ${holiday.country}
+
+</h3>
+
+
+
+<p class="rating">
+
+${"⭐".repeat(holiday.stars)}
+
+${holiday.rating}/5
+
+</p>
+
+
+
+
+
+<div class="score-box">
+
+
+<div class="score">
+
+👨‍👩‍👧 Family
+
+<br>
+
+${holiday.familyScore}/100
+
+</div>
+
+
+
+<div class="score">
+
+☀️ Weather
+
+<br>
+
+${holiday.weatherScore}/100
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="info">
+
+
+<h3>
+🏖 Facilities
+</h3>
+
+
+<p>
+
+${holiday.facilities.join(" • ")}
+
+</p>
+
+
+<h3>
+🛏 Rooms
+</h3>
+
+
+<p>
+
+${holiday.roomTypes.join(" • ")}
+
+</p>
+
+
+
+</div>
+
+
+
+
+
+
+<h2>
+
+Compare Prices
+
+</h2>
+
+
+
+
+
+${cheapest.map(function(company,index){
+
+
+
+return `
+
+
+
+<div class="supplier">
+
+
+<h3>
+
+${company.name}
+
+</h3>
+
+
+
+<h2>
+
+£${company.price}
+
+</h2>
+
+
+
+<p>
+
+${holiday.nights} Nights
+
+<br>
+
+${holiday.board}
+
+</p>
+
+
+
+
+<button onclick="bookHoliday('${company.url}')">
+
+BOOK NOW
+
+</button>
+
+
+
+</div>
+
+
+
+`;
+
+
+
+}).join("")}
+
+
+
+
+<h2>
+
+Available Dates
+
+</h2>
+
+
+
+${holiday.dates.map(function(date){
+
+
+return `
+
+<div class="supplier">
+
+📅 ${date.date}
+
+<br>
+
+<strong>
+
+£${date.price}
+
+</strong>
+
+</div>
+
+`;
+
+
+}).join("")}
+
+
+
+
+
+`;
+
+
+
+}
+
+
+
+
+
+
+
+function bookHoliday(url){
+
+
+if(url=="#" || url==""){
+
+
+alert("Booking link will be added soon");
+
+
+}
+
+else{
+
+
+window.open(url,"_blank");
+
+
+}
+
+
+}
+
+
+
+</script>
+
+
+
+</body>
+
+</html>

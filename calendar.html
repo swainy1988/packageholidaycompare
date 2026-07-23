@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Cheapest Holiday Dates - PackageHolidayCompare</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="style.css">
+
+
+<style>
+
+body{
+background:#f5f8fb;
+}
+
+
+.calendar-box{
+
+background:white;
+max-width:900px;
+margin:30px auto;
+padding:30px;
+border-radius:15px;
+box-shadow:0 5px 20px #ddd;
+
+}
+
+
+.month-grid{
+
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+
+}
+
+
+.day{
+
+background:#eef5ff;
+padding:20px;
+border-radius:12px;
+
+}
+
+
+.cheapest{
+
+background:#00a86b;
+color:white;
+
+}
+
+
+.price{
+
+font-size:24px;
+font-weight:bold;
+
+}
+
+
+.save-box{
+
+background:#e9ffe9;
+padding:15px;
+margin-top:20px;
+border-radius:10px;
+
+}
+
+
+button{
+
+background:#00a86b;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:8px;
+
+}
+
+
+
+@media(max-width:700px){
+
+.month-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<div class="logo">
+
+✈ PackageHolidayCompare
+
+</div>
+
+</header>
+
+
+
+
+
+<div class="calendar-box">
+
+
+<h1>
+Find The Cheapest Dates
+</h1>
+
+
+<p id="details"></p>
+
+
+<h2>
+Cheapest Options
+</h2>
+
+
+<div id="calendar" class="month-grid"></div>
+
+
+
+<div id="saving" class="save-box"></div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<footer>
+
+<p>
+© PackageHolidayCompare.co.uk
+</p>
+
+</footer>
+
+
+
+
+
+
+
+<script>
+
+
+
+let destination =
+localStorage.getItem("destination");
+
+
+let airport =
+localStorage.getItem("airport");
+
+
+
+document.getElementById("details").innerHTML =
+
+"✈ "+airport+
+" → "+
+destination;
+
+
+
+
+
+fetch("holidays.json")
+
+.then(response=>response.json())
+
+.then(data=>{
+
+
+
+let holidays=data.filter(function(h){
+
+
+return h.country===destination;
+
+
+});
+
+
+
+
+
+let dates=[];
+
+
+
+
+
+holidays.forEach(function(h){
+
+
+
+h.dates.forEach(function(d){
+
+
+
+dates.push({
+
+date:d.date,
+
+hotel:h.name,
+
+price:d.price
+
+});
+
+
+});
+
+
+});
+
+
+
+
+
+
+dates.sort(function(a,b){
+
+return a.price-b.price;
+
+});
+
+
+
+
+
+
+let cheapest =
+dates[0].price;
+
+
+
+let highest =
+dates[dates.length-1].price;
+
+
+
+let box=document.getElementById("calendar");
+
+
+
+
+
+
+dates.forEach(function(d,index){
+
+
+
+let card=document.createElement("div");
+
+
+card.className="day";
+
+
+
+if(d.price===cheapest){
+
+card.className="day cheapest";
+
+}
+
+
+
+card.innerHTML=
+
+
+(index===0 ?
+
+"🏆 CHEAPEST DEAL<br><br>" :
+
+"")
+
+
++"📅 "+d.date+
+
+"<br><br>"+
+
+"<b>"+d.hotel+"</b>"+
+
+"<br><br>"+
+
+"<span class='price'>£"+
+d.price+
+"</span>";
+
+
+
+
+box.appendChild(card);
+
+
+
+});
+
+
+
+
+
+
+
+document.getElementById("saving").innerHTML =
+
+
+"💰 The cheapest option saves £"+
+
+(highest-cheapest)+
+
+" compared with the highest price shown.";
+
+
+
+
+
+});
+
+
+</script>
+
+
+</body>
+
+</html>

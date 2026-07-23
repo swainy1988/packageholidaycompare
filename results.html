@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Holiday Results - PackageHolidayCompare</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="style.css">
+
+
+<style>
+
+body{
+background:#f5f8fb;
+}
+
+
+.layout{
+
+display:flex;
+gap:20px;
+padding:20px;
+max-width:1300px;
+margin:auto;
+
+}
+
+
+.filters,
+.sort-box{
+
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 5px 20px #ddd;
+
+}
+
+
+.filters{
+
+width:250px;
+height:max-content;
+
+}
+
+
+.cards{
+
+display:flex;
+flex-wrap:wrap;
+
+}
+
+
+.deal-card{
+
+background:white;
+width:360px;
+margin:10px;
+border-radius:15px;
+overflow:hidden;
+box-shadow:0 5px 20px #ddd;
+
+}
+
+
+.deal-card img{
+
+width:100%;
+height:220px;
+object-fit:cover;
+
+}
+
+
+.deal-content{
+
+padding:20px;
+
+}
+
+
+.badge{
+
+background:#ffd700;
+padding:8px 12px;
+border-radius:20px;
+display:inline-block;
+margin:5px;
+
+}
+
+
+.score{
+
+background:#00a86b;
+color:white;
+padding:10px;
+border-radius:10px;
+display:inline-block;
+
+}
+
+
+.price{
+
+font-size:30px;
+color:#0066cc;
+
+}
+
+
+.info{
+
+background:#eef5ff;
+padding:12px;
+border-radius:10px;
+margin:10px 0;
+
+}
+
+
+button{
+
+background:#0066cc;
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:8px;
+cursor:pointer;
+
+}
+
+
+.sort-box button{
+
+margin:5px;
+
+}
+
+
+
+@media(max-width:800px){
+
+.layout{
+
+display:block;
+
+}
+
+
+.filters{
+
+width:auto;
+
+}
+
+
+.deal-card{
+
+width:100%;
+
+}
+
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<div class="logo">
+
+✈ PackageHolidayCompare
+
+</div>
+
+</header>
+
+
+
+<h1 style="text-align:center">
+
+Holiday Results
+
+</h1>
+
+
+
+<p id="searchDetails" style="text-align:center"></p>
+
+
+
+
+<div class="layout">
+
+
+
+<div class="filters">
+
+
+<h2>Filters</h2>
+
+
+<h3>Budget</h3>
+
+
+<select id="priceFilter" onchange="displayResults()">
+
+
+
+<option value="999999">
+
+Any Budget
+
+</option>
+
+
+<option value="1000">
+
+£1000
+
+</option>
+
+
+<option value="1500">
+
+£1500
+
+</option>
+
+
+<option value="2000">
+
+£2000
+
+</option>
+
+
+<option value="3000">
+
+£3000
+
+</option>
+
+
+<option value="5000">
+
+£5000+
+
+</option>
+
+
+</select>
+
+
+
+
+
+<h3>Destination</h3>
+
+
+<select id="destinationFilter" onchange="displayResults()">
+
+
+
+<option value="All">
+
+All
+
+</option>
+
+
+<option value="Egypt">
+
+Egypt
+
+</option>
+
+
+<option value="Turkey">
+
+Turkey
+
+</option>
+
+
+<option value="Spain">
+
+Spain
+
+</option>
+
+
+<option value="Greece">
+
+Greece
+
+</option>
+
+
+<option value="Cyprus">
+
+Cyprus
+
+</option>
+
+
+<option value="Portugal">
+
+Portugal
+
+</option>
+
+
+<option value="Morocco">
+
+Morocco
+
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+<div>
+
+
+<div class="sort-box">
+
+
+<h3>Sort Holidays</h3>
+
+
+<button onclick="sortResults('price')">
+
+💷 Cheapest
+
+</button>
+
+
+<button onclick="sortResults('rating')">
+
+⭐ Best Rated
+
+</button>
+
+
+<button onclick="sortResults('family')">
+
+👨‍👩‍👧 Best Family
+
+</button>
+
+
+<button onclick="sortResults('weather')">
+
+☀️ Best Weather
+
+</button>
+
+
+</div>
+
+
+
+<div id="results" class="cards"></div>
+
+
+</div>
+
+
+</div>
+<script>
+
+
+let allDeals=[];
+
+let currentDeals=[];
+
+
+
+let destination =
+localStorage.getItem("destination");
+
+
+let airport =
+localStorage.getItem("airport");
+
+
+let adults =
+localStorage.getItem("adults");
+
+
+let children =
+localStorage.getItem("children");
+
+
+let child1 =
+localStorage.getItem("child1");
+
+
+let child2 =
+localStorage.getItem("child2");
+
+
+let budget =
+Number(localStorage.getItem("budget"));
+
+
+
+
+
+document.getElementById("searchDetails").innerHTML =
+
+"✈ "+airport+
+" → "+
+destination+
+
+"<br>👨 Adults: "+
+adults+
+
+" | 🧒 Children: "+
+children+
+
+"<br>🎂 Ages: "+
+(child1 || "")+
+" "+
+(child2 || "");
+
+
+
+
+
+
+fetch("holidays.json")
+
+.then(response=>response.json())
+
+.then(data=>{
+
+allDeals=data;
+
+displayResults();
+
+})
+
+.catch(()=>{
+
+document.getElementById("results").innerHTML=
+
+"<h2>Error loading holidays</h2>";
+
+});
+
+
+
+
+
+
+
+function displayResults(){
+
+
+let chosen =
+document.getElementById("destinationFilter").value;
+
+
+
+let limit = budget || 999999;
+
+
+
+currentDeals = allDeals.filter(function(holiday){
+
+
+return (
+
+(chosen==="All" ||
+
+holiday.country===chosen ||
+
+holiday.country===destination)
+
+&&
+
+holiday.suppliers[0].price <= limit
+
+
+);
+
+
+});
+
+
+
+sortResults("price");
+
+
+}
+
+
+
+
+
+
+
+
+function sortResults(type){
+
+
+
+if(type==="price"){
+
+currentDeals.sort((a,b)=>
+
+a.suppliers[0].price -
+b.suppliers[0].price
+
+);
+
+}
+
+
+
+if(type==="rating"){
+
+currentDeals.sort((a,b)=>
+
+b.rating-a.rating
+
+);
+
+}
+
+
+
+if(type==="family"){
+
+currentDeals.sort((a,b)=>
+
+b.familyScore-a.familyScore
+
+);
+
+}
+
+
+
+if(type==="weather"){
+
+currentDeals.sort((a,b)=>
+
+b.weatherScore-a.weatherScore
+
+);
+
+}
+
+
+
+showResults();
+
+
+}
+
+
+
+
+
+
+
+
+
+function getBadges(holiday){
+
+
+let badges="";
+
+
+
+if(holiday.familyScore>=95){
+
+badges +=
+
+"<div class='badge'>🏆 Best Family Match</div>";
+
+}
+
+
+
+if(holiday.facilities.includes("Waterpark")){
+
+badges +=
+
+"<div class='badge'>💦 Waterpark Holiday</div>";
+
+}
+
+
+
+if(holiday.weatherScore>=97){
+
+badges +=
+
+"<div class='badge'>☀️ Great Weather</div>";
+
+}
+
+
+
+if(holiday.rating>=4.7){
+
+badges +=
+
+"<div class='badge'>⭐ Highly Rated</div>";
+
+}
+
+
+
+return badges;
+
+
+}
+
+
+
+
+
+
+
+
+
+function showResults(){
+
+
+let box =
+document.getElementById("results");
+
+
+box.innerHTML="";
+
+
+
+
+
+if(currentDeals.length===0){
+
+
+box.innerHTML=
+
+"<h2>No holidays found</h2>";
+
+return;
+
+
+}
+
+
+
+
+
+
+currentDeals.forEach(function(holiday,index){
+
+
+
+let supplier =
+holiday.suppliers.sort(function(a,b){
+
+return a.price-b.price;
+
+})[0];
+
+
+
+
+
+
+box.innerHTML += `
+
+
+
+<div class="deal-card">
+
+
+
+<img src="${holiday.image}">
+
+
+
+<div class="deal-content">
+
+
+
+${getBadges(holiday)}
+
+
+
+
+<h2>
+
+${holiday.name}
+
+</h2>
+
+
+
+
+<p>
+
+📍 ${holiday.location}, ${holiday.country}
+
+</p>
+
+
+
+
+
+<p>
+
+${"⭐".repeat(holiday.stars)}
+
+(${holiday.rating}/5)
+
+</p>
+
+
+
+
+
+<div class="info">
+
+
+🏖 ${holiday.facilities.join(" • ")}
+
+
+<br><br>
+
+
+🛏 ${holiday.roomTypes.join(" • ")}
+
+
+
+</div>
+
+
+
+
+
+<div class="score">
+
+Family Score ${holiday.familyScore}/100
+
+</div>
+
+
+
+
+
+<h2 class="price">
+
+£${supplier.price}
+
+</h2>
+
+
+
+
+<p>
+
+🌙 ${holiday.nights} Nights
+
+<br>
+
+🍽 ${holiday.board}
+
+</p>
+
+
+
+
+
+<button onclick="viewHoliday(${index})">
+
+VIEW DEAL
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+`;
+
+
+
+});
+
+
+}
+
+
+
+
+
+
+
+
+function viewHoliday(index){
+
+
+localStorage.setItem(
+
+"selectedHoliday",
+
+JSON.stringify(currentDeals[index])
+
+);
+
+
+
+window.location="holiday.html";
+
+
+}
+
+
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+</body>
+
+</html>

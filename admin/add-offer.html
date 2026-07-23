@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Add Holiday Offer</title>
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+<aside class="sidebar">
+
+<div class="logo">
+
+PackageHolidayCompare
+
+</div>
+
+<nav>
+
+<a href="index.html">📊 Dashboard</a>
+
+<a href="hotels.html">🏨 Hotels</a>
+
+<a class="active" href="holiday-offers.html">🌴 Holiday Offers</a>
+
+<a href="images.html">🖼 Images</a>
+
+<a href="suppliers.html">✈ Suppliers</a>
+
+<a href="settings.html">⚙ Settings</a>
+
+</nav>
+
+</aside>
+
+<main class="main">
+
+<header class="topbar">
+
+<h1>Add Holiday Offer</h1>
+
+</header>
+
+<div class="card">
+
+<label>Hotel</label>
+
+<select id="hotel"></select>
+
+<label>Supplier</label>
+
+<select id="supplier">
+
+<option>Jet2holidays</option>
+<option>TUI</option>
+<option>Loveholidays</option>
+<option>On the Beach</option>
+<option>easyJet Holidays</option>
+<option>British Airways Holidays</option>
+<option>Booking.com</option>
+<option>Expedia</option>
+
+</select>
+
+<label>Price (£)</label>
+
+<input
+type="number"
+id="price">
+
+<label>Departure Date</label>
+
+<input
+type="date"
+id="departure">
+
+<label>Airport</label>
+
+<select id="airport">
+
+<option>Manchester</option>
+<option>Liverpool</option>
+<option>Birmingham</option>
+<option>London Gatwick</option>
+<option>London Heathrow</option>
+<option>Bristol</option>
+<option>Glasgow</option>
+<option>Edinburgh</option>
+
+</select>
+
+<label>Nights</label>
+
+<input
+type="number"
+id="nights"
+value="7">
+
+<label>Board Basis</label>
+
+<select id="board">
+
+<option>All Inclusive</option>
+<option>Ultra All Inclusive</option>
+<option>Half Board</option>
+<option>Full Board</option>
+<option>Bed & Breakfast</option>
+<option>Room Only</option>
+
+</select>
+
+<label>Booking URL</label>
+
+<input
+type="url"
+id="booking">
+
+<br><br>
+
+<button
+class="btn btn-primary"
+onclick="saveOffer()">
+
+Save Holiday Offer
+
+</button>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="../js/add-offer.js"></script>
+
+</body>
+
+</html>

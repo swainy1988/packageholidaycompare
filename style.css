@@ -1,0 +1,120 @@
+body {
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#f5f8fb;
+    color:#333;
+}
+
+header {
+    background:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 2px 10px #ddd;
+}
+
+.logo {
+    font-size:28px;
+    font-weight:bold;
+    color:#0066cc;
+}
+
+.hero {
+    text-align:center;
+    background:white;
+    padding:50px 20px;
+}
+
+.hero h1 {
+    font-size:42px;
+}
+
+.hero p {
+    font-size:20px;
+}
+
+.search-box {
+    background:white;
+    max-width:1000px;
+    margin:-20px auto 40px;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 25px #ddd;
+}
+
+.row {
+    display:flex;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.field {
+    flex:1;
+    min-width:200px;
+}
+
+label {
+    display:block;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+input, select {
+    width:100%;
+    padding:14px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+.counter {
+    display:flex;
+    align-items:center;
+    gap:15px;
+}
+
+.counter button {
+    width:35px;
+    height:35px;
+    border-radius:50%;
+    border:none;
+    background:#0066cc;
+    color:white;
+    font-size:20px;
+}
+
+.search-btn {
+    width:100%;
+    background:#00a86b;
+    color:white;
+    border:none;
+    padding:16px;
+    font-size:20px;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+.cards {
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.card {
+    background:white;
+    padding:25px;
+    width:220px;
+    border-radius:15px;
+    box-shadow:0 3px 15px #ddd;
+}
+
+footer {
+    margin-top:50px;
+    background:#003366;
+    color:white;
+    text-align:center;
+    padding:30px;
+}

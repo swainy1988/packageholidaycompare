@@ -1,0 +1,950 @@
+[
+  {
+    "name": "Neverland Hurghada Resort",
+    "country": "Egypt",
+    "location": "Hurghada",
+    "image": "images/egypt.jpg",
+    "stars": 5,
+    "rating": 4.8,
+    "nights": 7,
+    "board": "All Inclusive",
+    "familyScore": 96,
+    "weatherScore": 98,
+    "description": "Large family resort with pools, entertainment and a huge waterpark.",
+    "transferTime": "35 minutes",
+    "ageSuitability": [
+      "0-5",
+      "6-12",
+      "13+"
+    ],
+    "bestFor": [
+      "Families",
+      "Waterpark",
+      "Teenagers"
+    ],
+    "facilities": [
+      "Kids Club",
+      "Waterpark",
+      "Beachfront"
+    ],
+    "roomTypes": [
+      "Family Room",
+      "Swim Up Room"
+    ],
+    "dates": [
+      {
+        "date": "2026-08-25",
+        "price": 1099
+      },
+      {
+        "date": "2026-08-26",
+        "price": 1049
+      },
+      {
+        "date": "2026-08-27",
+        "price": 1199
+      }
+    ],
+    "suppliers": [
+      {
+        "name": "Jet2Holidays",
+        "price": 1099,
+        "url": "#"
+      },
+      {
+        "name": "TUI",
+        "price": 1149,
+        "url": "#"
+      }
+    ]
+  },
+
+  {
+    "name": "Jungle Aqua Park Hurghada",
+    "country": "Egypt",
+    "location": "Hurghada",
+    "image": "images/egypt.jpg",
+    "stars": 4,
+    "rating": 4.7,
+    "nights": 7,
+    "board": "All Inclusive",
+    "familyScore": 95,
+    "weatherScore": 98,
+    "description": "Family favourite with one of the biggest waterparks in Hurghada.",
+    "transferTime": "25 minutes",
+    "ageSuitability": [
+      "0-5",
+      "6-12",
+      "13+"
+    ],
+    "bestFor": [
+      "Waterpark",
+      "Families",
+      "Active Holidays"
+    ],
+    "facilities": [
+      "Waterpark",
+      "Kids Club",
+      "Multiple Pools"
+    ],
+    "roomTypes": [
+      "Family Room",
+      "Suite"
+    ],
+    "dates": [
+      {
+        "date": "2026-08-25",
+        "price": 999
+      },
+      {
+        "date": "2026-08-26",
+        "price": 949
+      }
+    ],
+    "suppliers": [
+      {
+        "name": "TUI",
+        "price": 999,
+        "url": "#"
+      },
+      {
+        "name": "Loveholidays",
+        "price": 1049,
+        "url": "#"
+      }
+    ]
+  },
+
+  {
+    "name": "Titanic Deluxe Lara",
+    "country": "Turkey",
+    "location": "Antalya",
+    "image": "images/turkey.jpg",
+    "stars": 5,
+    "rating": 4.7,
+    "nights": 7,
+    "board": "All Inclusive",
+    "familyScore": 94,
+    "weatherScore": 97,
+    "description": "Luxury Antalya family resort with pools, beach access and entertainment.",
+    "transferTime": "25 minutes",
+    "ageSuitability": [
+      "0-5",
+      "6-12",
+      "13+"
+    ],
+    "bestFor": [
+      "Families",
+      "Beach",
+      "Luxury"
+    ],
+    "facilities": [
+      "Kids Club",
+      "Waterpark",
+      "Beachfront"
+    ],
+    "roomTypes": [
+      "Family Suite",
+      "Large Room"
+    ],
+    "dates": [
+      {
+        "date": "2026-08-25",
+        "price": 999
+      },
+      {
+        "date": "2026-08-26",
+        "price": 949
+      }
+    ],
+    "suppliers": [
+      {
+        "name": "TUI",
+        "price": 999,
+        "url": "#"
+      },
+      {
+        "name": "Loveholidays",
+        "price": 1049,
+        "url": "#"
+      }
+    ]
+  },
+
+  {
+    "name": "Sol Tenerife Resort",
+    "country": "Spain",
+    "location": "Tenerife",
+    "image": "images/spain.jpg",
+    "stars": 4,
+    "rating": 4.4,
+    "nights": 7,
+    "board": "All Inclusive",
+    "familyScore": 88,
+    "weatherScore": 95,
+    "description": "Popular Tenerife family hotel close to beaches and attractions.",
+    "transferTime": "25 minutes",
+    "ageSuitability": [
+      "0-5",
+      "6-12",
+      "13+"
+    ],
+    "bestFor": [
+      "Families",
+      "Sun",
+      "Value"
+    ],
+    "facilities": [
+      "Kids Club",
+      "Pool",
+      "Near Beach"
+    ],
+    "roomTypes": [
+      "Family Room"
+    ],
+    "dates": [
+      {
+        "date": "2026-08-25",
+        "price": 899
+      }
+    ],
+    "suppliers": [
+      {
+        "name": "On The Beach",
+        "price": 899,
+        "url": "#"
+      },
+      {
+        "name": "Jet2Holidays",
+        "price": 949,
+        "url": "#"
+      }
+    ]
+  },
+  {
+  "name": "Atlantica Resort Rhodes",
+  "country": "Greece",
+  "location": "Rhodes",
+  "image": "images/greece.jpg",
+  "stars": 5,
+  "rating": 4.6,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 92,
+  "weatherScore": 96,
+  "description": "Family friendly Rhodes resort with pools, beach access and entertainment.",
+  "transferTime": "30 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Families",
+    "Beach",
+    "Sun"
+  ],
+  "facilities": [
+    "Kids Club",
+    "Pool",
+    "Beachfront"
+  ],
+  "roomTypes": [
+    "Family Room",
+    "Suite"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1299
+    },
+    {
+      "date": "2026-08-26",
+      "price": 1199
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "TUI",
+      "price": 1299,
+      "url": "#"
+    },
+    {
+      "name": "Jet2Holidays",
+      "price": 1249,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Stella Village Resort",
+  "country": "Greece",
+  "location": "Crete",
+  "image": "images/greece.jpg",
+  "stars": 4,
+  "rating": 4.5,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 93,
+  "weatherScore": 97,
+  "description": "Great value Crete family resort with pools and activities.",
+  "transferTime": "25 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Families",
+    "Value",
+    "Pools"
+  ],
+  "facilities": [
+    "Kids Club",
+    "Pools",
+    "Entertainment"
+  ],
+  "roomTypes": [
+    "Family Room"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1099
+    },
+    {
+      "date": "2026-08-26",
+      "price": 1049
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "Jet2Holidays",
+      "price": 1099,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Leonardo Cypria Bay",
+  "country": "Cyprus",
+  "location": "Paphos",
+  "image": "images/cyprus.jpg",
+  "stars": 4,
+  "rating": 4.5,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 90,
+  "weatherScore": 97,
+  "description": "Relaxed Cyprus family hotel close to beaches and attractions.",
+  "transferTime": "20 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Families",
+    "Beach",
+    "Sun"
+  ],
+  "facilities": [
+    "Kids Club",
+    "Pool",
+    "Beach Nearby"
+  ],
+  "roomTypes": [
+    "Family Room"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1149
+    },
+    {
+      "date": "2026-08-26",
+      "price": 1099
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "Loveholidays",
+      "price": 1149,
+      "url": "#"
+    },
+    {
+      "name": "TUI",
+      "price": 1099,
+      "url": "#"
+    }
+  ]
+},
+{
+  "name": "Algarve Family Beach Resort",
+  "country": "Portugal",
+  "location": "Algarve",
+  "image": "images/portugal.jpg",
+  "stars": 4,
+  "rating": 4.3,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 86,
+  "weatherScore": 94,
+  "description": "Affordable Algarve family resort close to beaches and restaurants.",
+  "transferTime": "40 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Value",
+    "Beach",
+    "Families"
+  ],
+  "facilities": [
+    "Pool",
+    "Kids Club",
+    "Beach Nearby"
+  ],
+  "roomTypes": [
+    "Family Apartment"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 999
+    },
+    {
+      "date": "2026-08-26",
+      "price": 949
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "easyJet holidays",
+      "price": 999,
+      "url": "#"
+    },
+    {
+      "name": "On The Beach",
+      "price": 1049,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Agadir Beach Family Resort",
+  "country": "Morocco",
+  "location": "Agadir",
+  "image": "images/morocco.jpg",
+  "stars": 4,
+  "rating": 4.2,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 85,
+  "weatherScore": 93,
+  "description": "Great value Morocco family holiday with beaches and pools.",
+  "transferTime": "30 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Value",
+    "Sun",
+    "Families"
+  ],
+  "facilities": [
+    "Pool",
+    "Kids Club",
+    "Beachfront"
+  ],
+  "roomTypes": [
+    "Family Room"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 949
+    },
+    {
+      "date": "2026-08-26",
+      "price": 899
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "TUI",
+      "price": 949,
+      "url": "#"
+    },
+    {
+      "name": "Loveholidays",
+      "price": 999,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Iberostar Selection Kantaoui Bay",
+  "country": "Tunisia",
+  "location": "Port El Kantaoui",
+  "image": "images/tunisia.jpg",
+  "stars": 5,
+  "rating": 4.6,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 91,
+  "weatherScore": 96,
+  "description": "Family friendly Tunisia resort with pools and beach access.",
+  "transferTime": "35 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Families",
+    "Beach",
+    "Value"
+  ],
+  "facilities": [
+    "Kids Club",
+    "Pool",
+    "Beachfront"
+  ],
+  "roomTypes": [
+    "Family Room"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 999
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "TUI",
+      "price": 999,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Sol Nessebar Resort",
+  "country": "Bulgaria",
+  "location": "Nessebar",
+  "image": "images/bulgaria.jpg",
+  "stars": 4,
+  "rating": 4.5,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 94,
+  "weatherScore": 91,
+  "description": "Large family resort with pools, slides and entertainment.",
+  "transferTime": "35 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Families",
+    "Waterpark",
+    "Value"
+  ],
+  "facilities": [
+    "Waterpark",
+    "Kids Club",
+    "Pools"
+  ],
+  "roomTypes": [
+    "Family Room"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 899
+    },
+    {
+      "date": "2026-08-26",
+      "price": 849
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "Jet2Holidays",
+      "price": 899,
+      "url": "#"
+    },
+    {
+      "name": "Loveholidays",
+      "price": 949,
+      "url": "#"
+    }
+  ]
+},
+{
+  "name": "Delphin Imperial Lara",
+  "country": "Turkey",
+  "location": "Antalya",
+  "image": "images/turkey.jpg",
+  "stars": 5,
+  "rating": 4.8,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 96,
+  "weatherScore": 97,
+  "description": "Luxury beachfront resort with water slides, kids club and excellent dining.",
+  "transferTime": "20 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Luxury",
+    "Families",
+    "Beach"
+  ],
+  "facilities": [
+    "Waterpark",
+    "Kids Club",
+    "Beachfront"
+  ],
+  "roomTypes": [
+    "Family Room",
+    "Suite"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1499
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "Jet2Holidays",
+      "price": 1499,
+      "url": "#"
+    },
+    {
+      "name": "TUI",
+      "price": 1549,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Pickalbatros Dana Beach Resort",
+  "country": "Egypt",
+  "location": "Hurghada",
+  "image": "images/egypt.jpg",
+  "stars": 5,
+  "rating": 4.8,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 94,
+  "weatherScore": 98,
+  "description": "Popular beachfront family resort with multiple pools and entertainment.",
+  "transferTime": "20 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Families",
+    "Beach",
+    "Relaxing"
+  ],
+  "facilities": [
+    "Kids Club",
+    "Beachfront",
+    "Pools"
+  ],
+  "roomTypes": [
+    "Family Room",
+    "Standard Room"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1299
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "TUI",
+      "price": 1299,
+      "url": "#"
+    },
+    {
+      "name": "Loveholidays",
+      "price": 1349,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Magic Robin Hood Resort",
+  "country": "Spain",
+  "location": "Benidorm",
+  "image": "images/spain.jpg",
+  "stars": 4,
+  "rating": 4.5,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 97,
+  "weatherScore": 94,
+  "description": "Adventure-themed family resort with water park and daily entertainment.",
+  "transferTime": "45 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Children",
+    "Waterpark",
+    "Entertainment"
+  ],
+  "facilities": [
+    "Waterpark",
+    "Kids Club",
+    "Games Area"
+  ],
+  "roomTypes": [
+    "Family Cabin",
+    "Suite"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1299
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "On The Beach",
+      "price": 1299,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Olympic Lagoon Resort",
+  "country": "Cyprus",
+  "location": "Ayia Napa",
+  "image": "images/cyprus.jpg",
+  "stars": 5,
+  "rating": 4.8,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 96,
+  "weatherScore": 98,
+  "description": "Luxury all inclusive resort with outstanding entertainment and pools.",
+  "transferTime": "45 minutes",
+  "ageSuitability": [
+    "0-5",
+    "6-12",
+    "13+"
+  ],
+  "bestFor": [
+    "Luxury",
+    "Families",
+    "Entertainment"
+  ],
+  "facilities": [
+    "Kids Club",
+    "Pools",
+    "Beachfront"
+  ],
+  "roomTypes": [
+    "Family Suite",
+    "Luxury Room"
+  ],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1799
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "TUI",
+      "price": 1799,
+      "url": "#"
+    }
+  ]
+},
+{
+  "name": "Pestana Blue Alvor",
+  "country": "Portugal",
+  "location": "Algarve",
+  "image": "images/portugal.jpg",
+  "stars": 5,
+  "rating": 4.6,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 91,
+  "weatherScore": 95,
+  "description": "Modern Algarve resort with excellent family facilities and multiple pools.",
+  "transferTime": "50 minutes",
+  "ageSuitability": ["0-5","6-12","13+"],
+  "bestFor": ["Families","Pools","Beach"],
+  "facilities": ["Kids Club","Pools","Beach Nearby"],
+  "roomTypes": ["Family Room","Suite"],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1399
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "TUI",
+      "price": 1399,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Voyage Belek Golf & Spa",
+  "country": "Turkey",
+  "location": "Belek",
+  "image": "images/turkey.jpg",
+  "stars": 5,
+  "rating": 4.9,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 97,
+  "weatherScore": 98,
+  "description": "One of Turkey's highest-rated luxury family resorts.",
+  "transferTime": "35 minutes",
+  "ageSuitability": ["0-5","6-12","13+"],
+  "bestFor": ["Luxury","Families","Beach"],
+  "facilities": ["Beachfront","Kids Club","Pools"],
+  "roomTypes": ["Family Suite","Deluxe Room"],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1899
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "Jet2Holidays",
+      "price": 1899,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Baron Resort Sharm El Sheikh",
+  "country": "Egypt",
+  "location": "Sharm El Sheikh",
+  "image": "images/egypt.jpg",
+  "stars": 5,
+  "rating": 4.7,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 91,
+  "weatherScore": 99,
+  "description": "Luxury Red Sea resort with excellent snorkelling and family facilities.",
+  "transferTime": "15 minutes",
+  "ageSuitability": ["6-12","13+"],
+  "bestFor": ["Snorkelling","Luxury","Beach"],
+  "facilities": ["Beachfront","Pool","Kids Club"],
+  "roomTypes": ["Family Room","Sea View Room"],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 1399
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "Jet2Holidays",
+      "price": 1399,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Sol Nessebar Resort",
+  "country": "Bulgaria",
+  "location": "Nessebar",
+  "image": "images/bulgaria.jpg",
+  "stars": 4,
+  "rating": 4.5,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 94,
+  "weatherScore": 91,
+  "description": "Large family resort with pools, slides and entertainment.",
+  "transferTime": "35 minutes",
+  "ageSuitability": ["0-5","6-12","13+"],
+  "bestFor": ["Families","Waterpark","Value"],
+  "facilities": ["Waterpark","Kids Club","Pools"],
+  "roomTypes": ["Family Room"],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 899
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "Jet2Holidays",
+      "price": 899,
+      "url": "#"
+    }
+  ]
+},
+
+{
+  "name": "Iberostar Selection Kantaoui Bay",
+  "country": "Tunisia",
+  "location": "Port El Kantaoui",
+  "image": "images/tunisia.jpg",
+  "stars": 5,
+  "rating": 4.6,
+  "nights": 7,
+  "board": "All Inclusive",
+  "familyScore": 91,
+  "weatherScore": 96,
+  "description": "Excellent beachfront Tunisia resort for families.",
+  "transferTime": "35 minutes",
+  "ageSuitability": ["0-5","6-12","13+"],
+  "bestFor": ["Families","Beach","Value"],
+  "facilities": ["Kids Club","Pool","Beachfront"],
+  "roomTypes": ["Family Room"],
+  "dates": [
+    {
+      "date": "2026-08-25",
+      "price": 999
+    }
+  ],
+  "suppliers": [
+    {
+      "name": "TUI",
+      "price": 999,
+      "url": "#"
+    }
+  ]
+}
+]

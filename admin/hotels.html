@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Hotels | PackageHolidayCompare Admin</title>
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h1>PackageHolidayCompare</h1>
+
+<a href="index.html">📊 Dashboard</a>
+<a href="hotels.html"><strong>🏨 Hotels</strong></a>
+<a href="holiday-offers.html">🌴 Holiday Offers</a>
+<a href="images.html">🖼 Images</a>
+<a href="suppliers.html">✈ Suppliers</a>
+<a href="settings.html">⚙ Settings</a>
+
+</div>
+
+<div class="main">
+
+<h1>Hotels</h1>
+
+<div class="card">
+
+<input
+type="text"
+id="searchHotel"
+class="search"
+placeholder="Search hotels...">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Image</th>
+<th>Hotel</th>
+<th>Country</th>
+<th>Location</th>
+<th>Stars</th>
+<th>Rating</th>
+<th>Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="hotelTable">
+
+<tr>
+
+<td colspan="7">
+
+Loading hotels...
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script src="../js/hotels.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,155 @@
+/* ==========================================
+   Hotels Manager
+========================================== */
+
+.admin-container{
+    max-width:1400px;
+    margin:auto;
+    padding:30px;
+}
+
+.admin-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.admin-header h1{
+    margin:0;
+    font-size:32px;
+}
+
+.admin-header p{
+    margin-top:5px;
+    color:#666;
+}
+
+.btn-primary{
+    background:#2563eb;
+    color:#fff;
+    text-decoration:none;
+    padding:12px 20px;
+    border-radius:8px;
+    font-weight:600;
+    transition:.2s;
+}
+
+.btn-primary:hover{
+    background:#1d4ed8;
+}
+
+.stats{
+    margin-bottom:25px;
+}
+
+.stat-card{
+    background:#fff;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    width:220px;
+}
+
+.stat-card h2{
+    margin:0;
+    font-size:38px;
+}
+
+.toolbar{
+    display:grid;
+    grid-template-columns:2fr repeat(4,1fr);
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.toolbar input,
+.toolbar select{
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:15px;
+}
+
+.table-wrapper{
+    background:#fff;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.hotel-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.hotel-table th{
+    background:#f8fafc;
+    text-align:left;
+    padding:15px;
+    border-bottom:2px solid #eee;
+}
+
+.hotel-table td{
+    padding:15px;
+    border-bottom:1px solid #eee;
+    vertical-align:middle;
+}
+
+.hotel-table img{
+    width:90px;
+    height:65px;
+    object-fit:cover;
+    border-radius:8px;
+}
+
+.badge{
+    display:inline-block;
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:13px;
+    background:#9ca3af;
+    color:#fff;
+}
+
+.badge.active{
+    background:#16a34a;
+}
+
+.hotel-table a{
+    text-decoration:none;
+    color:#2563eb;
+    margin-right:12px;
+    font-weight:600;
+}
+
+.hotel-table button{
+    background:#dc2626;
+    color:#fff;
+    border:none;
+    padding:8px 12px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.hotel-table button:hover{
+    background:#b91c1c;
+}
+
+@media(max-width:900px){
+
+.toolbar{
+grid-template-columns:1fr;
+}
+
+.admin-header{
+flex-direction:column;
+align-items:flex-start;
+gap:20px;
+}
+
+.table-wrapper{
+overflow-x:auto;
+}
+
+}

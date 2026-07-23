@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Upload Holidays</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const client = window.supabase.createClient(
+    "https://lezietramgfhjhgkyeyf.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlemlldHJhbWdmaGpoZ2t5ZXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwNTE4NzAsImV4cCI6MjA5OTYyNzg3MH0.OqCNR82awUNVndL_xy3tXvO67xwMXTEc2JBNW-0Ve6U"
+);
+
+</script>
+
+<style>
+
+body{
+    font-family:Arial;
+    padding:40px;
+}
+
+#status{
+    white-space:pre-wrap;
+    line-height:1.8;
+    font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Uploading Holidays...</h1>
+
+<div id="status">Starting...</div>
+
+<script>
+
+async function upload(){
+
+const status=document.getElementById("status");
+
+status.innerHTML="Loading holidays.json...";
+
+try{
+
+const response=await fetch("holidays.json");
+const holidays=await response.json();
+
+status.innerHTML="Found "+holidays.length+" holidays...\n\n";
+
+for(const holiday of holidays){
+
+const { error } = await client
+.from("holidays")
+.insert([{
+
+name:holiday.name,
+country:holiday.country,
+location:holiday.location,
+image:holiday.image,
+stars:holiday.stars,
+rating:holiday.rating,
+nights:holiday.nights,
+board:holiday.board,
+familyscore:holiday.familyScore,
+weatherscore:holiday.weatherScore,
+description:holiday.description,
+transfertime:holiday.transferTime,
+agesuitability:holiday.ageSuitability,
+bestfor:holiday.bestFor,
+facilities:holiday.facilities,
+roomtypes:holiday.roomTypes,
+dates:holiday.dates,
+suppliers:holiday.suppliers
+
+}]);
+
+if(error){
+
+status.innerHTML +=
+"\n❌ " + holiday.name + "\n" +
+error.message;
+
+console.error(error);
+
+return;
+
+}
+
+status.innerHTML +=
+"✅ " + holiday.name + "\n";
+
+}
+
+status.innerHTML +=
+"\n\n🎉 ALL HOLIDAYS UPLOADED SUCCESSFULLY!";
+
+}catch(err){
+
+status.innerHTML +=
+"\n\n❌ " + err.message;
+
+console.error(err);
+
+}
+
+}
+
+upload();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<title>HolidayScout Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#eef4fb;
+padding:40px;
+max-width:900px;
+margin:auto;
+}
+
+input,select,textarea{
+
+width:100%;
+padding:12px;
+margin-bottom:15px;
+border-radius:8px;
+border:1px solid #ccc;
+
+}
+
+button{
+
+background:#0066cc;
+color:white;
+padding:15px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-size:18px;
+
+}
+
+h1{
+
+text-align:center;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>HolidayScout Admin</h1>
+
+<input id="name" placeholder="Hotel Name">
+
+<input id="country" placeholder="Country">
+
+<input id="location" placeholder="Location">
+
+<input id="image" placeholder="Image URL">
+
+<input id="stars" type="number" placeholder="Stars">
+
+<input id="rating" type="number" step="0.1" placeholder="Rating">
+
+<input id="price" type="number" placeholder="Price">
+
+<button onclick="saveHoliday()">
+Save Holiday
+</button>
+
+<p id="message"></p>
+
+<script>
+
+async function saveHoliday(){
+
+const {error}=await supabase
+.from("holidays")
+.insert([{
+
+name:document.getElementById("name").value,
+
+country:document.getElementById("country").value,
+
+location:document.getElementById("location").value,
+
+image:document.getElementById("image").value,
+
+stars:Number(document.getElementById("stars").value),
+
+rating:Number(document.getElementById("rating").value),
+
+price:Number(document.getElementById("price").value)
+
+}]);
+
+if(error){
+
+document.getElementById("message").innerHTML=
+error.message;
+
+}
+else{
+
+document.getElementById("message").innerHTML=
+"Holiday saved successfully.";
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

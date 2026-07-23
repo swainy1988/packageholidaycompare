@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Edit Hotel</title>
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#f4f7fb;
+padding:40px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+background:#fff;
+padding:30px;
+border-radius:12px;
+box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+input,select,textarea{
+
+width:100%;
+padding:12px;
+margin-bottom:18px;
+border:1px solid #ddd;
+border-radius:8px;
+font-size:15px;
+
+}
+
+textarea{
+
+height:180px;
+resize:vertical;
+
+}
+
+button{
+
+background:#009879;
+color:#fff;
+padding:15px 25px;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-size:16px;
+
+}
+
+button:hover{
+
+background:#00785f;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Edit Hotel</h1>
+
+<input id="name" placeholder="Hotel Name">
+
+<input id="country" placeholder="Country">
+
+<input id="destination" placeholder="Destination">
+
+<input id="region" placeholder="Region">
+
+<select id="stars">
+
+<option value="5">★★★★★</option>
+<option value="4">★★★★</option>
+<option value="3">★★★</option>
+<option value="2">★★</option>
+<option value="1">★</option>
+
+</select>
+
+<select id="board_basis">
+
+<option>All Inclusive</option>
+<option>Ultra All Inclusive</option>
+<option>Half Board</option>
+<option>Full Board</option>
+<option>Bed & Breakfast</option>
+<option>Room Only</option>
+
+</select>
+
+<input id="main_image" placeholder="Main Image URL">
+
+<textarea id="description" placeholder="Hotel Description"></textarea>
+
+<input id="airport" placeholder="Airport">
+
+<input id="transfer_time" placeholder="Transfer Time">
+
+<button onclick="saveHotel()">
+
+💾 Update Hotel
+
+</button>
+
+</div>
+
+<script>
+
+const params=new URLSearchParams(window.location.search);
+
+const id=params.get("id");
+
+async function loadHotel(){
+
+const {data,error}=await db
+
+.from("hotels")
+
+.select("*")
+
+.eq("id",id)
+
+.single();
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+name.value=data.name||"";
+country.value=data.country||"";
+destination.value=data.destination||"";
+region.value=data.region||"";
+stars.value=data.stars||5;
+board_basis.value=data.board_basis||"All Inclusive";
+main_image.value=data.main_image||"";
+description.value=data.description||"";
+airport.value=data.airport||"";
+transfer_time.value=data.transfer_time||"";
+
+}
+
+async function saveHotel(){
+
+const {error}=await db
+
+.from("hotels")
+
+.update({
+
+name:name.value,
+country:country.value,
+destination:destination.value,
+region:region.value,
+stars:Number(stars.value),
+board_basis:board_basis.value,
+main_image:main_image.value,
+description:description.value,
+airport:airport.value,
+transfer_time:transfer_time.value
+
+})
+
+.eq("id",id);
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+alert("✅ Hotel Updated");
+
+window.location="hotels.html";
+
+}
+
+loadHotel();
+
+</script>
+
+</body>
+
+</html>

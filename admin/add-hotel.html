@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Add Hotel</title>
+
+<link rel="stylesheet" href="../css/admin.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+
+<style>
+
+.form-card{
+    background:#fff;
+    border-radius:12px;
+    padding:25px;
+    margin-bottom:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+.form-group label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+
+    width:100%;
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:15px;
+
+}
+
+textarea{
+
+    height:180px;
+    resize:vertical;
+
+}
+
+.publishBtn{
+
+    background:#009879;
+    color:white;
+    border:none;
+    padding:15px 28px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+
+}
+
+.publishBtn:hover{
+
+    background:#007d63;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h1>PackageHolidayCompare</h1>
+
+<a href="index.html">🏠 Dashboard</a>
+<a href="hotels.html">🏨 Hotels</a>
+<a href="images.html">🖼 Images</a>
+<a href="suppliers.html">💷 Suppliers</a>
+<a href="settings.html">⚙ Settings</a>
+
+</div>
+
+<div class="main">
+
+<h1>Add Hotel</h1>
+
+<div class="form-card">
+
+<div class="form-group">
+
+<label>Hotel Name</label>
+
+<input
+id="name"
+type="text">
+
+</div>
+
+<div class="form-group">
+
+<label>Country</label>
+
+<input
+id="country"
+type="text">
+
+</div>
+
+<div class="form-group">
+
+<label>Destination</label>
+
+<input
+id="destination"
+type="text">
+
+</div>
+
+<div class="form-group">
+
+<label>Region</label>
+
+<input
+id="region"
+type="text">
+
+</div>
+
+<div class="form-group">
+
+<label>Stars</label>
+
+<select id="stars">
+
+<option value="5">★★★★★</option>
+<option value="4">★★★★</option>
+<option value="3">★★★</option>
+<option value="2">★★</option>
+<option value="1">★</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>Board Basis</label>
+
+<select id="board">
+
+<option>All Inclusive</option>
+<option>Ultra All Inclusive</option>
+<option>Half Board</option>
+<option>Full Board</option>
+<option>Bed & Breakfast</option>
+<option>Room Only</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label>Main Image URL</label>
+
+<input
+id="image"
+type="text">
+
+</div>
+
+<div class="form-group">
+
+<label>Description</label>
+
+<textarea
+id="description"></textarea>
+
+</div>
+
+<button
+class="publishBtn"
+onclick="saveHotel()">
+
+Publish Hotel
+
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+function slugify(text){
+
+return text
+.toLowerCase()
+.trim()
+.replace(/[^a-z0-9]+/g,"-")
+.replace(/^-|-$/g,"");
+
+}
+
+async function saveHotel(){
+
+const name=document.getElementById("name").value;
+
+const slug=slugify(name);
+
+const country=document.getElementById("country").value;
+
+const destination=document.getElementById("destination").value;
+
+const region=document.getElementById("region").value;
+
+const stars=parseInt(document.getElementById("stars").value);
+
+const board=document.getElementById("board").value;
+
+const image=document.getElementById("image").value;
+
+const description=document.getElementById("description").value;
+
+const {error}=await db
+
+.from("hotels")
+
+.insert([{
+
+name:name,
+
+slug:slug,
+
+country:country,
+
+destination:destination,
+
+region:region,
+
+stars:stars,
+
+board_basis:board,
+
+description:description,
+
+main_image:image,
+
+published:true
+
+}]);
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+alert("Hotel added successfully!");
+
+window.location="hotels.html";
+
+}
+
+</script>
+
+</body>
+
+</html>
