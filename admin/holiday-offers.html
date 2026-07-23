@@ -45,15 +45,9 @@ PackageHolidayCompare
 
 <main class="main">
 
-<header class="topbar">
-
-<div>
+<div class="page-header">
 
 <h1>Holiday Offers</h1>
-
-<p>Manage supplier prices.</p>
-
-</div>
 
 <a class="btn btn-primary"
 href="add-offer.html">
@@ -62,14 +56,15 @@ href="add-offer.html">
 
 </a>
 
-</header>
+</div>
 
 <div class="card">
 
 <input
-id="searchOffer"
 type="text"
-placeholder="Search offers...">
+id="searchOffers"
+placeholder="Search hotel or supplier..."
+class="search-box">
 
 <div class="table-container">
 
@@ -80,18 +75,24 @@ placeholder="Search offers...">
 <tr>
 
 <th>Hotel</th>
+
 <th>Supplier</th>
+
 <th>Price</th>
-<th>Departure</th>
+
+<th>Date</th>
+
 <th>Airport</th>
+
 <th>Nights</th>
+
 <th>Actions</th>
 
 </tr>
 
 </thead>
 
-<tbody id="offerTable">
+<tbody id="offersTable">
 
 <tr>
 
@@ -115,7 +116,7 @@ Loading...
 
 </div>
 
-<script src="../js/holiday-offers.js"></script>
+<script src="../js/offers.js"></script>
 
 </body>
 
