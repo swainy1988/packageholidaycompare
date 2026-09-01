@@ -1,0 +1,17 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/packajdh/public_html/
+    - /bin/cp -R admin "$DEPLOYPATH"
+    - /bin/cp -R css "$DEPLOYPATH"
+    - /bin/cp -R js "$DEPLOYPATH"
+    - /bin/cp -R nc_assets "$DEPLOYPATH"
+    - /bin/cp admin.html "$DEPLOYPATH"
+    - /bin/cp calendar.html "$DEPLOYPATH"
+    - /bin/cp holiday.html "$DEPLOYPATH"
+    - /bin/cp holidays.json "$DEPLOYPATH"
+    - /bin/cp index.html "$DEPLOYPATH"
+    - /bin/cp results.html "$DEPLOYPATH"
+    - /bin/cp script.js "$DEPLOYPATH"
+    - /bin/cp style.css "$DEPLOYPATH"
+    - /bin/cp upload-holidays.html "$DEPLOYPATH"
