@@ -1,6 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Holiday Results Page
+// Version: 2026-09-01-3
 // ======================================================
 
 let allHotels = [];
@@ -105,6 +106,7 @@ function attachEventListeners() {
         );
 
     if (refineForm) {
+
         refineForm.addEventListener(
             "submit",
             handleUpdatedSearch
@@ -112,6 +114,7 @@ function attachEventListeners() {
     }
 
     if (childrenSelect) {
+
         childrenSelect.addEventListener(
             "change",
             createSearchChildAgeFields
@@ -119,6 +122,7 @@ function attachEventListeners() {
     }
 
     if (departureDate) {
+
         departureDate.addEventListener(
             "change",
             handleDepartureDateChange
@@ -126,6 +130,7 @@ function attachEventListeners() {
     }
 
     if (returnDate) {
+
         returnDate.addEventListener(
             "change",
             updateSearchDuration
@@ -133,6 +138,7 @@ function attachEventListeners() {
     }
 
     if (applyFiltersButton) {
+
         applyFiltersButton.addEventListener(
             "click",
             applyResultFilters
@@ -140,6 +146,7 @@ function attachEventListeners() {
     }
 
     if (clearFiltersButton) {
+
         clearFiltersButton.addEventListener(
             "click",
             clearResultFilters
@@ -147,6 +154,7 @@ function attachEventListeners() {
     }
 
     if (resetSearchButton) {
+
         resetSearchButton.addEventListener(
             "click",
             resetMainSearch
@@ -154,6 +162,7 @@ function attachEventListeners() {
     }
 
     if (sortResults) {
+
         sortResults.addEventListener(
             "change",
             sortAndRenderResults
@@ -161,6 +170,7 @@ function attachEventListeners() {
     }
 
     if (refineToggle) {
+
         refineToggle.addEventListener(
             "click",
             toggleRefineSearch
@@ -168,6 +178,7 @@ function attachEventListeners() {
     }
 
     if (searchBudget) {
+
         searchBudget.addEventListener(
             "change",
             syncMaximumPriceFilter
@@ -924,6 +935,7 @@ function updateSearchSummary() {
         );
 
     if (summary) {
+
         summary.textContent =
             summaryParts.join(" • ");
     }
@@ -1188,12 +1200,10 @@ function offerMatchesSearch(
         return false;
     }
 
-    // --------------------------------------------------
-    // FLEXIBLE DURATION SEARCH
-    // Allow offers up to 3 nights shorter or longer.
-    // Example:
-    // Search 14 nights = match 11 to 17 nights.
-    // --------------------------------------------------
+    // ==================================================
+    // FLEXIBLE DURATION
+    // Search 14 nights = allow 11 to 17 nights
+    // ==================================================
 
     if (search.nights) {
 
@@ -1212,24 +1222,32 @@ function offerMatchesSearch(
                 search.nights
             );
 
-        if (nightDifference > 3) {
+        if (
+            nightDifference > 3
+        ) {
             return false;
         }
     }
 
-    // --------------------------------------------------
-    // FLEXIBLE DATE SEARCH
-    // Allow offers up to 3 days before or after the
-    // selected departure date.
-    // --------------------------------------------------
+    // ==================================================
+    // FLEXIBLE DEPARTURE DATE
+    // Allow 3 days before or after selected date
+    // ==================================================
 
     if (search.departureDate) {
 
+        const rawOfferDate =
+            String(
+                offer.departure_date || ""
+            ).slice(0, 10);
+
+        if (!rawOfferDate) {
+            return false;
+        }
+
         const offerDate =
             new Date(
-                `${String(
-                    offer.departure_date || ""
-                ).slice(0, 10)}T00:00:00`
+                `${rawOfferDate}T00:00:00`
             );
 
         const requestedDate =
@@ -1261,7 +1279,9 @@ function offerMatchesSearch(
             ) /
             millisecondsPerDay;
 
-        if (differenceInDays > 3) {
+        if (
+            differenceInDays > 3
+        ) {
             return false;
         }
     }
@@ -1269,6 +1289,10 @@ function offerMatchesSearch(
     return true;
 }
 
+
+// ======================================================
+// DESTINATION MATCHING
+// ======================================================
 
 function hotelMatchesDestination(
     hotel,
@@ -1412,6 +1436,7 @@ function populateSelectOptions(
             previousValue
         )
     ) {
+
         select.value =
             previousValue;
     }
@@ -1424,27 +1449,47 @@ function populateSelectOptions(
 
 function applyResultFilters() {
 
-    const destination =
+    const destinationElement =
         document.getElementById(
             "destinationFilter"
-        ).value;
+        );
 
-    const supplier =
+    const supplierElement =
         document.getElementById(
             "supplierFilter"
-        ).value;
+        );
 
-    const board =
+    const boardElement =
         document.getElementById(
             "boardFilter"
-        ).value;
+        );
+
+    const maximumPriceElement =
+        document.getElementById(
+            "maximumPriceFilter"
+        );
+
+    const destination =
+        destinationElement
+            ? destinationElement.value
+            : "";
+
+    const supplier =
+        supplierElement
+            ? supplierElement.value
+            : "";
+
+    const board =
+        boardElement
+            ? boardElement.value
+            : "";
 
     const maximumPrice =
-        Number(
-            document.getElementById(
-                "maximumPriceFilter"
-            ).value
-        ) || 0;
+        maximumPriceElement
+            ? Number(
+                maximumPriceElement.value
+            ) || 0
+            : 0;
 
     visibleResults =
         groupedResults
@@ -1528,8 +1573,13 @@ function applyResultFilters() {
                 );
 
                 return {
-                    hotel: group.hotel,
-                    offers: filteredOffers,
+
+                    hotel:
+                        group.hotel,
+
+                    offers:
+                        filteredOffers,
+
                     cheapestOffer:
                         filteredOffers[0]
                 };
@@ -1547,6 +1597,7 @@ function clearResultFilters() {
     visibleResults =
         groupedResults.map(
             group => ({
+
                 hotel:
                     group.hotel,
 
@@ -2089,21 +2140,24 @@ function createSupplierOfferRow(offer) {
 
             <td>
                 ${escapeHtml(
-                    offer.airport || "-"
+                    offer.airport ||
+                    "-"
                 )}
             </td>
 
             <td>
                 ${escapeHtml(
                     String(
-                        offer.nights || "-"
+                        offer.nights ||
+                        "-"
                     )
                 )}
             </td>
 
             <td>
                 ${escapeHtml(
-                    offer.board_basis || "-"
+                    offer.board_basis ||
+                    "-"
                 )}
             </td>
 
@@ -2347,6 +2401,7 @@ function showLoadingMessage() {
         );
 
     if (count) {
+
         count.textContent =
             "Loading results...";
     }
