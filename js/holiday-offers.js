@@ -3,42 +3,85 @@
 // Holiday Offers Manager
 // ======================================================
 
-let offers = [];
+let allOffers = [];
+let hotelNames = {};
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const searchInput =
+        document.getElementById("searchOffers");
+
+    if (searchInput) {
+
+        searchInput.addEventListener("input", function () {
+
+            const search =
+                this.value.trim().toLowerCase();
+
+            const filteredOffers =
+                allOffers.filter(offer => {
+
+                    const hotelName =
+                        hotelNames[offer.hotel_id] || "";
+
+                    const supplier =
+                        offer.supplier || "";
+
+                    const airport =
+                        offer.airport || "";
+
+                    return (
+                        hotelName
+                            .toLowerCase()
+                            .includes(search) ||
+
+                        supplier
+                            .toLowerCase()
+                            .includes(search) ||
+
+                        airport
+                            .toLowerCase()
+                            .includes(search)
+                    );
+
+                });
+
+            renderOffers(filteredOffers);
+
+        });
+
+    }
+
+    loadOffers();
+
+});
 
 async function loadOffers() {
 
-    if (!window.db) {
-        console.error("Supabase not connected.");
+    const table =
+        document.getElementById("offersTable");
+
+    if (!table) {
+
+        console.error(
+            "The offersTable element was not found."
+        );
+
         return;
+
     }
 
-    const tbody = document.getElementById("offerTable");
+    if (!window.db) {
 
-    if (!tbody) return;
+        console.error(
+            "Supabase is not connected."
+        );
 
-    tbody.innerHTML = `
-        <tr>
-            <td colspan="7">Loading offers...</td>
-        </tr>
-    `;
-
-    const { data, error } = await window.db
-        .from("holiday_offers")
-        .select(`
-            *,
-            hotels (
-                name
-            )
-        `)
-        .order("departure_date", { ascending: true });
-
-    if (error) {
-
-        console.error(error);
-
-        tbody.innerHTML = `
+        table.innerHTML = `
             <tr>
-                <td colspan="7">Failed to load offers.</td>
+                <td colspan="7">
+                    Supabase connection is unavailable.
+                </td>
             </tr>
         `;
 
@@ -46,21 +89,95 @@ async function loadOffers() {
 
     }
 
-    offers = data;
+    table.innerHTML = `
+        <tr>
+            <td colspan="7">
+                Loading offers...
+            </td>
+        </tr>
+    `;
 
-    renderOffers(offers);
+    try {
+
+        // Load hotel names separately.
+        // This works without a foreign-key relationship.
+
+        const {
+            data: hotels,
+            error: hotelError
+        } = await window.db
+            .from("hotels")
+            .select("id, name")
+            .order("name", {
+                ascending: true
+            });
+
+        if (hotelError) {
+            throw hotelError;
+        }
+
+        hotelNames = {};
+
+        (hotels || []).forEach(hotel => {
+
+            hotelNames[hotel.id] =
+                hotel.name;
+
+        });
+
+        // Load all holiday offers.
+
+        const {
+            data: offers,
+            error: offersError
+        } = await window.db
+            .from("holiday_offers")
+            .select("*")
+            .order("departure_date", {
+                ascending: true
+            });
+
+        if (offersError) {
+            throw offersError;
+        }
+
+        allOffers = offers || [];
+
+        renderOffers(allOffers);
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load holiday offers:",
+            error
+        );
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="7">
+                    Failed to load offers.
+                </td>
+            </tr>
+        `;
+
+    }
 
 }
 
-function renderOffers(list) {
+function renderOffers(offers) {
 
-    const tbody = document.getElementById("offerTable");
+    const table =
+        document.getElementById("offersTable");
 
-    tbody.innerHTML = "";
+    if (!table) {
+        return;
+    }
 
-    if (list.length === 0) {
+    table.innerHTML = "";
 
-        tbody.innerHTML = `
+    if (!offers.length) {
+
+        table.innerHTML = `
             <tr>
                 <td colspan="7">
                     No holiday offers found.
@@ -72,117 +189,148 @@ function renderOffers(list) {
 
     }
 
-    list.forEach(offer => {
+    offers.forEach(offer => {
 
-        tbody.innerHTML += `
-            <tr>
+        const hotelName =
+            hotelNames[offer.hotel_id] ||
+            "Unknown hotel";
 
-                <td>${offer.hotels?.name || "-"}</td>
+        const price =
+            Number(offer.price || 0)
+                .toLocaleString("en-GB", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                });
 
-                <td>${offer.supplier || "-"}</td>
+        table.insertAdjacentHTML(
+            "beforeend",
+            `
+                <tr>
 
-                <td>£${offer.price || 0}</td>
+                    <td>
+                        ${escapeHtml(hotelName)}
+                    </td>
 
-                <td>${offer.departure_date || "-"}</td>
+                    <td>
+                        ${escapeHtml(
+                            offer.supplier || "-"
+                        )}
+                    </td>
 
-                <td>${offer.airport || "-"}</td>
+                    <td>
+                        £${price}
+                    </td>
 
-                <td>${offer.nights || "-"}</td>
+                    <td>
+                        ${formatDate(
+                            offer.departure_date
+                        )}
+                    </td>
 
-                <td>
+                    <td>
+                        ${escapeHtml(
+                            offer.airport || "-"
+                        )}
+                    </td>
 
-                    <button
-                        class="btn btn-small"
-                        onclick="editOffer('${offer.id}')">
+                    <td>
+                        ${offer.nights ?? "-"}
+                    </td>
 
-                        Edit
+                    <td>
 
-                    </button>
+                        <a
+                            class="btn btn-small"
+                            href="edit-offer.html?id=${encodeURIComponent(
+                                offer.id
+                            )}"
+                        >
+                            Edit
+                        </a>
 
-                    <button
-                        class="btn btn-danger btn-small"
-                        onclick="deleteOffer('${offer.id}')">
+                        <button
+                            type="button"
+                            class="btn-red"
+                            onclick="deleteOffer('${offer.id}')"
+                        >
+                            Delete
+                        </button>
 
-                        Delete
+                    </td>
 
-                    </button>
-
-                </td>
-
-            </tr>
-        `;
+                </tr>
+            `
+        );
 
     });
 
 }
 
-function editOffer(id){
+async function deleteOffer(id) {
 
-    window.location =
-        "edit-offer.html?id=" + id;
+    const confirmed = confirm(
+        "Are you sure you want to delete this holiday offer?"
+    );
 
-}
-
-async function deleteOffer(id){
-
-    if(!confirm("Delete this offer?"))
+    if (!confirmed) {
         return;
+    }
 
     const { error } = await window.db
         .from("holiday_offers")
         .delete()
         .eq("id", id);
 
-    if(error){
+    if (error) {
 
-        alert(error.message);
+        console.error(
+            "Failed to delete offer:",
+            error
+        );
+
+        alert(
+            "The holiday offer could not be deleted."
+        );
+
         return;
 
     }
 
-    loadOffers();
+    await loadOffers();
 
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{
+function formatDate(value) {
 
-    const search =
-        document.getElementById("searchOffer");
-
-    if(search){
-
-        search.addEventListener("input", function(){
-
-            const value =
-                this.value.toLowerCase();
-
-            const filtered =
-                offers.filter(o =>
-
-                    (o.hotels?.name || "")
-                    .toLowerCase()
-                    .includes(value)
-
-                    ||
-
-                    (o.supplier || "")
-                    .toLowerCase()
-                    .includes(value)
-
-                    ||
-
-                    (o.airport || "")
-                    .toLowerCase()
-                    .includes(value)
-
-                );
-
-            renderOffers(filtered);
-
-        });
-
+    if (!value) {
+        return "-";
     }
 
-    loadOffers();
+    const date =
+        new Date(`${value}T00:00:00`);
 
-});
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return date.toLocaleDateString(
+        "en-GB",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
+
+}
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}

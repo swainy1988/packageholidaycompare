@@ -3,147 +3,308 @@
 
 <head>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta charset="UTF-8">
 
-<title>Add Holiday Offer</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<link rel="stylesheet" href="../css/admin.css">
+    <title>Add Holiday Offer | PackageHolidayCompare</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/supabase.js"></script>
+    <link
+        rel="stylesheet"
+        href="../css/admin.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/supabase.js"></script>
 
 </head>
 
 <body>
 
-<div class="admin-layout">
+    <div class="admin-layout">
 
-<aside class="sidebar">
+        <aside class="sidebar">
 
-<div class="logo">
+            <div class="logo">
+                PackageHolidayCompare
+            </div>
 
-PackageHolidayCompare
+            <nav>
 
-</div>
+                <a href="index.html">
+                    📊 Dashboard
+                </a>
 
-<nav>
+                <a href="hotels.html">
+                    🏨 Hotels
+                </a>
 
-<a href="index.html">📊 Dashboard</a>
+                <a
+                    class="active"
+                    href="holiday-offers.html"
+                >
+                    🌴 Holiday Offers
+                </a>
 
-<a href="hotels.html">🏨 Hotels</a>
+                <a href="images.html">
+                    🖼 Images
+                </a>
 
-<a class="active" href="holiday-offers.html">🌴 Holiday Offers</a>
+                <a href="suppliers.html">
+                    ✈ Suppliers
+                </a>
 
-<a href="images.html">🖼 Images</a>
+                <a href="settings.html">
+                    ⚙ Settings
+                </a>
 
-<a href="suppliers.html">✈ Suppliers</a>
+            </nav>
 
-<a href="settings.html">⚙ Settings</a>
+        </aside>
 
-</nav>
+        <main class="main">
 
-</aside>
+            <header class="topbar">
 
-<main class="main">
+                <div>
 
-<header class="topbar">
+                    <h1>Add Holiday Offer</h1>
 
-<h1>Add Holiday Offer</h1>
+                    <p>
+                        Add a supplier package price to a hotel.
+                    </p>
 
-</header>
+                </div>
 
-<div class="card">
+                <a
+                    class="btn"
+                    href="holiday-offers.html"
+                >
+                    ← Back to Offers
+                </a>
 
-<label>Hotel</label>
+            </header>
 
-<select id="hotel"></select>
+            <div class="card">
 
-<label>Supplier</label>
+                <form id="offerForm">
 
-<select id="supplier">
+                    <div class="form-grid">
 
-<option>Jet2holidays</option>
-<option>TUI</option>
-<option>Loveholidays</option>
-<option>On the Beach</option>
-<option>easyJet Holidays</option>
-<option>British Airways Holidays</option>
-<option>Booking.com</option>
-<option>Expedia</option>
+                        <div class="form-group">
 
-</select>
+                            <label for="hotel">
+                                Hotel *
+                            </label>
 
-<label>Price (£)</label>
+                            <select
+                                id="hotel"
+                                required
+                            >
 
-<input
-type="number"
-id="price">
+                                <option value="">
+                                    Loading hotels...
+                                </option>
 
-<label>Departure Date</label>
+                            </select>
 
-<input
-type="date"
-id="departure">
+                        </div>
 
-<label>Airport</label>
+                        <div class="form-group">
 
-<select id="airport">
+                            <label for="supplier">
+                                Supplier *
+                            </label>
 
-<option>Manchester</option>
-<option>Liverpool</option>
-<option>Birmingham</option>
-<option>London Gatwick</option>
-<option>London Heathrow</option>
-<option>Bristol</option>
-<option>Glasgow</option>
-<option>Edinburgh</option>
+                            <input
+                                type="text"
+                                id="supplier"
+                                placeholder="Example: TUI"
+                                required
+                            >
 
-</select>
+                        </div>
 
-<label>Nights</label>
+                        <div class="form-group">
 
-<input
-type="number"
-id="nights"
-value="7">
+                            <label for="price">
+                                Total Price (£) *
+                            </label>
 
-<label>Board Basis</label>
+                            <input
+                                type="number"
+                                id="price"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="1299"
+                                required
+                            >
 
-<select id="board">
+                        </div>
 
-<option>All Inclusive</option>
-<option>Ultra All Inclusive</option>
-<option>Half Board</option>
-<option>Full Board</option>
-<option>Bed & Breakfast</option>
-<option>Room Only</option>
+                        <div class="form-group">
 
-</select>
+                            <label for="departure">
+                                Departure Date *
+                            </label>
 
-<label>Booking URL</label>
+                            <input
+                                type="date"
+                                id="departure"
+                                required
+                            >
 
-<input
-type="url"
-id="booking">
+                        </div>
 
-<br><br>
+                        <div class="form-group">
 
-<button
-class="btn btn-primary"
-onclick="saveOffer()">
+                            <label for="airport">
+                                Departure Airport *
+                            </label>
 
-Save Holiday Offer
+                            <input
+                                type="text"
+                                id="airport"
+                                placeholder="Manchester"
+                                required
+                            >
 
-</button>
+                        </div>
 
-</div>
+                        <div class="form-group">
 
-</main>
+                            <label for="nights">
+                                Nights *
+                            </label>
 
-</div>
+                            <input
+                                type="number"
+                                id="nights"
+                                min="1"
+                                step="1"
+                                value="7"
+                                required
+                            >
 
-<script src="../js/add-offer.js"></script>
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="board">
+                                Board Basis
+                            </label>
+
+                            <select id="board">
+
+                                <option value="">
+                                    Select board basis
+                                </option>
+
+                                <option value="Room Only">
+                                    Room Only
+                                </option>
+
+                                <option value="Self Catering">
+                                    Self Catering
+                                </option>
+
+                                <option value="Bed & Breakfast">
+                                    Bed & Breakfast
+                                </option>
+
+                                <option value="Half Board">
+                                    Half Board
+                                </option>
+
+                                <option value="Full Board">
+                                    Full Board
+                                </option>
+
+                                <option value="All Inclusive">
+                                    All Inclusive
+                                </option>
+
+                                <option value="Ultra All Inclusive">
+                                    Ultra All Inclusive
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="roomType">
+                                Room Type
+                            </label>
+
+                            <input
+                                type="text"
+                                id="roomType"
+                                placeholder="Example: Family Room"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="bookingUrl">
+                            Booking URL
+                        </label>
+
+                        <input
+                            type="url"
+                            id="bookingUrl"
+                            placeholder="https://www.example.com/holiday"
+                        >
+
+                    </div>
+
+                    <div
+                        id="formMessage"
+                        aria-live="polite"
+                    ></div>
+
+                    <div
+                        style="
+                            display:flex;
+                            gap:10px;
+                            margin-top:20px;
+                        "
+                    >
+
+                        <button
+                            type="submit"
+                            id="saveOfferButton"
+                            class="btn btn-primary"
+                        >
+                            Save Holiday Offer
+                        </button>
+
+                        <a
+                            href="holiday-offers.html"
+                            class="btn"
+                        >
+                            Cancel
+                        </a>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="../js/add-offer.js"></script>
 
 </body>
 

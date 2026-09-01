@@ -1,23 +1,44 @@
 // ======================================================
 // PackageHolidayCompare
-// Add Holiday Offer
+// Edit Holiday Offer
 // ======================================================
 
-document.addEventListener("DOMContentLoaded", () => {
+let offerId = null;
+
+document.addEventListener("DOMContentLoaded", async () => {
 
     const form =
         document.getElementById("offerForm");
+
+    const params =
+        new URLSearchParams(window.location.search);
+
+    offerId =
+        params.get("id");
+
+    if (!offerId) {
+
+        showMessage(
+            "No holiday offer was selected.",
+            true
+        );
+
+        return;
+
+    }
 
     if (form) {
 
         form.addEventListener(
             "submit",
-            saveOffer
+            updateOffer
         );
 
     }
 
-    loadHotels();
+    await loadHotels();
+
+    await loadOffer();
 
 });
 
@@ -32,25 +53,14 @@ async function loadHotels() {
 
     if (!window.db) {
 
-        hotelSelect.innerHTML = `
-            <option value="">
-                Supabase is not connected
-            </option>
-        `;
-
-        console.error(
-            "Supabase is not connected."
+        showMessage(
+            "Supabase is not connected.",
+            true
         );
 
         return;
 
     }
-
-    hotelSelect.innerHTML = `
-        <option value="">
-            Loading hotels...
-        </option>
-    `;
 
     const {
         data: hotels,
@@ -69,11 +79,10 @@ async function loadHotels() {
             error
         );
 
-        hotelSelect.innerHTML = `
-            <option value="">
-                Failed to load hotels
-            </option>
-        `;
+        showMessage(
+            "Hotels could not be loaded.",
+            true
+        );
 
         return;
 
@@ -96,22 +105,13 @@ async function loadHotels() {
         option.textContent =
             hotel.name;
 
-        hotelSelect.appendChild(
-            option
-        );
+        hotelSelect.appendChild(option);
 
     });
 
 }
 
-async function saveOffer(event) {
-
-    event.preventDefault();
-
-    const button =
-        document.getElementById(
-            "saveOfferButton"
-        );
+async function loadOffer() {
 
     if (!window.db) {
 
@@ -124,6 +124,110 @@ async function saveOffer(event) {
 
     }
 
+    const button =
+        document.getElementById(
+            "saveOfferButton"
+        );
+
+    if (button) {
+
+        button.disabled = true;
+
+        button.textContent =
+            "Loading...";
+
+    }
+
+    const {
+        data: offer,
+        error
+    } = await window.db
+        .from("holiday_offers")
+        .select("*")
+        .eq("id", offerId)
+        .single();
+
+    if (error) {
+
+        console.error(
+            "Failed to load holiday offer:",
+            error
+        );
+
+        showMessage(
+            "The holiday offer could not be loaded.",
+            true
+        );
+
+        if (button) {
+
+            button.textContent =
+                "Update Holiday Offer";
+
+        }
+
+        return;
+
+    }
+
+    document.getElementById("hotel").value =
+        offer.hotel_id || "";
+
+    document.getElementById("supplier").value =
+        offer.supplier || "";
+
+    document.getElementById("price").value =
+        offer.price ?? "";
+
+    document.getElementById("departure").value =
+        offer.departure_date || "";
+
+    document.getElementById("airport").value =
+        offer.airport || "";
+
+    document.getElementById("nights").value =
+        offer.nights ?? "";
+
+    document.getElementById("board").value =
+        offer.board_basis || "";
+
+    document.getElementById("roomType").value =
+        offer.room_type || "";
+
+    document.getElementById("bookingUrl").value =
+        offer.booking_url || "";
+
+    if (button) {
+
+        button.disabled = false;
+
+        button.textContent =
+            "Update Holiday Offer";
+
+    }
+
+}
+
+async function updateOffer(event) {
+
+    event.preventDefault();
+
+    if (!window.db) {
+
+        showMessage(
+            "Supabase is not connected.",
+            true
+        );
+
+        return;
+
+    }
+
+    const button =
+        document.getElementById(
+            "saveOfferButton"
+        );
+
     const hotelId =
         document.getElementById(
             "hotel"
@@ -132,12 +236,14 @@ async function saveOffer(event) {
     const supplier =
         document.getElementById(
             "supplier"
-        ).value.trim();
-
-    const priceValue =
-        document.getElementById(
-            "price"
         ).value;
+
+    const price =
+        Number(
+            document.getElementById(
+                "price"
+            ).value
+        );
 
     const departureDate =
         document.getElementById(
@@ -147,12 +253,14 @@ async function saveOffer(event) {
     const airport =
         document.getElementById(
             "airport"
-        ).value.trim();
-
-    const nightsValue =
-        document.getElementById(
-            "nights"
         ).value;
+
+    const nights =
+        Number(
+            document.getElementById(
+                "nights"
+            ).value
+        );
 
     const boardBasis =
         document.getElementById(
@@ -168,12 +276,6 @@ async function saveOffer(event) {
         document.getElementById(
             "bookingUrl"
         ).value.trim();
-
-    const price =
-        Number(priceValue);
-
-    const nights =
-        Number(nightsValue);
 
     if (
         !hotelId ||
@@ -222,14 +324,9 @@ async function saveOffer(event) {
     button.disabled = true;
 
     button.textContent =
-        "Saving...";
+        "Updating...";
 
-    showMessage(
-        "",
-        false
-    );
-
-    const offer = {
+    const updatedOffer = {
 
         hotel_id:
             hotelId,
@@ -250,7 +347,7 @@ async function saveOffer(event) {
             nights,
 
         board_basis:
-            boardBasis || null,
+            boardBasis,
 
         room_type:
             roomType || null,
@@ -263,12 +360,13 @@ async function saveOffer(event) {
     const { error } =
         await window.db
             .from("holiday_offers")
-            .insert([offer]);
+            .update(updatedOffer)
+            .eq("id", offerId);
 
     if (error) {
 
         console.error(
-            "Failed to save offer:",
+            "Failed to update holiday offer:",
             error
         );
 
@@ -280,14 +378,14 @@ async function saveOffer(event) {
         button.disabled = false;
 
         button.textContent =
-            "Save Holiday Offer";
+            "Update Holiday Offer";
 
         return;
 
     }
 
     showMessage(
-        "Holiday offer added successfully.",
+        "Holiday offer updated successfully.",
         false
     );
 
