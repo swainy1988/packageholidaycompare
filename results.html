@@ -1,858 +1,1320 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
-<meta charset="UTF-8">
-
-<title>Holiday Results - PackageHolidayCompare</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="style.css">
-
-
-<style>
-
-body{
-background:#f5f8fb;
-}
-
-
-.layout{
-
-display:flex;
-gap:20px;
-padding:20px;
-max-width:1300px;
-margin:auto;
-
-}
-
-
-.filters,
-.sort-box{
-
-background:white;
-padding:20px;
-border-radius:15px;
-box-shadow:0 5px 20px #ddd;
-
-}
-
-
-.filters{
-
-width:250px;
-height:max-content;
-
-}
-
-
-.cards{
-
-display:flex;
-flex-wrap:wrap;
-
-}
-
-
-.deal-card{
-
-background:white;
-width:360px;
-margin:10px;
-border-radius:15px;
-overflow:hidden;
-box-shadow:0 5px 20px #ddd;
-
-}
-
-
-.deal-card img{
-
-width:100%;
-height:220px;
-object-fit:cover;
-
-}
-
-
-.deal-content{
-
-padding:20px;
-
-}
-
-
-.badge{
-
-background:#ffd700;
-padding:8px 12px;
-border-radius:20px;
-display:inline-block;
-margin:5px;
-
-}
-
-
-.score{
-
-background:#00a86b;
-color:white;
-padding:10px;
-border-radius:10px;
-display:inline-block;
-
-}
-
-
-.price{
-
-font-size:30px;
-color:#0066cc;
-
-}
-
-
-.info{
-
-background:#eef5ff;
-padding:12px;
-border-radius:10px;
-margin:10px 0;
-
-}
-
-
-button{
-
-background:#0066cc;
-color:white;
-border:none;
-padding:12px 18px;
-border-radius:8px;
-cursor:pointer;
-
-}
-
-
-.sort-box button{
-
-margin:5px;
-
-}
-
-
-
-@media(max-width:800px){
-
-.layout{
-
-display:block;
-
-}
-
-
-.filters{
-
-width:auto;
-
-}
-
-
-.deal-card{
-
-width:100%;
-
-}
-
-
-}
-
-
-</style>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Holiday Results | PackageHolidayCompare
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f7fb;
+            color: #1f2937;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        select,
+        input {
+            font: inherit;
+        }
+
+        .site-header {
+            background: #ffffff;
+            border-bottom: 1px solid #dfe6ee;
+            padding: 18px 24px;
+        }
+
+        .header-inner {
+            width: min(1320px, 100%);
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .site-logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: #004f9e;
+        }
+
+        .home-link {
+            background: #0066cc;
+            color: #ffffff;
+            padding: 11px 18px;
+            border-radius: 9px;
+            font-weight: 700;
+        }
+
+        .results-hero {
+            background:
+                linear-gradient(
+                    135deg,
+                    #0059b3,
+                    #00a86b
+                );
+            color: #ffffff;
+            padding: 34px 20px 58px;
+        }
+
+        .hero-inner {
+            width: min(1320px, 100%);
+            margin: 0 auto;
+        }
+
+        .hero-inner h1 {
+            margin: 0 0 12px;
+            font-size: clamp(30px, 5vw, 46px);
+        }
+
+        .search-summary {
+            margin: 0;
+            font-size: 17px;
+            line-height: 1.7;
+        }
+
+        .page-shell {
+            width: min(1320px, 100%);
+            margin: -30px auto 0;
+            padding: 0 20px 60px;
+        }
+
+        .refine-search {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow:
+                0 12px 35px
+                rgba(31, 41, 55, 0.12);
+        }
+
+        .refine-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .refine-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .refine-toggle {
+            display: none;
+            border: 0;
+            background: #eef6ff;
+            color: #0059b3;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .refine-form {
+            display: block;
+        }
+
+        .refine-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .refine-group {
+            min-width: 0;
+        }
+
+        .refine-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 750;
+        }
+
+        .refine-group select,
+        .refine-group input {
+            width: 100%;
+            min-height: 46px;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            background: #ffffff;
+            color: #1f2937;
+        }
+
+        .refine-group select:focus,
+        .refine-group input:focus {
+            outline: 3px solid
+                rgba(0, 102, 204, 0.14);
+            border-color: #0066cc;
+        }
+
+        .duration-message {
+            display: none;
+            margin-top: 7px;
+            padding: 8px 10px;
+            background: #eef6ff;
+            border-radius: 7px;
+            color: #0059b3;
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .child-ages-section {
+            display: none;
+            margin-top: 18px;
+            padding: 17px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .child-ages-section h3 {
+            margin: 0 0 14px;
+        }
+
+        .child-age-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(6, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .refine-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .update-results-button {
+            flex: 1;
+            border: 0;
+            background: #00a86b;
+            color: #ffffff;
+            padding: 14px 20px;
+            border-radius: 9px;
+            font-size: 17px;
+            font-weight: 850;
+            cursor: pointer;
+        }
+
+        .reset-search-button {
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #334155;
+            padding: 14px 20px;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: 750;
+            cursor: pointer;
+        }
+
+        .refine-error {
+            display: none;
+            margin-top: 15px;
+            padding: 12px 14px;
+            border: 1px solid #fecdd3;
+            border-radius: 9px;
+            background: #fff1f2;
+            color: #b42318;
+            font-weight: 700;
+        }
+
+        .results-layout {
+            display: grid;
+            grid-template-columns:
+                270px minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .filter-panel {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow:
+                0 8px 25px
+                rgba(31, 41, 55, 0.08);
+            position: sticky;
+            top: 20px;
+        }
+
+        .filter-panel h2 {
+            margin: 0 0 20px;
+            font-size: 23px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 700;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            background: #ffffff;
+        }
+
+        .filter-button {
+            width: 100%;
+            border: 0;
+            background: #0066cc;
+            color: #ffffff;
+            padding: 13px;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .clear-button {
+            width: 100%;
+            margin-top: 10px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            color: #334155;
+            padding: 12px;
+            border-radius: 9px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .results-column {
+            min-width: 0;
+        }
+
+        .results-toolbar {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 17px 20px;
+            margin-bottom: 18px;
+            box-shadow:
+                0 8px 25px
+                rgba(31, 41, 55, 0.07);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .results-count {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .sort-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sort-area label {
+            font-weight: 700;
+        }
+
+        .sort-area select {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+        }
+
+        .loading-box,
+        .message-box {
+            background: #ffffff;
+            padding: 36px 24px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow:
+                0 8px 25px
+                rgba(31, 41, 55, 0.07);
+        }
+
+        .loading-box h2,
+        .message-box h2 {
+            margin-top: 0;
+        }
+
+        .hotel-result-card {
+            background: #ffffff;
+            border-radius: 17px;
+            overflow: hidden;
+            box-shadow:
+                0 8px 25px
+                rgba(31, 41, 55, 0.09);
+            margin-bottom: 22px;
+        }
+
+        .hotel-main {
+            display: grid;
+            grid-template-columns:
+                300px minmax(0, 1fr) 235px;
+            min-height: 245px;
+        }
+
+        .hotel-image-wrap {
+            background: #e5e7eb;
+            min-height: 245px;
+        }
+
+        .hotel-image {
+            width: 100%;
+            height: 100%;
+            min-height: 245px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .hotel-details {
+            padding: 22px;
+            min-width: 0;
+        }
+
+        .hotel-location {
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .hotel-name {
+            margin: 0 0 8px;
+            font-size: 25px;
+            line-height: 1.25;
+        }
+
+        .hotel-stars {
+            color: #f5a623;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+        }
+
+        .offer-information {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 10px 18px;
+            margin-top: 17px;
+        }
+
+        .offer-information div {
+            background: #f4f7fb;
+            border-radius: 9px;
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+
+        .hotel-description {
+            margin: 17px 0 0;
+            color: #475569;
+            line-height: 1.55;
+        }
+
+        .price-panel {
+            border-left: 1px solid #e2e8f0;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .cheapest-label {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+
+        .supplier-name {
+            font-weight: 800;
+            margin-bottom: 11px;
+        }
+
+        .price {
+            color: #0059b3;
+            font-size: 34px;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        .total-price-label {
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .compare-button {
+            width: 100%;
+            border: 0;
+            background: #00a86b;
+            color: #ffffff;
+            padding: 13px 15px;
+            border-radius: 9px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .book-button {
+            display: block;
+            margin-top: 10px;
+            background: #0066cc;
+            color: #ffffff;
+            padding: 13px 15px;
+            border-radius: 9px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .book-button.disabled {
+            background: #94a3b8;
+            pointer-events: none;
+        }
+
+        .supplier-comparison {
+            display: none;
+            border-top: 1px solid #e2e8f0;
+            padding: 20px 22px 24px;
+            background: #fbfdff;
+        }
+
+        .supplier-comparison.open {
+            display: block;
+        }
+
+        .supplier-comparison h3 {
+            margin: 0 0 15px;
+        }
+
+        .supplier-table-wrap {
+            overflow-x: auto;
+        }
+
+        .supplier-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 680px;
+        }
+
+        .supplier-table th,
+        .supplier-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .supplier-table th {
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .supplier-table .supplier-price {
+            font-size: 18px;
+            font-weight: 800;
+            color: #0059b3;
+        }
+
+        .small-book-link {
+            display: inline-block;
+            background: #0066cc;
+            color: #ffffff;
+            padding: 9px 13px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        .small-book-link.disabled {
+            background: #94a3b8;
+            pointer-events: none;
+        }
+
+        @media (max-width: 1100px) {
+
+            .refine-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .child-age-grid {
+                grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+            }
+
+            .hotel-main {
+                grid-template-columns:
+                    250px minmax(0, 1fr);
+            }
+
+            .price-panel {
+                grid-column: 1 / -1;
+                border-left: 0;
+                border-top: 1px solid #e2e8f0;
+                display: grid;
+                grid-template-columns:
+                    1fr auto auto;
+                align-items: center;
+                gap: 16px;
+                text-align: left;
+            }
+
+            .price-panel .book-button {
+                margin-top: 0;
+            }
+
+        }
+
+        @media (max-width: 820px) {
+
+            .refine-toggle {
+                display: inline-block;
+            }
+
+            .refine-form.mobile-hidden {
+                display: none;
+            }
+
+            .results-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-panel {
+                position: static;
+            }
+
+            .hotel-main {
+                grid-template-columns: 1fr;
+            }
+
+            .hotel-image-wrap,
+            .hotel-image {
+                min-height: 230px;
+                height: 230px;
+            }
+
+            .price-panel {
+                grid-column: auto;
+                display: block;
+                text-align: center;
+            }
+
+            .price-panel .book-button {
+                margin-top: 10px;
+            }
+
+        }
+
+        @media (max-width: 620px) {
+
+            .site-header {
+                padding: 15px;
+            }
+
+            .header-inner {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .page-shell {
+                padding-left: 13px;
+                padding-right: 13px;
+            }
+
+            .refine-search {
+                padding: 19px;
+            }
+
+            .refine-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .child-age-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .refine-actions {
+                flex-direction: column;
+            }
+
+            .offer-information {
+                grid-template-columns: 1fr;
+            }
+
+            .results-toolbar {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .sort-area {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+        }
+
+    </style>
 
 </head>
 
-
 <body>
 
+    <header class="site-header">
 
-<header>
+        <div class="header-inner">
 
-<div class="logo">
+            <a
+                class="site-logo"
+                href="index.html"
+            >
+                ✈ PackageHolidayCompare
+            </a>
 
-✈ PackageHolidayCompare
+            <a
+                class="home-link"
+                href="index.html"
+            >
+                Home
+            </a>
 
-</div>
+        </div>
 
-</header>
+    </header>
 
+    <section class="results-hero">
 
+        <div class="hero-inner">
 
-<h1 style="text-align:center">
+            <h1>
+                Holiday Results
+            </h1>
 
-Holiday Results
+            <p
+                id="searchSummary"
+                class="search-summary"
+            >
+                Loading your search...
+            </p>
 
-</h1>
+        </div>
 
+    </section>
 
+    <main class="page-shell">
 
-<p id="searchDetails" style="text-align:center"></p>
+        <section class="refine-search">
 
+            <div class="refine-header">
 
+                <h2>
+                    Change your search
+                </h2>
 
+                <button
+                    type="button"
+                    id="refineToggle"
+                    class="refine-toggle"
+                >
+                    Show Search
+                </button>
 
-<div class="layout">
+            </div>
 
+            <form
+                id="refineSearchForm"
+                class="refine-form"
+                novalidate
+            >
 
+                <div class="refine-grid">
 
-<div class="filters">
+                    <div class="refine-group">
 
+                        <label for="searchAirport">
+                            Flying from
+                        </label>
 
-<h2>Filters</h2>
+                        <select id="searchAirport">
 
+                            <option value="">
+                                Any UK airport
+                            </option>
 
-<h3>Budget</h3>
+                            <option value="Manchester">
+                                Manchester
+                            </option>
 
+                            <option value="Liverpool">
+                                Liverpool
+                            </option>
 
-<select id="priceFilter" onchange="displayResults()">
+                            <option value="Birmingham">
+                                Birmingham
+                            </option>
 
+                            <option value="London Gatwick">
+                                London Gatwick
+                            </option>
 
+                            <option value="London Heathrow">
+                                London Heathrow
+                            </option>
 
-<option value="999999">
+                            <option value="London Stansted">
+                                London Stansted
+                            </option>
 
-Any Budget
+                            <option value="London Luton">
+                                London Luton
+                            </option>
 
-</option>
+                            <option value="Bristol">
+                                Bristol
+                            </option>
 
+                            <option value="East Midlands">
+                                East Midlands
+                            </option>
 
-<option value="1000">
+                            <option value="Leeds Bradford">
+                                Leeds Bradford
+                            </option>
 
-£1000
+                            <option value="Newcastle">
+                                Newcastle
+                            </option>
 
-</option>
+                            <option value="Glasgow">
+                                Glasgow
+                            </option>
 
+                            <option value="Edinburgh">
+                                Edinburgh
+                            </option>
 
-<option value="1500">
+                            <option value="Belfast">
+                                Belfast
+                            </option>
 
-£1500
+                        </select>
 
-</option>
+                    </div>
 
+                    <div class="refine-group">
 
-<option value="2000">
+                        <label for="searchDestination">
+                            Destination
+                        </label>
 
-£2000
+                        <select id="searchDestination">
 
-</option>
+                            <option value="">
+                                Anywhere
+                            </option>
 
+                            <option value="Egypt">
+                                Egypt
+                            </option>
 
-<option value="3000">
+                            <option value="Turkey">
+                                Turkey
+                            </option>
 
-£3000
+                            <option value="Spain">
+                                Spain
+                            </option>
 
-</option>
+                            <option value="Greece">
+                                Greece
+                            </option>
 
+                            <option value="Cyprus">
+                                Cyprus
+                            </option>
 
-<option value="5000">
+                            <option value="Portugal">
+                                Portugal
+                            </option>
 
-£5000+
+                            <option value="Morocco">
+                                Morocco
+                            </option>
 
-</option>
+                            <option value="Tunisia">
+                                Tunisia
+                            </option>
 
+                            <option value="Bulgaria">
+                                Bulgaria
+                            </option>
 
-</select>
+                        </select>
 
+                    </div>
 
+                    <div class="refine-group">
 
+                        <label for="searchDepartureDate">
+                            Departure date
+                        </label>
 
+                        <input
+                            type="date"
+                            id="searchDepartureDate"
+                        >
 
-<h3>Destination</h3>
+                    </div>
 
+                    <div class="refine-group">
 
-<select id="destinationFilter" onchange="displayResults()">
+                        <label for="searchReturnDate">
+                            Return date
+                        </label>
 
+                        <input
+                            type="date"
+                            id="searchReturnDate"
+                        >
 
+                        <div
+                            id="searchDuration"
+                            class="duration-message"
+                        ></div>
 
-<option value="All">
+                    </div>
 
-All
+                    <div class="refine-group">
 
-</option>
+                        <label for="searchAdults">
+                            Adults
+                        </label>
 
+                        <select id="searchAdults">
 
-<option value="Egypt">
+                            <option value="1">
+                                1 adult
+                            </option>
 
-Egypt
+                            <option value="2">
+                                2 adults
+                            </option>
 
-</option>
+                            <option value="3">
+                                3 adults
+                            </option>
 
+                            <option value="4">
+                                4 adults
+                            </option>
 
-<option value="Turkey">
+                            <option value="5">
+                                5 adults
+                            </option>
 
-Turkey
+                            <option value="6">
+                                6 adults
+                            </option>
 
-</option>
+                            <option value="7">
+                                7 adults
+                            </option>
 
+                            <option value="8">
+                                8 adults
+                            </option>
 
-<option value="Spain">
+                        </select>
 
-Spain
+                    </div>
 
-</option>
+                    <div class="refine-group">
 
+                        <label for="searchChildren">
+                            Children
+                        </label>
 
-<option value="Greece">
+                        <select id="searchChildren">
 
-Greece
+                            <option value="0">
+                                0 children
+                            </option>
 
-</option>
+                            <option value="1">
+                                1 child
+                            </option>
 
+                            <option value="2">
+                                2 children
+                            </option>
 
-<option value="Cyprus">
+                            <option value="3">
+                                3 children
+                            </option>
 
-Cyprus
+                            <option value="4">
+                                4 children
+                            </option>
 
-</option>
+                            <option value="5">
+                                5 children
+                            </option>
 
+                            <option value="6">
+                                6 children
+                            </option>
 
-<option value="Portugal">
+                        </select>
 
-Portugal
+                    </div>
 
-</option>
+                    <div class="refine-group">
 
+                        <label for="searchBoard">
+                            Board basis
+                        </label>
 
-<option value="Morocco">
+                        <select id="searchBoard">
 
-Morocco
+                            <option value="">
+                                Any board basis
+                            </option>
 
-</option>
+                            <option value="All Inclusive">
+                                All Inclusive
+                            </option>
 
+                            <option value="Half Board">
+                                Half Board
+                            </option>
 
-</select>
+                            <option value="Full Board">
+                                Full Board
+                            </option>
 
+                            <option value="Bed & Breakfast">
+                                Bed & Breakfast
+                            </option>
 
-</div>
+                            <option value="Self Catering">
+                                Self Catering
+                            </option>
 
+                            <option value="Room Only">
+                                Room Only
+                            </option>
 
+                        </select>
 
+                    </div>
 
+                    <div class="refine-group">
 
-<div>
+                        <label for="searchBudget">
+                            Maximum total budget
+                        </label>
 
+                        <select id="searchBudget">
 
-<div class="sort-box">
+                            <option value="">
+                                Any budget
+                            </option>
 
+                            <option value="500">
+                                Up to £500
+                            </option>
 
-<h3>Sort Holidays</h3>
+                            <option value="750">
+                                Up to £750
+                            </option>
 
+                            <option value="1000">
+                                Up to £1,000
+                            </option>
 
-<button onclick="sortResults('price')">
+                            <option value="1200">
+                                Up to £1,200
+                            </option>
 
-💷 Cheapest
+                            <option value="1500">
+                                Up to £1,500
+                            </option>
 
-</button>
+                            <option value="2000">
+                                Up to £2,000
+                            </option>
 
+                            <option value="2500">
+                                Up to £2,500
+                            </option>
 
-<button onclick="sortResults('rating')">
+                            <option value="3000">
+                                Up to £3,000
+                            </option>
 
-⭐ Best Rated
+                            <option value="4000">
+                                Up to £4,000
+                            </option>
 
-</button>
+                            <option value="5000">
+                                Up to £5,000
+                            </option>
 
+                            <option value="7500">
+                                Up to £7,500
+                            </option>
 
-<button onclick="sortResults('family')">
+                            <option value="10000">
+                                Up to £10,000
+                            </option>
 
-👨‍👩‍👧 Best Family
+                        </select>
 
-</button>
+                    </div>
 
+                </div>
 
-<button onclick="sortResults('weather')">
+                <div
+                    id="searchChildAges"
+                    class="child-ages-section"
+                >
 
-☀️ Best Weather
+                    <h3>
+                        Children's ages
+                    </h3>
 
-</button>
+                    <div
+                        id="searchChildAgeFields"
+                        class="child-age-grid"
+                    ></div>
 
+                </div>
 
-</div>
+                <div
+                    id="refineError"
+                    class="refine-error"
+                ></div>
 
+                <div class="refine-actions">
 
+                    <button
+                        type="submit"
+                        class="update-results-button"
+                    >
+                        UPDATE RESULTS
+                    </button>
 
-<div id="results" class="cards"></div>
+                    <button
+                        type="button"
+                        id="resetSearchButton"
+                        class="reset-search-button"
+                    >
+                        Reset to Any
+                    </button>
 
+                </div>
 
-</div>
+            </form>
 
+        </section>
 
-</div>
-<script>
+        <div class="results-layout">
 
+            <aside class="filter-panel">
 
-let allDeals=[];
+                <h2>
+                    Filter Results
+                </h2>
 
-let currentDeals=[];
+                <div class="filter-group">
 
+                    <label for="destinationFilter">
+                        Destination
+                    </label>
 
+                    <select id="destinationFilter">
 
-let destination =
-localStorage.getItem("destination");
+                        <option value="">
+                            All destinations
+                        </option>
 
+                    </select>
 
-let airport =
-localStorage.getItem("airport");
+                </div>
 
+                <div class="filter-group">
 
-let adults =
-localStorage.getItem("adults");
+                    <label for="supplierFilter">
+                        Supplier
+                    </label>
 
+                    <select id="supplierFilter">
 
-let children =
-localStorage.getItem("children");
+                        <option value="">
+                            All suppliers
+                        </option>
 
+                    </select>
 
-let child1 =
-localStorage.getItem("child1");
+                </div>
 
+                <div class="filter-group">
 
-let child2 =
-localStorage.getItem("child2");
+                    <label for="boardFilter">
+                        Board basis
+                    </label>
 
+                    <select id="boardFilter">
 
-let budget =
-Number(localStorage.getItem("budget"));
+                        <option value="">
+                            All board types
+                        </option>
 
+                    </select>
 
+                </div>
 
+                <div class="filter-group">
 
+                    <label for="maximumPriceFilter">
+                        Maximum total price
+                    </label>
 
-document.getElementById("searchDetails").innerHTML =
+                    <input
+                        type="number"
+                        id="maximumPriceFilter"
+                        min="0"
+                        step="50"
+                        placeholder="Example: 2000"
+                    >
 
-"✈ "+airport+
-" → "+
-destination+
+                </div>
 
-"<br>👨 Adults: "+
-adults+
+                <button
+                    type="button"
+                    id="applyFiltersButton"
+                    class="filter-button"
+                >
+                    Apply Filters
+                </button>
 
-" | 🧒 Children: "+
-children+
+                <button
+                    type="button"
+                    id="clearFiltersButton"
+                    class="clear-button"
+                >
+                    Clear Filters
+                </button>
 
-"<br>🎂 Ages: "+
-(child1 || "")+
-" "+
-(child2 || "");
+            </aside>
 
+            <section class="results-column">
 
+                <div class="results-toolbar">
 
+                    <div
+                        id="resultsCount"
+                        class="results-count"
+                    >
+                        Loading results...
+                    </div>
 
+                    <div class="sort-area">
 
+                        <label for="sortResults">
+                            Sort by
+                        </label>
 
-fetch("holidays.json")
+                        <select id="sortResults">
 
-.then(response=>response.json())
+                            <option value="price-low">
+                                Cheapest first
+                            </option>
 
-.then(data=>{
+                            <option value="price-high">
+                                Highest price first
+                            </option>
 
-allDeals=data;
+                            <option value="rating-high">
+                                Highest rated
+                            </option>
 
-displayResults();
+                            <option value="stars-high">
+                                Most stars
+                            </option>
 
-})
+                            <option value="name">
+                                Hotel name
+                            </option>
 
-.catch(()=>{
+                        </select>
 
-document.getElementById("results").innerHTML=
+                    </div>
 
-"<h2>Error loading holidays</h2>";
+                </div>
 
-});
+                <div id="resultsContainer">
 
+                    <div class="loading-box">
 
+                        <h2>
+                            Finding live holiday offers...
+                        </h2>
 
+                        <p>
+                            We are checking the latest offers in the database.
+                        </p>
 
+                    </div>
 
+                </div>
 
+            </section>
 
-function displayResults(){
+        </div>
 
+    </main>
 
-let chosen =
-document.getElementById("destinationFilter").value;
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <script src="js/supabase.js?v=20260729-3"></script>
 
+    <script src="js/results.js?v=20260901-1"></script>
 
-let limit = budget || 999999;
-
-
-
-currentDeals = allDeals.filter(function(holiday){
-
-
-return (
-
-(chosen==="All" ||
-
-holiday.country===chosen ||
-
-holiday.country===destination)
-
-&&
-
-holiday.suppliers[0].price <= limit
-
-
-);
-
-
-});
-
-
-
-sortResults("price");
-
-
-}
-
-
-
-
-
-
-
-
-function sortResults(type){
-
-
-
-if(type==="price"){
-
-currentDeals.sort((a,b)=>
-
-a.suppliers[0].price -
-b.suppliers[0].price
-
-);
-
-}
-
-
-
-if(type==="rating"){
-
-currentDeals.sort((a,b)=>
-
-b.rating-a.rating
-
-);
-
-}
-
-
-
-if(type==="family"){
-
-currentDeals.sort((a,b)=>
-
-b.familyScore-a.familyScore
-
-);
-
-}
-
-
-
-if(type==="weather"){
-
-currentDeals.sort((a,b)=>
-
-b.weatherScore-a.weatherScore
-
-);
-
-}
-
-
-
-showResults();
-
-
-}
-
-
-
-
-
-
-
-
-
-function getBadges(holiday){
-
-
-let badges="";
-
-
-
-if(holiday.familyScore>=95){
-
-badges +=
-
-"<div class='badge'>🏆 Best Family Match</div>";
-
-}
-
-
-
-if(holiday.facilities.includes("Waterpark")){
-
-badges +=
-
-"<div class='badge'>💦 Waterpark Holiday</div>";
-
-}
-
-
-
-if(holiday.weatherScore>=97){
-
-badges +=
-
-"<div class='badge'>☀️ Great Weather</div>";
-
-}
-
-
-
-if(holiday.rating>=4.7){
-
-badges +=
-
-"<div class='badge'>⭐ Highly Rated</div>";
-
-}
-
-
-
-return badges;
-
-
-}
-
-
-
-
-
-
-
-
-
-function showResults(){
-
-
-let box =
-document.getElementById("results");
-
-
-box.innerHTML="";
-
-
-
-
-
-if(currentDeals.length===0){
-
-
-box.innerHTML=
-
-"<h2>No holidays found</h2>";
-
-return;
-
-
-}
-
-
-
-
-
-
-currentDeals.forEach(function(holiday,index){
-
-
-
-let supplier =
-holiday.suppliers.sort(function(a,b){
-
-return a.price-b.price;
-
-})[0];
-
-
-
-
-
-
-box.innerHTML += `
-
-
-
-<div class="deal-card">
-
-
-
-<img src="${holiday.image}">
-
-
-
-<div class="deal-content">
-
-
-
-${getBadges(holiday)}
-
-
-
-
-<h2>
-
-${holiday.name}
-
-</h2>
-
-
-
-
-<p>
-
-📍 ${holiday.location}, ${holiday.country}
-
-</p>
-
-
-
-
-
-<p>
-
-${"⭐".repeat(holiday.stars)}
-
-(${holiday.rating}/5)
-
-</p>
-
-
-
-
-
-<div class="info">
-
-
-🏖 ${holiday.facilities.join(" • ")}
-
-
-<br><br>
-
-
-🛏 ${holiday.roomTypes.join(" • ")}
-
-
-
-</div>
-
-
-
-
-
-<div class="score">
-
-Family Score ${holiday.familyScore}/100
-
-</div>
-
-
-
-
-
-<h2 class="price">
-
-£${supplier.price}
-
-</h2>
-
-
-
-
-<p>
-
-🌙 ${holiday.nights} Nights
-
-<br>
-
-🍽 ${holiday.board}
-
-</p>
-
-
-
-
-
-<button onclick="viewHoliday(${index})">
-
-VIEW DEAL
-
-</button>
-
-
-
-</div>
-
-
-</div>
-
-
-`;
-
-
-
-});
-
-
-}
-
-
-
-
-
-
-
-
-function viewHoliday(index){
-
-
-localStorage.setItem(
-
-"selectedHoliday",
-
-JSON.stringify(currentDeals[index])
-
-);
-
-
-
-window.location="holiday.html";
-
-
-}
-
-
-
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase.js"></script>
 </body>
 
 </html>
