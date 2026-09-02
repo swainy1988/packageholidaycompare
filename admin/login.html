@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Admin Login | PackageHolidayCompare
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../css/admin.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/supabase.js"></script>
+
+    <style>
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #f4f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 430px;
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 34px;
+            box-shadow:
+                0 15px 45px
+                rgba(31, 41, 55, 0.12);
+        }
+
+        .login-logo {
+            margin-bottom: 26px;
+            color: #1769d2;
+            font-size: 22px;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .login-card h1 {
+            margin: 0 0 8px;
+            text-align: center;
+            font-size: 30px;
+        }
+
+        .login-intro {
+            margin: 0 0 28px;
+            color: #64748b;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .login-group {
+            margin-bottom: 18px;
+        }
+
+        .login-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 700;
+        }
+
+        .login-group input {
+            width: 100%;
+            min-height: 48px;
+            padding: 11px 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            box-sizing: border-box;
+            font: inherit;
+        }
+
+        .login-group input:focus {
+            outline: 3px solid rgba(23, 105, 210, 0.12);
+            border-color: #1769d2;
+        }
+
+        .login-button {
+            width: 100%;
+            min-height: 48px;
+            border: 0;
+            border-radius: 9px;
+            background: #1769d2;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .login-button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .login-message {
+            display: none;
+            margin-top: 18px;
+            padding: 12px 14px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .login-message.error {
+            display: block;
+            background: #fff1f2;
+            color: #b42318;
+            border: 1px solid #fecdd3;
+        }
+
+        .login-message.success {
+            display: block;
+            background: #ecfdf3;
+            color: #027a48;
+            border: 1px solid #a6f4c5;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 24px;
+            text-align: center;
+            color: #1769d2;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <main class="login-page">
+
+        <div class="login-card">
+
+            <div class="login-logo">
+                ✈ PackageHolidayCompare
+            </div>
+
+            <h1>
+                Admin Login
+            </h1>
+
+            <p class="login-intro">
+                Sign in to manage hotels, holiday offers,
+                suppliers and images.
+            </p>
+
+            <form id="loginForm">
+
+                <div class="login-group">
+
+                    <label for="email">
+                        Email address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        autocomplete="email"
+                        required
+                    >
+
+                </div>
+
+                <div class="login-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="login-button"
+                >
+                    Sign In
+                </button>
+
+                <div
+                    id="loginMessage"
+                    class="login-message"
+                    aria-live="polite"
+                ></div>
+
+            </form>
+
+            <a
+                href="../index.html"
+                class="back-link"
+            >
+                ← Back to PackageHolidayCompare
+            </a>
+
+        </div>
+
+    </main>
+
+    <script src="../js/admin-login.js?v=20260902-1"></script>
+
+</body>
+
+</html>
