@@ -2576,7 +2576,7 @@ function createHotelCard(group) {
         );
 
     const bookingButton =
-        bookingUrl && !DEMO_MODE
+        bookingUrl
             ? `
                 <a
                     class="book-button"
@@ -2590,9 +2590,9 @@ function createHotelCard(group) {
             : `
                 <span
                     class="book-button disabled"
-                    title="This test offer does not have a live supplier booking link."
+                    title="No supplier booking link has been added for this offer yet."
                 >
-                    Demo offer — no live booking link
+                    No booking link
                 </span>
             `;
 
@@ -2860,7 +2860,7 @@ function createSupplierOfferRow(offer) {
         );
 
     const bookingLink =
-        bookingUrl && !DEMO_MODE
+        bookingUrl
             ? `
                 <a
                     class="small-book-link"
@@ -2874,9 +2874,9 @@ function createSupplierOfferRow(offer) {
             : `
                 <span
                     class="small-book-link disabled"
-                    title="This test offer does not have a live supplier booking link."
+                    title="No supplier booking link has been added for this offer yet."
                 >
-                    Demo only
+                    No booking link
                 </span>
             `;
 
