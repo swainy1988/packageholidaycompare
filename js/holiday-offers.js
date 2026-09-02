@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     const airport =
                         offer.airport || "";
 
+                    const roomType =
+                        offer.room_type || "";
+
                     return (
                         hotelName
                             .toLowerCase()
@@ -40,6 +43,10 @@ document.addEventListener("DOMContentLoaded", () => {
                             .includes(search) ||
 
                         airport
+                            .toLowerCase()
+                            .includes(search) ||
+
+                        roomType
                             .toLowerCase()
                             .includes(search)
                     );
@@ -55,6 +62,11 @@ document.addEventListener("DOMContentLoaded", () => {
     loadOffers();
 
 });
+
+
+// ======================================================
+// LOAD OFFERS
+// ======================================================
 
 async function loadOffers() {
 
@@ -79,7 +91,7 @@ async function loadOffers() {
 
         table.innerHTML = `
             <tr>
-                <td colspan="7">
+                <td colspan="9">
                     Supabase connection is unavailable.
                 </td>
             </tr>
@@ -91,7 +103,7 @@ async function loadOffers() {
 
     table.innerHTML = `
         <tr>
-            <td colspan="7">
+            <td colspan="9">
                 Loading offers...
             </td>
         </tr>
@@ -99,8 +111,9 @@ async function loadOffers() {
 
     try {
 
-        // Load hotel names separately.
-        // This works without a foreign-key relationship.
+        // ==================================================
+        // LOAD HOTEL NAMES
+        // ==================================================
 
         const {
             data: hotels,
@@ -125,7 +138,10 @@ async function loadOffers() {
 
         });
 
-        // Load all holiday offers.
+
+        // ==================================================
+        // LOAD HOLIDAY OFFERS
+        // ==================================================
 
         const {
             data: offers,
@@ -141,9 +157,12 @@ async function loadOffers() {
             throw offersError;
         }
 
-        allOffers = offers || [];
+        allOffers =
+            offers || [];
 
-        renderOffers(allOffers);
+        renderOffers(
+            allOffers
+        );
 
     } catch (error) {
 
@@ -154,7 +173,7 @@ async function loadOffers() {
 
         table.innerHTML = `
             <tr>
-                <td colspan="7">
+                <td colspan="9">
                     Failed to load offers.
                 </td>
             </tr>
@@ -163,6 +182,11 @@ async function loadOffers() {
     }
 
 }
+
+
+// ======================================================
+// RENDER OFFERS
+// ======================================================
 
 function renderOffers(offers) {
 
@@ -179,7 +203,7 @@ function renderOffers(offers) {
 
         table.innerHTML = `
             <tr>
-                <td colspan="7">
+                <td colspan="9">
                     No holiday offers found.
                 </td>
             </tr>
@@ -196,11 +220,51 @@ function renderOffers(offers) {
             "Unknown hotel";
 
         const price =
-            Number(offer.price || 0)
-                .toLocaleString("en-GB", {
+            Number(
+                offer.price || 0
+            ).toLocaleString(
+                "en-GB",
+                {
                     minimumFractionDigits: 0,
                     maximumFractionDigits: 2
-                });
+                }
+            );
+
+        const roomType =
+            offer.room_type
+                ? escapeHtml(
+                    offer.room_type
+                )
+                : "-";
+
+        const bookingUrl =
+            createSafeBookingUrl(
+                offer.booking_url
+            );
+
+        const bookingLink =
+            bookingUrl
+                ? `
+                    <a
+                        class="btn btn-small"
+                        href="${bookingUrl}"
+                        target="_blank"
+                        rel="noopener"
+                    >
+                        View Link
+                    </a>
+                `
+                : `
+                    <span
+                        style="
+                            color:#777;
+                            font-size:13px;
+                            font-weight:600;
+                        "
+                    >
+                        No link
+                    </span>
+                `;
 
         table.insertAdjacentHTML(
             "beforeend",
@@ -208,7 +272,9 @@ function renderOffers(offers) {
                 <tr>
 
                     <td>
-                        ${escapeHtml(hotelName)}
+                        ${escapeHtml(
+                            hotelName
+                        )}
                     </td>
 
                     <td>
@@ -234,7 +300,17 @@ function renderOffers(offers) {
                     </td>
 
                     <td>
-                        ${offer.nights ?? "-"}
+                        ${escapeHtml(
+                            offer.nights ?? "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${roomType}
+                    </td>
+
+                    <td>
+                        ${bookingLink}
                     </td>
 
                     <td>
@@ -251,7 +327,9 @@ function renderOffers(offers) {
                         <button
                             type="button"
                             class="btn-red"
-                            onclick="deleteOffer('${offer.id}')"
+                            onclick="deleteOffer('${escapeAttribute(
+                                offer.id
+                            )}')"
                         >
                             Delete
                         </button>
@@ -266,20 +344,37 @@ function renderOffers(offers) {
 
 }
 
+
+// ======================================================
+// DELETE OFFER
+// ======================================================
+
 async function deleteOffer(id) {
 
-    const confirmed = confirm(
-        "Are you sure you want to delete this holiday offer?"
-    );
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this holiday offer?"
+        );
 
     if (!confirmed) {
         return;
     }
 
-    const { error } = await window.db
-        .from("holiday_offers")
-        .delete()
-        .eq("id", id);
+    if (!window.db) {
+
+        alert(
+            "Supabase is not connected."
+        );
+
+        return;
+
+    }
+
+    const { error } =
+        await window.db
+            .from("holiday_offers")
+            .delete()
+            .eq("id", id);
 
     if (error) {
 
@@ -300,6 +395,38 @@ async function deleteOffer(id) {
 
 }
 
+
+// ======================================================
+// BOOKING URL
+// ======================================================
+
+function createSafeBookingUrl(value) {
+
+    const url =
+        String(
+            value || ""
+        ).trim();
+
+    if (
+        url.startsWith("https://") ||
+        url.startsWith("http://")
+    ) {
+
+        return escapeAttribute(
+            url
+        );
+
+    }
+
+    return "";
+
+}
+
+
+// ======================================================
+// DATE FORMAT
+// ======================================================
+
 function formatDate(value) {
 
     if (!value) {
@@ -307,10 +434,20 @@ function formatDate(value) {
     }
 
     const date =
-        new Date(`${value}T00:00:00`);
+        new Date(
+            `${String(value).slice(0, 10)}T00:00:00`
+        );
 
-    if (Number.isNaN(date.getTime())) {
-        return value;
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return escapeHtml(
+            value
+        );
+
     }
 
     return date.toLocaleDateString(
@@ -324,13 +461,44 @@ function formatDate(value) {
 
 }
 
+
+// ======================================================
+// HTML SAFETY
+// ======================================================
+
 function escapeHtml(value) {
 
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    return String(
+        value ?? ""
+    )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
+
+}
+
+
+function escapeAttribute(value) {
+
+    return escapeHtml(
+        value
+    );
 
 }
