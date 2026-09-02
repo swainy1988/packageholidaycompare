@@ -94,7 +94,7 @@ async function loadSuppliers() {
 
         table.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td colspan="6">
                     Supabase connection is unavailable.
                 </td>
             </tr>
@@ -106,7 +106,7 @@ async function loadSuppliers() {
 
     table.innerHTML = `
         <tr>
-            <td colspan="5">
+            <td colspan="6">
                 Loading suppliers...
             </td>
         </tr>
@@ -147,7 +147,7 @@ async function loadSuppliers() {
 
         table.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td colspan="6">
                     Failed to load suppliers.
                 </td>
             </tr>
@@ -179,7 +179,7 @@ function renderSuppliers(suppliers) {
 
         table.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td colspan="6">
                     No suppliers found.
                 </td>
             </tr>
@@ -191,6 +191,64 @@ function renderSuppliers(suppliers) {
 
     suppliers.forEach(
         supplier => {
+
+            // ==================================================
+            // LOGO
+            // ==================================================
+
+            const logoUrl =
+                createSafeUrl(
+                    supplier.logo_url
+                );
+
+            const logoDisplay =
+                logoUrl
+                    ? `
+                        <div
+                            style="
+                                width:90px;
+                                min-height:50px;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                padding:6px;
+                                border:1px solid #e5e7eb;
+                                border-radius:8px;
+                                background:#ffffff;
+                            "
+                        >
+                            <img
+                                src="${logoUrl}"
+                                alt="${escapeAttribute(
+                                    supplier.name ||
+                                    "Supplier"
+                                )} logo"
+                                style="
+                                    max-width:78px;
+                                    max-height:40px;
+                                    width:auto;
+                                    height:auto;
+                                    object-fit:contain;
+                                "
+                                onerror="this.parentElement.innerHTML='<span style=&quot;color:#777;font-size:12px;&quot;>Logo unavailable</span>'"
+                            >
+                        </div>
+                    `
+                    : `
+                        <span
+                            style="
+                                color:#777;
+                                font-size:13px;
+                            "
+                        >
+                            No logo
+                        </span>
+                    `;
+
+
+            // ==================================================
+            // WEBSITE
+            // ==================================================
 
             const websiteUrl =
                 createSafeUrl(
@@ -218,6 +276,11 @@ function renderSuppliers(suppliers) {
                             No website
                         </span>
                     `;
+
+
+            // ==================================================
+            // STATUS
+            // ==================================================
 
             const status =
                 supplier.active
@@ -252,10 +315,19 @@ function renderSuppliers(suppliers) {
                         </span>
                     `;
 
+
+            // ==================================================
+            // TABLE ROW
+            // ==================================================
+
             table.insertAdjacentHTML(
                 "beforeend",
                 `
                     <tr>
+
+                        <td>
+                            ${logoDisplay}
+                        </td>
 
                         <td>
                             <strong>
