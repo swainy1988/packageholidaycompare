@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Suppliers | PackageHolidayCompare</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/admin.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/supabase.js"></script>
+
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                PackageHolidayCompare
+            </div>
+
+            <nav>
+
+                <a href="index.html">
+                    📊 Dashboard
+                </a>
+
+                <a href="hotels.html">
+                    🏨 Hotels
+                </a>
+
+                <a href="holiday-offers.html">
+                    🌴 Holiday Offers
+                </a>
+
+                <a href="images.html">
+                    🖼 Images
+                </a>
+
+                <a
+                    class="active"
+                    href="suppliers.html"
+                >
+                    ✈ Suppliers
+                </a>
+
+                <a href="settings.html">
+                    ⚙ Settings
+                </a>
+
+            </nav>
+
+        </aside>
+
+        <main class="main">
+
+            <header class="topbar">
+
+                <div>
+
+                    <h1>Suppliers</h1>
+
+                    <p>
+                        Manage holiday suppliers used across PackageHolidayCompare.
+                    </p>
+
+                </div>
+
+                <a
+                    class="btn btn-primary"
+                    href="add-supplier.html"
+                >
+                    + Add Supplier
+                </a>
+
+            </header>
+
+            <div class="card">
+
+                <input
+                    type="text"
+                    id="searchSuppliers"
+                    class="search"
+                    placeholder="Search suppliers..."
+                >
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Supplier</th>
+                                <th>Slug</th>
+                                <th>Website</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="suppliersTable">
+
+                            <tr>
+                                <td colspan="5">
+                                    Loading suppliers...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script src="../js/suppliers.js?v=20260902-1"></script>
+
+</body>
+
+</html>
