@@ -1,11 +1,15 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Holiday Results Page
-// Version: 2026-09-02-1
+// Version: 2026-09-02-2
 // ======================================================
 
 let allHotels = [];
 let allOffers = [];
+let allSuppliers = [];
+
+let supplierMap = new Map();
+
 let groupedResults = [];
 let visibleResults = [];
 
@@ -964,7 +968,8 @@ async function loadHolidayResults() {
 
         const [
             hotelsResponse,
-            offersResponse
+            offersResponse,
+            suppliersResponse
         ] = await Promise.all([
 
             window.db
@@ -979,6 +984,12 @@ async function loadHolidayResults() {
                     {
                         ascending: true
                     }
+                ),
+
+            window.db
+                .from("suppliers")
+                .select(
+                    "id, name, slug, website_url, logo_url, active"
                 )
         ]);
 
@@ -990,11 +1001,23 @@ async function loadHolidayResults() {
             throw offersResponse.error;
         }
 
+        if (suppliersResponse.error) {
+            throw suppliersResponse.error;
+        }
+
         allHotels =
             hotelsResponse.data || [];
 
         allOffers =
             offersResponse.data || [];
+
+        allSuppliers =
+            suppliersResponse.data || [];
+
+        supplierMap =
+            createSupplierMap(
+                allSuppliers
+            );
 
         groupedResults =
             createGroupedResults(
@@ -1641,6 +1664,96 @@ function clearAlternativeMaximumPriceFilter() {
         maximumPriceFilter.value =
             "";
     }
+}
+
+
+// ======================================================
+// SUPPLIER MAP
+// ======================================================
+
+function createSupplierMap(suppliers) {
+
+    const map =
+        new Map();
+
+    suppliers.forEach(supplier => {
+
+        const key =
+            normaliseText(
+                supplier.name
+            );
+
+        if (!key) {
+            return;
+        }
+
+        map.set(
+            key,
+            supplier
+        );
+    });
+
+    return map;
+}
+
+
+function getSupplierData(name) {
+
+    const key =
+        normaliseText(name);
+
+    if (!key) {
+        return null;
+    }
+
+    return (
+        supplierMap.get(key) ||
+        null
+    );
+}
+
+
+function createSupplierLogo(
+    supplierName,
+    size = "small"
+) {
+
+    const supplier =
+        getSupplierData(
+            supplierName
+        );
+
+    if (!supplier) {
+        return "";
+    }
+
+    const logoUrl =
+        createSafeBookingUrl(
+            supplier.logo_url
+        );
+
+    if (!logoUrl) {
+        return "";
+    }
+
+    const className =
+        size === "large"
+            ? "supplier-logo supplier-logo-large"
+            : "supplier-logo supplier-logo-small";
+
+    return `
+        <img
+            class="${className}"
+            src="${logoUrl}"
+            alt="${escapeAttribute(
+                supplier.name ||
+                supplierName ||
+                "Supplier"
+            )} logo"
+            loading="lazy"
+            onerror="this.style.display='none'"
+        >
+    `;
 }
 
 
@@ -2561,6 +2674,12 @@ function createHotelCard(group) {
             cheapest.booking_url
         );
 
+    const supplierLogo =
+        createSupplierLogo(
+            cheapest.supplier,
+            "large"
+        );
+
     const demoBadge =
         DEMO_MODE
             ? `
@@ -2711,11 +2830,15 @@ function createHotelCard(group) {
                             }
                         </div>
 
-                        <div class="supplier-name">
-                            ${escapeHtml(
-                                cheapest.supplier ||
-                                "Supplier"
-                            )}
+                        <div class="supplier-brand">
+                            ${supplierLogo}
+
+                            <div class="supplier-name">
+                                ${escapeHtml(
+                                    cheapest.supplier ||
+                                    "Supplier"
+                                )}
+                            </div>
                         </div>
 
                         <div class="price">
@@ -2859,6 +2982,12 @@ function createSupplierOfferRow(offer) {
             offer.booking_url
         );
 
+    const supplierLogo =
+        createSupplierLogo(
+            offer.supplier,
+            "small"
+        );
+
     const bookingLink =
         bookingUrl
             ? `
@@ -2893,10 +3022,18 @@ function createSupplierOfferRow(offer) {
         <tr>
 
             <td>
-                ${escapeHtml(
-                    offer.supplier ||
-                    "Supplier"
-                )}
+                <div class="supplier-table-brand">
+
+                    ${supplierLogo}
+
+                    <span>
+                        ${escapeHtml(
+                            offer.supplier ||
+                            "Supplier"
+                        )}
+                    </span>
+
+                </div>
             </td>
 
             <td>
@@ -3102,6 +3239,38 @@ function injectResultEnhancementStyles() {
             color: #6f5200;
             font-size: 12px;
             font-weight: 800;
+        }
+
+        .supplier-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .supplier-logo {
+            display: block;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .supplier-logo-large {
+            max-width: 110px;
+            max-height: 44px;
+        }
+
+        .supplier-logo-small {
+            max-width: 72px;
+            max-height: 28px;
+            flex: 0 0 auto;
+        }
+
+        .supplier-table-brand {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 130px;
         }
 
         .hotel-image-wrap {
