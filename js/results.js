@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Holiday Results Page
-// Version: 2026-09-01-3
+// Version: 2026-09-02-1
 // ======================================================
 
 let allHotels = [];
@@ -9,9 +9,19 @@ let allOffers = [];
 let groupedResults = [];
 let visibleResults = [];
 
+let resultsMode = "matches";
+
 // Keep this true while offers are manually entered test data.
 // Change it to false after approved live supplier feeds are connected.
 const DEMO_MODE = true;
+
+// Main search flexibility.
+const PRIMARY_DATE_FLEX_DAYS = 3;
+const PRIMARY_NIGHT_FLEX = 3;
+
+// Alternative search flexibility.
+const ALTERNATIVE_DATE_FLEX_DAYS = 14;
+const ALTERNATIVE_NIGHT_FLEX = 7;
 
 document.addEventListener(
     "DOMContentLoaded",
@@ -500,7 +510,7 @@ function updateSearchDuration() {
             nights === 1
                 ? "night"
                 : "nights"
-        } selected • showing ±3 nights`;
+        } selected • showing ±${PRIMARY_NIGHT_FLEX} nights`;
 }
 
 
@@ -877,7 +887,7 @@ function updateSearchSummary() {
         );
 
         summaryParts.push(
-            "Flexible ±3 days"
+            `Flexible ±${PRIMARY_DATE_FLEX_DAYS} days`
         );
 
         if (nights > 0) {
@@ -887,7 +897,7 @@ function updateSearchSummary() {
                     nights === 1
                         ? "night"
                         : "nights"
-                } ±3 nights`
+                } ±${PRIMARY_NIGHT_FLEX} nights`
             );
         }
 
@@ -992,7 +1002,34 @@ async function loadHolidayResults() {
                 allOffers
             );
 
+        if (groupedResults.length > 0) {
+
+            resultsMode = "matches";
+
+        } else {
+
+            groupedResults =
+                createAlternativeGroupedResults(
+                    allHotels,
+                    allOffers
+                );
+
+            resultsMode =
+                groupedResults.length > 0
+                    ? "alternatives"
+                    : "none";
+        }
+
         populateResultFilterOptions();
+
+        if (
+            resultsMode ===
+            "alternatives"
+        ) {
+
+            clearAlternativeMaximumPriceFilter();
+        }
+
         applyResultFilters();
 
     } catch (error) {
@@ -1011,7 +1048,7 @@ async function loadHolidayResults() {
 
 
 // ======================================================
-// GROUP HOTELS AND OFFERS
+// GROUP NORMAL HOTEL RESULTS
 // ======================================================
 
 function createGroupedResults(
@@ -1032,15 +1069,7 @@ function createGroupedResults(
         );
 
     const hotelMap =
-        new Map();
-
-    hotels.forEach(hotel => {
-
-        hotelMap.set(
-            String(hotel.id),
-            hotel
-        );
-    });
+        createHotelMap(hotels);
 
     const groupedMap =
         new Map();
@@ -1077,7 +1106,8 @@ function createGroupedResults(
                 hotelId,
                 {
                     hotel,
-                    offers: []
+                    offers: [],
+                    isAlternative: false
                 }
             );
         }
@@ -1107,6 +1137,531 @@ function createGroupedResults(
 
         return group;
     });
+}
+
+
+// ======================================================
+// ALTERNATIVE RESULTS
+// ======================================================
+
+function createAlternativeGroupedResults(
+    hotels,
+    offers
+) {
+
+    const search =
+        getCurrentSearch();
+
+    const hotelMap =
+        createHotelMap(hotels);
+
+    const groupedMap =
+        new Map();
+
+    offers.forEach(originalOffer => {
+
+        const hotelId =
+            String(
+                originalOffer.hotel_id || ""
+            );
+
+        const hotel =
+            hotelMap.get(hotelId);
+
+        if (!hotel) {
+            return;
+        }
+
+        // Keep destination relevant.
+        if (
+            search.destination &&
+            !hotelMatchesDestination(
+                hotel,
+                search.destination
+            )
+        ) {
+            return;
+        }
+
+        // Keep the requested departure airport.
+        if (
+            search.airport &&
+            normaliseText(
+                originalOffer.airport
+            ) !==
+            normaliseText(
+                search.airport
+            )
+        ) {
+            return;
+        }
+
+        // Keep the requested board basis.
+        if (
+            search.board &&
+            normaliseText(
+                originalOffer.board_basis
+            ) !==
+            normaliseText(
+                search.board
+            )
+        ) {
+            return;
+        }
+
+        const alternativeInfo =
+            calculateAlternativeInfo(
+                originalOffer,
+                search
+            );
+
+        if (
+            !alternativeInfo.allowed
+        ) {
+            return;
+        }
+
+        const offer = {
+            ...originalOffer,
+
+            _alternativeScore:
+                alternativeInfo.score,
+
+            _alternativeReasons:
+                alternativeInfo.reasons,
+
+            _dateDifference:
+                alternativeInfo.dateDifference,
+
+            _nightDifference:
+                alternativeInfo.nightDifference,
+
+            _budgetDifference:
+                alternativeInfo.budgetDifference
+        };
+
+        if (
+            !groupedMap.has(hotelId)
+        ) {
+
+            groupedMap.set(
+                hotelId,
+                {
+                    hotel,
+                    offers: [],
+                    isAlternative: true
+                }
+            );
+        }
+
+        groupedMap
+            .get(hotelId)
+            .offers
+            .push(offer);
+    });
+
+    const groups =
+        Array.from(
+            groupedMap.values()
+        );
+
+    groups.forEach(group => {
+
+        group.offers.sort(
+            (first, second) => {
+
+                const scoreDifference =
+                    Number(
+                        first._alternativeScore || 0
+                    ) -
+                    Number(
+                        second._alternativeScore || 0
+                    );
+
+                if (scoreDifference !== 0) {
+                    return scoreDifference;
+                }
+
+                return (
+                    Number(
+                        first.price || 0
+                    ) -
+                    Number(
+                        second.price || 0
+                    )
+                );
+            }
+        );
+
+        group.cheapestOffer =
+            group.offers[0];
+
+        group.alternativeScore =
+            Number(
+                group.cheapestOffer
+                    ._alternativeScore || 0
+            );
+    });
+
+    groups.sort(
+        (first, second) => {
+
+            const scoreDifference =
+                Number(
+                    first.alternativeScore || 0
+                ) -
+                Number(
+                    second.alternativeScore || 0
+                );
+
+            if (scoreDifference !== 0) {
+                return scoreDifference;
+            }
+
+            return (
+                Number(
+                    first.cheapestOffer.price || 0
+                ) -
+                Number(
+                    second.cheapestOffer.price || 0
+                )
+            );
+        }
+    );
+
+    return groups;
+}
+
+
+function calculateAlternativeInfo(
+    offer,
+    search
+) {
+
+    let score = 0;
+
+    const reasons = [];
+
+    let dateDifference = 0;
+    let nightDifference = 0;
+    let budgetDifference = 0;
+
+    // --------------------------------------------------
+    // DATE DIFFERENCE
+    // --------------------------------------------------
+
+    if (search.departureDate) {
+
+        dateDifference =
+            getSignedDateDifference(
+                offer.departure_date,
+                search.departureDate
+            );
+
+        if (dateDifference === null) {
+
+            return {
+                allowed: false,
+                score: 0,
+                reasons: []
+            };
+        }
+
+        if (
+            Math.abs(dateDifference) >
+            ALTERNATIVE_DATE_FLEX_DAYS
+        ) {
+
+            return {
+                allowed: false,
+                score: 0,
+                reasons: []
+            };
+        }
+
+        if (
+            Math.abs(dateDifference) >
+            PRIMARY_DATE_FLEX_DAYS
+        ) {
+
+            reasons.push(
+                createDateDifferenceLabel(
+                    dateDifference
+                )
+            );
+        }
+
+        score +=
+            Math.abs(dateDifference) *
+            10;
+    }
+
+    // --------------------------------------------------
+    // NIGHT DIFFERENCE
+    // --------------------------------------------------
+
+    if (search.nights) {
+
+        const offerNights =
+            Number(
+                offer.nights || 0
+            );
+
+        if (!offerNights) {
+
+            return {
+                allowed: false,
+                score: 0,
+                reasons: []
+            };
+        }
+
+        nightDifference =
+            offerNights -
+            search.nights;
+
+        if (
+            Math.abs(nightDifference) >
+            ALTERNATIVE_NIGHT_FLEX
+        ) {
+
+            return {
+                allowed: false,
+                score: 0,
+                reasons: []
+            };
+        }
+
+        if (
+            Math.abs(nightDifference) >
+            PRIMARY_NIGHT_FLEX
+        ) {
+
+            reasons.push(
+                createNightDifferenceLabel(
+                    nightDifference
+                )
+            );
+        }
+
+        score +=
+            Math.abs(nightDifference) *
+            8;
+    }
+
+    // --------------------------------------------------
+    // BUDGET DIFFERENCE
+    // --------------------------------------------------
+
+    if (search.budget) {
+
+        const offerPrice =
+            Number(
+                offer.price || 0
+            );
+
+        budgetDifference =
+            offerPrice -
+            search.budget;
+
+        if (budgetDifference > 0) {
+
+            const maximumOverspend =
+                Math.max(
+                    1000,
+                    search.budget * 0.35
+                );
+
+            if (
+                budgetDifference >
+                maximumOverspend
+            ) {
+
+                return {
+                    allowed: false,
+                    score: 0,
+                    reasons: []
+                };
+            }
+
+            reasons.push(
+                `£${formatNumber(
+                    budgetDifference
+                )} over budget`
+            );
+
+            score +=
+                budgetDifference /
+                20;
+        }
+    }
+
+    // This should only be used when the normal search
+    // returned zero matches.
+    if (reasons.length === 0) {
+
+        reasons.push(
+            "Closest available alternative"
+        );
+    }
+
+    return {
+
+        allowed: true,
+
+        score,
+
+        reasons,
+
+        dateDifference,
+
+        nightDifference,
+
+        budgetDifference
+    };
+}
+
+
+function createDateDifferenceLabel(
+    difference
+) {
+
+    const absolute =
+        Math.abs(difference);
+
+    if (difference > 0) {
+
+        return `${absolute} ${
+            absolute === 1
+                ? "day"
+                : "days"
+        } later`;
+    }
+
+    return `${absolute} ${
+        absolute === 1
+            ? "day"
+            : "days"
+    } earlier`;
+}
+
+
+function createNightDifferenceLabel(
+    difference
+) {
+
+    const absolute =
+        Math.abs(difference);
+
+    if (difference > 0) {
+
+        return `${absolute} ${
+            absolute === 1
+                ? "night"
+                : "nights"
+        } longer`;
+    }
+
+    return `${absolute} ${
+        absolute === 1
+            ? "night"
+            : "nights"
+    } shorter`;
+}
+
+
+function getSignedDateDifference(
+    offerValue,
+    requestedValue
+) {
+
+    const offerDateValue =
+        String(
+            offerValue || ""
+        ).slice(0, 10);
+
+    const requestedDateValue =
+        String(
+            requestedValue || ""
+        ).slice(0, 10);
+
+    if (
+        !offerDateValue ||
+        !requestedDateValue
+    ) {
+        return null;
+    }
+
+    const offerDate =
+        new Date(
+            `${offerDateValue}T00:00:00`
+        );
+
+    const requestedDate =
+        new Date(
+            `${requestedDateValue}T00:00:00`
+        );
+
+    if (
+        Number.isNaN(
+            offerDate.getTime()
+        ) ||
+        Number.isNaN(
+            requestedDate.getTime()
+        )
+    ) {
+        return null;
+    }
+
+    const millisecondsPerDay =
+        1000 *
+        60 *
+        60 *
+        24;
+
+    return Math.round(
+        (
+            offerDate.getTime() -
+            requestedDate.getTime()
+        ) /
+        millisecondsPerDay
+    );
+}
+
+
+function clearAlternativeMaximumPriceFilter() {
+
+    const maximumPriceFilter =
+        document.getElementById(
+            "maximumPriceFilter"
+        );
+
+    if (maximumPriceFilter) {
+
+        maximumPriceFilter.value =
+            "";
+    }
+}
+
+
+// ======================================================
+// HOTEL MAP
+// ======================================================
+
+function createHotelMap(hotels) {
+
+    const hotelMap =
+        new Map();
+
+    hotels.forEach(hotel => {
+
+        hotelMap.set(
+            String(hotel.id),
+            hotel
+        );
+    });
+
+    return hotelMap;
 }
 
 
@@ -1202,6 +1757,7 @@ function offerMatchesSearch(
 
     // ==================================================
     // FLEXIBLE DURATION
+    // Example:
     // Search 14 nights = allow 11 to 17 nights
     // ==================================================
 
@@ -1223,7 +1779,8 @@ function offerMatchesSearch(
             );
 
         if (
-            nightDifference > 3
+            nightDifference >
+            PRIMARY_NIGHT_FLEX
         ) {
             return false;
         }
@@ -1231,56 +1788,28 @@ function offerMatchesSearch(
 
     // ==================================================
     // FLEXIBLE DEPARTURE DATE
-    // Allow 3 days before or after selected date
+    // Allow ±3 days
     // ==================================================
 
     if (search.departureDate) {
 
-        const rawOfferDate =
-            String(
-                offer.departure_date || ""
-            ).slice(0, 10);
-
-        if (!rawOfferDate) {
-            return false;
-        }
-
-        const offerDate =
-            new Date(
-                `${rawOfferDate}T00:00:00`
-            );
-
-        const requestedDate =
-            new Date(
-                `${search.departureDate}T00:00:00`
+        const differenceInDays =
+            getSignedDateDifference(
+                offer.departure_date,
+                search.departureDate
             );
 
         if (
-            Number.isNaN(
-                offerDate.getTime()
-            ) ||
-            Number.isNaN(
-                requestedDate.getTime()
-            )
+            differenceInDays === null
         ) {
             return false;
         }
 
-        const millisecondsPerDay =
-            1000 *
-            60 *
-            60 *
-            24;
-
-        const differenceInDays =
-            Math.abs(
-                offerDate.getTime() -
-                requestedDate.getTime()
-            ) /
-            millisecondsPerDay;
-
         if (
-            differenceInDays > 3
+            Math.abs(
+                differenceInDays
+            ) >
+            PRIMARY_DATE_FLEX_DAYS
         ) {
             return false;
         }
@@ -1562,15 +2091,52 @@ function applyResultFilters() {
                     return null;
                 }
 
-                filteredOffers.sort(
-                    (first, second) =>
-                        Number(
-                            first.price || 0
-                        ) -
-                        Number(
-                            second.price || 0
-                        )
-                );
+                if (
+                    group.isAlternative
+                ) {
+
+                    filteredOffers.sort(
+                        (first, second) => {
+
+                            const scoreDifference =
+                                Number(
+                                    first._alternativeScore ||
+                                    0
+                                ) -
+                                Number(
+                                    second._alternativeScore ||
+                                    0
+                                );
+
+                            if (
+                                scoreDifference !== 0
+                            ) {
+                                return scoreDifference;
+                            }
+
+                            return (
+                                Number(
+                                    first.price || 0
+                                ) -
+                                Number(
+                                    second.price || 0
+                                )
+                            );
+                        }
+                    );
+
+                } else {
+
+                    filteredOffers.sort(
+                        (first, second) =>
+                            Number(
+                                first.price || 0
+                            ) -
+                            Number(
+                                second.price || 0
+                            )
+                    );
+                }
 
                 return {
 
@@ -1581,7 +2147,18 @@ function applyResultFilters() {
                         filteredOffers,
 
                     cheapestOffer:
-                        filteredOffers[0]
+                        filteredOffers[0],
+
+                    isAlternative:
+                        Boolean(
+                            group.isAlternative
+                        ),
+
+                    alternativeScore:
+                        Number(
+                            filteredOffers[0]
+                                ._alternativeScore || 0
+                        )
                 };
             })
             .filter(Boolean);
@@ -1594,6 +2171,14 @@ function clearResultFilters() {
 
     clearSecondaryFiltersOnly();
 
+    if (
+        resultsMode ===
+        "alternatives"
+    ) {
+
+        clearAlternativeMaximumPriceFilter();
+    }
+
     visibleResults =
         groupedResults.map(
             group => ({
@@ -1605,7 +2190,17 @@ function clearResultFilters() {
                     [...group.offers],
 
                 cheapestOffer:
-                    group.cheapestOffer
+                    group.cheapestOffer,
+
+                isAlternative:
+                    Boolean(
+                        group.isAlternative
+                    ),
+
+                alternativeScore:
+                    Number(
+                        group.alternativeScore || 0
+                    )
             })
         );
 
@@ -1649,15 +2244,26 @@ function clearSecondaryFiltersOnly() {
 
     if (maximumPriceFilter) {
 
-        const mainBudget =
-            document.getElementById(
-                "searchBudget"
-            );
+        if (
+            resultsMode ===
+            "alternatives"
+        ) {
 
-        maximumPriceFilter.value =
-            mainBudget
-                ? mainBudget.value
-                : "";
+            maximumPriceFilter.value =
+                "";
+
+        } else {
+
+            const mainBudget =
+                document.getElementById(
+                    "searchBudget"
+                );
+
+            maximumPriceFilter.value =
+                mainBudget
+                    ? mainBudget.value
+                    : "";
+        }
     }
 }
 
@@ -1745,17 +2351,61 @@ function sortAndRenderResults() {
         case "price-low":
         default:
 
-            sortedResults.sort(
-                (first, second) =>
-                    Number(
-                        first.cheapestOffer.price ||
-                        0
-                    ) -
-                    Number(
-                        second.cheapestOffer.price ||
-                        0
-                    )
-            );
+            if (
+                resultsMode ===
+                "alternatives"
+            ) {
+
+                sortedResults.sort(
+                    (first, second) => {
+
+                        const scoreDifference =
+                            Number(
+                                first.alternativeScore ||
+                                first.cheapestOffer
+                                    ._alternativeScore ||
+                                0
+                            ) -
+                            Number(
+                                second.alternativeScore ||
+                                second.cheapestOffer
+                                    ._alternativeScore ||
+                                0
+                            );
+
+                        if (
+                            scoreDifference !== 0
+                        ) {
+                            return scoreDifference;
+                        }
+
+                        return (
+                            Number(
+                                first.cheapestOffer.price ||
+                                0
+                            ) -
+                            Number(
+                                second.cheapestOffer.price ||
+                                0
+                            )
+                        );
+                    }
+                );
+
+            } else {
+
+                sortedResults.sort(
+                    (first, second) =>
+                        Number(
+                            first.cheapestOffer.price ||
+                            0
+                        ) -
+                        Number(
+                            second.cheapestOffer.price ||
+                            0
+                        )
+                );
+            }
 
             break;
     }
@@ -1786,30 +2436,80 @@ function renderResults(results) {
 
     if (countElement) {
 
-        countElement.textContent =
-            `${results.length} ${
-                results.length === 1
-                    ? "hotel"
-                    : "hotels"
-            } found`;
+        if (
+            resultsMode ===
+            "alternatives"
+        ) {
+
+            countElement.textContent =
+                `${results.length} ${
+                    results.length === 1
+                        ? "alternative hotel"
+                        : "alternative hotels"
+                } found`;
+
+        } else {
+
+            countElement.textContent =
+                `${results.length} ${
+                    results.length === 1
+                        ? "hotel"
+                        : "hotels"
+                } found`;
+        }
     }
 
     if (results.length === 0) {
 
         showResultsMessage(
             "No matching holidays found",
-            "Try changing your airport, destination, dates, board basis or budget."
+            "We could not find suitable holidays for this search. Try changing your airport, destination, dates, board basis or budget."
         );
 
         return;
     }
 
+    const alternativeNotice =
+        resultsMode ===
+        "alternatives"
+            ? createAlternativeResultsNotice()
+            : "";
+
     container.innerHTML =
+        alternativeNotice +
         results.map(
             createHotelCard
         ).join("");
 
     attachComparisonButtons();
+}
+
+
+function createAlternativeResultsNotice() {
+
+    return `
+        <div class="alternative-results-notice">
+
+            <div class="alternative-results-icon">
+                💡
+            </div>
+
+            <div>
+
+                <h2>
+                    No exact flexible matches — here are the closest alternatives
+                </h2>
+
+                <p>
+                    These holidays fall outside one or more parts of your original search.
+                    We have kept your destination, departure airport and board basis where selected,
+                    and clearly highlighted what is different.
+                </p>
+
+            </div>
+
+        </div>
+    `;
 }
 
 
@@ -1870,6 +2570,11 @@ function createHotelCard(group) {
             `
             : "";
 
+    const alternativeBadge =
+        createAlternativeBadge(
+            group
+        );
+
     const bookingButton =
         bookingUrl && !DEMO_MODE
             ? `
@@ -1919,6 +2624,8 @@ function createHotelCard(group) {
                     <h2 class="hotel-name">
                         ${hotelName}
                     </h2>
+
+                    ${alternativeBadge}
 
                     ${demoBadge}
 
@@ -1996,9 +2703,11 @@ function createHotelCard(group) {
 
                         <div class="cheapest-label">
                             ${
-                                DEMO_MODE
-                                    ? "Example offer"
-                                    : "Cheapest offer"
+                                group.isAlternative
+                                    ? "Closest alternative"
+                                    : DEMO_MODE
+                                        ? "Example offer"
+                                        : "Cheapest offer"
                             }
                         </div>
 
@@ -2066,6 +2775,7 @@ function createHotelCard(group) {
                                 <th>Nights</th>
                                 <th>Board</th>
                                 <th>Price</th>
+                                <th>Difference</th>
                                 <th>Book</th>
                             </tr>
 
@@ -2088,6 +2798,56 @@ function createHotelCard(group) {
             </div>
 
         </article>
+    `;
+}
+
+
+function createAlternativeBadge(group) {
+
+    if (
+        !group.isAlternative ||
+        !group.cheapestOffer
+    ) {
+        return "";
+    }
+
+    const reasons =
+        Array.isArray(
+            group.cheapestOffer
+                ._alternativeReasons
+        )
+            ? group.cheapestOffer
+                ._alternativeReasons
+            : [];
+
+    if (
+        reasons.length === 0
+    ) {
+        return "";
+    }
+
+    return `
+        <div class="alternative-match-box">
+
+            <strong>
+                Closest alternative:
+            </strong>
+
+            <div class="alternative-match-tags">
+
+                ${reasons
+                    .map(
+                        reason => `
+                            <span class="alternative-match-tag">
+                                ${escapeHtml(reason)}
+                            </span>
+                        `
+                    )
+                    .join("")}
+
+            </div>
+
+        </div>
     `;
 }
 
@@ -2119,6 +2879,15 @@ function createSupplierOfferRow(offer) {
                     Demo only
                 </span>
             `;
+
+    const differenceText =
+        Array.isArray(
+            offer._alternativeReasons
+        ) &&
+        offer._alternativeReasons.length > 0
+            ? offer._alternativeReasons
+                .join(", ")
+            : "Matches search";
 
     return `
         <tr>
@@ -2165,6 +2934,21 @@ function createSupplierOfferRow(offer) {
                 £${formatNumber(
                     offer.price
                 )}
+            </td>
+
+            <td>
+                ${
+                    resultsMode ===
+                    "alternatives"
+                        ? `
+                            <span class="supplier-difference">
+                                ${escapeHtml(
+                                    differenceText
+                                )}
+                            </span>
+                        `
+                        : "—"
+                }
             </td>
 
             <td>
@@ -2273,7 +3057,7 @@ function toggleRefineSearch() {
 
 
 // ======================================================
-// DEMO NOTICE AND STYLES
+// DEMO NOTICE AND EXTRA STYLES
 // ======================================================
 
 function injectResultEnhancementStyles() {
@@ -2327,6 +3111,82 @@ function injectResultEnhancementStyles() {
 
         .hotel-image {
             background: #dbeafe;
+        }
+
+        .alternative-results-notice {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #93c5fd;
+            border-radius: 15px;
+            background: #eff6ff;
+            color: #1e3a5f;
+            box-shadow:
+                0 6px 20px
+                rgba(31, 41, 55, 0.06);
+        }
+
+        .alternative-results-notice h2 {
+            margin: 0 0 7px;
+            font-size: 20px;
+        }
+
+        .alternative-results-notice p {
+            margin: 0;
+            line-height: 1.55;
+        }
+
+        .alternative-results-icon {
+            flex: 0 0 auto;
+            font-size: 26px;
+            line-height: 1;
+        }
+
+        .alternative-match-box {
+            margin: 4px 0 12px;
+            padding: 11px 12px;
+            border: 1px solid #93c5fd;
+            border-radius: 10px;
+            background: #eff6ff;
+            color: #1e3a5f;
+            font-size: 13px;
+        }
+
+        .alternative-match-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 8px;
+        }
+
+        .alternative-match-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .supplier-difference {
+            display: inline-block;
+            max-width: 220px;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 620px) {
+
+            .alternative-results-notice {
+                flex-direction: column;
+            }
         }
     `;
 
@@ -2437,6 +3297,20 @@ function showResultsMessage(
 
     if (!container) {
         return;
+    }
+
+    const count =
+        document.getElementById(
+            "resultsCount"
+        );
+
+    if (
+        count &&
+        resultsMode === "none"
+    ) {
+
+        count.textContent =
+            "0 hotels found";
     }
 
     container.innerHTML = `
