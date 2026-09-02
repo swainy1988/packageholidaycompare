@@ -11,7 +11,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("offerForm");
 
     const params =
-        new URLSearchParams(window.location.search);
+        new URLSearchParams(
+            window.location.search
+        );
 
     offerId =
         params.get("id");
@@ -36,16 +38,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     }
 
-    await loadHotels();
+    await Promise.all([
+        loadHotels(),
+        loadSuppliers()
+    ]);
 
     await loadOffer();
 
 });
 
+
+// ======================================================
+// LOAD HOTELS
+// ======================================================
+
 async function loadHotels() {
 
     const hotelSelect =
-        document.getElementById("hotel");
+        document.getElementById(
+            "hotel"
+        );
 
     if (!hotelSelect) {
         return;
@@ -62,15 +74,24 @@ async function loadHotels() {
 
     }
 
+    hotelSelect.innerHTML = `
+        <option value="">
+            Loading hotels...
+        </option>
+    `;
+
     const {
         data: hotels,
         error
     } = await window.db
         .from("hotels")
         .select("id, name")
-        .order("name", {
-            ascending: true
-        });
+        .order(
+            "name",
+            {
+                ascending: true
+            }
+        );
 
     if (error) {
 
@@ -78,6 +99,12 @@ async function loadHotels() {
             "Failed to load hotels:",
             error
         );
+
+        hotelSelect.innerHTML = `
+            <option value="">
+                Failed to load hotels
+            </option>
+        `;
 
         showMessage(
             "Hotels could not be loaded.",
@@ -94,22 +121,128 @@ async function loadHotels() {
         </option>
     `;
 
-    (hotels || []).forEach(hotel => {
+    (hotels || []).forEach(
+        hotel => {
 
-        const option =
-            document.createElement("option");
+            const option =
+                document.createElement(
+                    "option"
+                );
 
-        option.value =
-            hotel.id;
+            option.value =
+                hotel.id;
 
-        option.textContent =
-            hotel.name;
+            option.textContent =
+                hotel.name;
 
-        hotelSelect.appendChild(option);
+            hotelSelect.appendChild(
+                option
+            );
 
-    });
+        }
+    );
 
 }
+
+
+// ======================================================
+// LOAD SUPPLIERS
+// ======================================================
+
+async function loadSuppliers() {
+
+    const supplierSelect =
+        document.getElementById(
+            "supplier"
+        );
+
+    if (!supplierSelect) {
+        return;
+    }
+
+    if (!window.db) {
+
+        supplierSelect.innerHTML = `
+            <option value="">
+                Supabase is not connected
+            </option>
+        `;
+
+        return;
+
+    }
+
+    supplierSelect.innerHTML = `
+        <option value="">
+            Loading suppliers...
+        </option>
+    `;
+
+    const {
+        data: suppliers,
+        error
+    } = await window.db
+        .from("suppliers")
+        .select("id, name, active")
+        .order(
+            "name",
+            {
+                ascending: true
+            }
+        );
+
+    if (error) {
+
+        console.error(
+            "Failed to load suppliers:",
+            error
+        );
+
+        supplierSelect.innerHTML = `
+            <option value="">
+                Failed to load suppliers
+            </option>
+        `;
+
+        return;
+
+    }
+
+    supplierSelect.innerHTML = `
+        <option value="">
+            Select supplier
+        </option>
+    `;
+
+    (suppliers || []).forEach(
+        supplier => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                supplier.name;
+
+            option.textContent =
+                supplier.active
+                    ? supplier.name
+                    : `${supplier.name} (Inactive)`;
+
+            supplierSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// LOAD EXISTING OFFER
+// ======================================================
 
 async function loadOffer() {
 
@@ -144,7 +277,10 @@ async function loadOffer() {
     } = await window.db
         .from("holiday_offers")
         .select("*")
-        .eq("id", offerId)
+        .eq(
+            "id",
+            offerId
+        )
         .single();
 
     if (error) {
@@ -170,31 +306,49 @@ async function loadOffer() {
 
     }
 
-    document.getElementById("hotel").value =
+    document.getElementById(
+        "hotel"
+    ).value =
         offer.hotel_id || "";
 
-    document.getElementById("supplier").value =
+    document.getElementById(
+        "supplier"
+    ).value =
         offer.supplier || "";
 
-    document.getElementById("price").value =
+    document.getElementById(
+        "price"
+    ).value =
         offer.price ?? "";
 
-    document.getElementById("departure").value =
+    document.getElementById(
+        "departure"
+    ).value =
         offer.departure_date || "";
 
-    document.getElementById("airport").value =
+    document.getElementById(
+        "airport"
+    ).value =
         offer.airport || "";
 
-    document.getElementById("nights").value =
+    document.getElementById(
+        "nights"
+    ).value =
         offer.nights ?? "";
 
-    document.getElementById("board").value =
+    document.getElementById(
+        "board"
+    ).value =
         offer.board_basis || "";
 
-    document.getElementById("roomType").value =
+    document.getElementById(
+        "roomType"
+    ).value =
         offer.room_type || "";
 
-    document.getElementById("bookingUrl").value =
+    document.getElementById(
+        "bookingUrl"
+    ).value =
         offer.booking_url || "";
 
     if (button) {
@@ -207,6 +361,11 @@ async function loadOffer() {
     }
 
 }
+
+
+// ======================================================
+// UPDATE OFFER
+// ======================================================
 
 async function updateOffer(event) {
 
@@ -236,7 +395,7 @@ async function updateOffer(event) {
     const supplier =
         document.getElementById(
             "supplier"
-        ).value;
+        ).value.trim();
 
     const price =
         Number(
@@ -326,6 +485,11 @@ async function updateOffer(event) {
     button.textContent =
         "Updating...";
 
+    showMessage(
+        "",
+        false
+    );
+
     const updatedOffer = {
 
         hotel_id:
@@ -347,7 +511,7 @@ async function updateOffer(event) {
             nights,
 
         board_basis:
-            boardBasis,
+            boardBasis || null,
 
         room_type:
             roomType || null,
@@ -357,11 +521,17 @@ async function updateOffer(event) {
 
     };
 
-    const { error } =
-        await window.db
-            .from("holiday_offers")
-            .update(updatedOffer)
-            .eq("id", offerId);
+    const {
+        error
+    } = await window.db
+        .from("holiday_offers")
+        .update(
+            updatedOffer
+        )
+        .eq(
+            "id",
+            offerId
+        );
 
     if (error) {
 
@@ -389,14 +559,22 @@ async function updateOffer(event) {
         false
     );
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        window.location.href =
-            "holiday-offers.html";
+            window.location.href =
+                "holiday-offers.html";
 
-    }, 800);
+        },
+        800
+    );
 
 }
+
+
+// ======================================================
+// MESSAGE
+// ======================================================
 
 function showMessage(
     text,

@@ -3,7 +3,7 @@
 // Add Holiday Offer
 // ======================================================
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
     const form =
         document.getElementById("offerForm");
@@ -17,9 +17,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
-    loadHotels();
+    await Promise.all([
+        loadHotels(),
+        loadSuppliers()
+    ]);
 
 });
+
+
+// ======================================================
+// LOAD HOTELS
+// ======================================================
 
 async function loadHotels() {
 
@@ -58,9 +66,12 @@ async function loadHotels() {
     } = await window.db
         .from("hotels")
         .select("id, name")
-        .order("name", {
-            ascending: true
-        });
+        .order(
+            "name",
+            {
+                ascending: true
+            }
+        );
 
     if (error) {
 
@@ -88,7 +99,9 @@ async function loadHotels() {
     (hotels || []).forEach(hotel => {
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
         option.value =
             hotel.id;
@@ -103,6 +116,108 @@ async function loadHotels() {
     });
 
 }
+
+
+// ======================================================
+// LOAD SUPPLIERS
+// ======================================================
+
+async function loadSuppliers() {
+
+    const supplierSelect =
+        document.getElementById(
+            "supplier"
+        );
+
+    if (!supplierSelect) {
+        return;
+    }
+
+    if (!window.db) {
+
+        supplierSelect.innerHTML = `
+            <option value="">
+                Supabase is not connected
+            </option>
+        `;
+
+        return;
+
+    }
+
+    supplierSelect.innerHTML = `
+        <option value="">
+            Loading suppliers...
+        </option>
+    `;
+
+    const {
+        data: suppliers,
+        error
+    } = await window.db
+        .from("suppliers")
+        .select("id, name, active")
+        .eq(
+            "active",
+            true
+        )
+        .order(
+            "name",
+            {
+                ascending: true
+            }
+        );
+
+    if (error) {
+
+        console.error(
+            "Failed to load suppliers:",
+            error
+        );
+
+        supplierSelect.innerHTML = `
+            <option value="">
+                Failed to load suppliers
+            </option>
+        `;
+
+        return;
+
+    }
+
+    supplierSelect.innerHTML = `
+        <option value="">
+            Select supplier
+        </option>
+    `;
+
+    (suppliers || []).forEach(
+        supplier => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                supplier.name;
+
+            option.textContent =
+                supplier.name;
+
+            supplierSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// SAVE OFFER
+// ======================================================
 
 async function saveOffer(event) {
 
@@ -260,10 +375,13 @@ async function saveOffer(event) {
 
     };
 
-    const { error } =
-        await window.db
-            .from("holiday_offers")
-            .insert([offer]);
+    const {
+        error
+    } = await window.db
+        .from("holiday_offers")
+        .insert([
+            offer
+        ]);
 
     if (error) {
 
@@ -291,14 +409,22 @@ async function saveOffer(event) {
         false
     );
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        window.location.href =
-            "holiday-offers.html";
+            window.location.href =
+                "holiday-offers.html";
 
-    }, 800);
+        },
+        800
+    );
 
 }
+
+
+// ======================================================
+// MESSAGE
+// ======================================================
 
 function showMessage(
     text,
