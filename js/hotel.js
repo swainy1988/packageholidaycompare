@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Hotel Details Page
-// Version: 2026-09-23-1
+// Version: 2026-09-23-2
 // ======================================================
 
 let currentHotel = null;
@@ -377,6 +377,10 @@ function renderHotel() {
 
     renderHotelFacts();
 
+    renderHotelFacilities();
+
+    renderHotelRoomTypes();
+
     renderCheapestOffer();
 
     renderOffersTable();
@@ -421,7 +425,7 @@ function renderHotelHeading() {
         stars > 0
             ? "★".repeat(
                 Math.min(
-                    stars,
+                    Math.round(stars),
                     5
                 )
             )
@@ -463,7 +467,6 @@ function renderGallery() {
     thumbnails.innerHTML = "";
 
 
-    // Create a clean list of available images.
     const galleryImages =
         currentImages
             .filter(
@@ -474,8 +477,6 @@ function renderGallery() {
             );
 
 
-    // If hotel_images has no records,
-    // fall back to hotels.main_image.
     if (
         galleryImages.length === 0 &&
         isValidHttpUrl(
@@ -671,8 +672,10 @@ function setMainGalleryImage(
 function renderHotelDescription() {
 
     const description =
-        currentHotel?.description
-            ?.trim();
+        String(
+            currentHotel?.description ||
+            ""
+        ).trim();
 
     setText(
         "hotelDescription",
@@ -717,7 +720,7 @@ function renderHotelFacts() {
         "hotelRating",
         Number.isFinite(rating) &&
         rating > 0
-            ? `${rating.toFixed(1)} / 5`
+            ? String(rating)
             : "-"
     );
 
@@ -733,6 +736,525 @@ function renderHotelFacts() {
         currentHotel?.transfer_time ||
         "-"
     );
+
+}
+
+
+// ======================================================
+// HOTEL FACILITIES
+// ======================================================
+
+function renderHotelFacilities() {
+
+    const container =
+        document.getElementById(
+            "hotelFacilities"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+
+    const facilities =
+        normaliseListField(
+            currentHotel?.facilities
+        );
+
+
+    if (
+        facilities.length === 0
+    ) {
+
+        const message =
+            document.createElement(
+                "p"
+            );
+
+        message.className =
+            "empty-section";
+
+        message.textContent =
+            "Hotel facilities have not been added yet.";
+
+        container.appendChild(
+            message
+        );
+
+        return;
+
+    }
+
+
+    facilities.forEach(
+        facility => {
+
+            const name =
+                getListItemName(
+                    facility
+                );
+
+            if (!name) {
+                return;
+            }
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+            item.className =
+                "facility-item";
+
+
+            const icon =
+                document.createElement(
+                    "span"
+                );
+
+            icon.className =
+                "facility-icon";
+
+            icon.textContent =
+                "✓";
+
+
+            const text =
+                document.createElement(
+                    "span"
+                );
+
+            text.textContent =
+                name;
+
+
+            item.appendChild(
+                icon
+            );
+
+            item.appendChild(
+                text
+            );
+
+            container.appendChild(
+                item
+            );
+
+        }
+    );
+
+
+    if (
+        container.children.length === 0
+    ) {
+
+        const message =
+            document.createElement(
+                "p"
+            );
+
+        message.className =
+            "empty-section";
+
+        message.textContent =
+            "Hotel facilities have not been added yet.";
+
+        container.appendChild(
+            message
+        );
+
+    }
+
+}
+
+
+// ======================================================
+// ROOM TYPES
+// ======================================================
+
+function renderHotelRoomTypes() {
+
+    const container =
+        document.getElementById(
+            "hotelRoomTypes"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = "";
+
+
+    const roomTypes =
+        normaliseListField(
+            currentHotel?.room_types
+        );
+
+
+    if (
+        roomTypes.length === 0
+    ) {
+
+        const message =
+            document.createElement(
+                "p"
+            );
+
+        message.className =
+            "empty-section";
+
+        message.textContent =
+            "Room types have not been added yet.";
+
+        container.appendChild(
+            message
+        );
+
+        return;
+
+    }
+
+
+    roomTypes.forEach(
+        room => {
+
+            const roomName =
+                getListItemName(
+                    room
+                );
+
+            if (!roomName) {
+                return;
+            }
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+            item.className =
+                "room-type-item";
+
+
+            const name =
+                document.createElement(
+                    "p"
+                );
+
+            name.className =
+                "room-type-name";
+
+            name.textContent =
+                roomName;
+
+
+            item.appendChild(
+                name
+            );
+
+
+            const description =
+                getListItemDescription(
+                    room
+                );
+
+
+            if (description) {
+
+                const descriptionElement =
+                    document.createElement(
+                        "p"
+                    );
+
+                descriptionElement.style.margin =
+                    "8px 0 0";
+
+                descriptionElement.style.color =
+                    "#64748b";
+
+                descriptionElement.style.lineHeight =
+                    "1.5";
+
+                descriptionElement.textContent =
+                    description;
+
+                item.appendChild(
+                    descriptionElement
+                );
+
+            }
+
+
+            container.appendChild(
+                item
+            );
+
+        }
+    );
+
+
+    if (
+        container.children.length === 0
+    ) {
+
+        const message =
+            document.createElement(
+                "p"
+            );
+
+        message.className =
+            "empty-section";
+
+        message.textContent =
+            "Room types have not been added yet.";
+
+        container.appendChild(
+            message
+        );
+
+    }
+
+}
+
+
+// ======================================================
+// NORMALISE JSON / LIST FIELDS
+//
+// Supports examples such as:
+//
+// ["Pool", "Wi-Fi"]
+//
+// [
+//   {"name":"Family Room"},
+//   {"name":"Suite"}
+// ]
+//
+// "Pool, Wi-Fi, Spa"
+// ======================================================
+
+function normaliseListField(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+
+        return [];
+
+    }
+
+
+    if (
+        Array.isArray(value)
+    ) {
+
+        return value;
+
+    }
+
+
+    if (
+        typeof value ===
+        "object"
+    ) {
+
+        if (
+            Array.isArray(
+                value.items
+            )
+        ) {
+
+            return value.items;
+
+        }
+
+
+        return Object.values(
+            value
+        );
+
+    }
+
+
+    if (
+        typeof value ===
+        "string"
+    ) {
+
+        const trimmed =
+            value.trim();
+
+        if (!trimmed) {
+            return [];
+        }
+
+
+        try {
+
+            const parsed =
+                JSON.parse(
+                    trimmed
+                );
+
+            if (
+                Array.isArray(parsed)
+            ) {
+
+                return parsed;
+
+            }
+
+
+            if (
+                parsed &&
+                typeof parsed ===
+                "object"
+            ) {
+
+                if (
+                    Array.isArray(
+                        parsed.items
+                    )
+                ) {
+
+                    return parsed.items;
+
+                }
+
+
+                return Object.values(
+                    parsed
+                );
+
+            }
+
+        } catch (error) {
+
+            // Not JSON.
+            // Continue and treat as text.
+        }
+
+
+        return trimmed
+            .split(/[\n,;]+/)
+            .map(
+                item =>
+                    item.trim()
+            )
+            .filter(Boolean);
+
+    }
+
+
+    return [];
+
+}
+
+
+// ======================================================
+// GET DISPLAY NAME FROM LIST ITEM
+// ======================================================
+
+function getListItemName(
+    item
+) {
+
+    if (
+        item === null ||
+        item === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    if (
+        typeof item ===
+        "string" ||
+        typeof item ===
+        "number"
+    ) {
+
+        return String(
+            item
+        ).trim();
+
+    }
+
+
+    if (
+        typeof item ===
+        "object"
+    ) {
+
+        const possibleName =
+            item.name ||
+            item.title ||
+            item.label ||
+            item.room_type ||
+            item.roomType ||
+            item.facility ||
+            item.value;
+
+        if (
+            possibleName !==
+            undefined &&
+            possibleName !==
+            null
+        ) {
+
+            return String(
+                possibleName
+            ).trim();
+
+        }
+
+    }
+
+
+    return "";
+
+}
+
+
+// ======================================================
+// OPTIONAL ROOM DESCRIPTION
+// ======================================================
+
+function getListItemDescription(
+    item
+) {
+
+    if (
+        !item ||
+        typeof item !==
+        "object" ||
+        Array.isArray(item)
+    ) {
+
+        return "";
+
+    }
+
+
+    const description =
+        item.description ||
+        item.details ||
+        item.info ||
+        "";
+
+    return String(
+        description
+    ).trim();
 
 }
 
@@ -979,7 +1501,7 @@ function renderCheapestOffer() {
             "_blank";
 
         dealButton.rel =
-            "noopener noreferrer";
+            "noopener noreferrer sponsored";
 
         dealButton.className =
             "deal-button";
@@ -1267,7 +1789,7 @@ function renderOffersTable() {
                     "_blank";
 
                 dealButton.rel =
-                    "noopener noreferrer";
+                    "noopener noreferrer sponsored";
 
                 dealButton.className =
                     "small-deal-button";
@@ -1316,9 +1838,6 @@ function renderOffersTable() {
 
 // ======================================================
 // OFFER FIELD HELPERS
-//
-// These support the names used during earlier database
-// versions as well as the current fields.
 // ======================================================
 
 function getOfferPrice(
@@ -1490,9 +2009,17 @@ function formatDate(
         return "-";
     }
 
+    const cleanDate =
+        String(
+            dateValue
+        ).slice(
+            0,
+            10
+        );
+
     const date =
         new Date(
-            `${dateValue}T00:00:00`
+            `${cleanDate}T00:00:00`
         );
 
     if (
@@ -1501,7 +2028,9 @@ function formatDate(
         )
     ) {
 
-        return dateValue;
+        return String(
+            dateValue
+        );
 
     }
 

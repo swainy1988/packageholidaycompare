@@ -16,7 +16,7 @@
 
     <meta
         name="description"
-        content="View hotel details, images and compare package holiday offers from multiple suppliers."
+        content="View hotel details, facilities, room types, images and compare package holiday offers from multiple suppliers."
     >
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -254,6 +254,73 @@
 
 
         /* ==========================================
+           FACILITIES
+        ========================================== */
+
+        .facility-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .facility-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 52px;
+            padding: 12px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+            font-weight: 700;
+        }
+
+        .facility-icon {
+            flex: 0 0 auto;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #e8f3ff;
+            color: #1769d2;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 900;
+        }
+
+        .empty-section {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+
+        /* ==========================================
+           ROOM TYPES
+        ========================================== */
+
+        .room-type-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .room-type-item {
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 11px;
+            background: #f8fafc;
+        }
+
+        .room-type-name {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 850;
+        }
+
+
+        /* ==========================================
            CHEAPEST OFFER
         ========================================== */
 
@@ -436,7 +503,8 @@
                 height: 270px;
             }
 
-            .facts-grid {
+            .facts-grid,
+            .facility-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -724,6 +792,54 @@
 
                     </section>
 
+
+                    <!-- ==================================
+                         FACILITIES
+                    =================================== -->
+
+                    <section class="card content-card">
+
+                        <h2>
+                            Hotel facilities
+                        </h2>
+
+                        <div
+                            id="hotelFacilities"
+                            class="facility-grid"
+                        >
+
+                            <p class="empty-section">
+                                Loading hotel facilities...
+                            </p>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ==================================
+                         ROOM TYPES
+                    =================================== -->
+
+                    <section class="card content-card">
+
+                        <h2>
+                            Room types
+                        </h2>
+
+                        <div
+                            id="hotelRoomTypes"
+                            class="room-type-grid"
+                        >
+
+                            <p class="empty-section">
+                                Loading room types...
+                            </p>
+
+                        </div>
+
+                    </section>
+
                 </div>
 
 
@@ -813,7 +929,7 @@
 
 
     <!-- Hotel page functionality -->
-    <script src="js/hotel.js?v=20260923-1"></script>
+    <script src="js/hotel.js?v=20260923-2"></script>
 
 </body>
 
