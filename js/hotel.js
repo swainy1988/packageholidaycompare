@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Hotel Details Page
-// Version: 2026-09-23-4
+// Version: 2026-09-23-5
 // ======================================================
 
 let currentHotel = null;
@@ -368,7 +368,7 @@ function hasOfferSearchCriteria(
 
 
 // ======================================================
-// CHECK WHETHER SEARCH SUMMARY SHOULD SHOW
+// SEARCH SUMMARY CHECK
 // ======================================================
 
 function hasSearchSummaryCriteria(
@@ -671,15 +671,13 @@ async function loadHotelOffers() {
 
 
 // ======================================================
-// CHECK OFFER AGAINST CURRENT SEARCH
+// CHECK OFFER AGAINST SEARCH
 // ======================================================
 
 function offerMatchesCurrentSearch(
     offer,
     search
 ) {
-
-    // AIRPORT
 
     if (search.airport) {
 
@@ -698,8 +696,6 @@ function offerMatchesCurrentSearch(
 
     }
 
-
-    // BOARD
 
     if (search.board) {
 
@@ -721,8 +717,6 @@ function offerMatchesCurrentSearch(
     }
 
 
-    // BUDGET
-
     if (search.budget) {
 
         const price =
@@ -742,8 +736,6 @@ function offerMatchesCurrentSearch(
 
     }
 
-
-    // NIGHTS
 
     if (search.nights) {
 
@@ -779,19 +771,13 @@ function offerMatchesCurrentSearch(
     }
 
 
-    // DEPARTURE DATE
-
     if (search.departureDate) {
-
-        const offerDeparture =
-            getOfferDeparture(
-                offer
-            );
-
 
         const difference =
             getSignedDateDifference(
-                offerDeparture,
+                getOfferDeparture(
+                    offer
+                ),
                 search.departureDate
             );
 
@@ -906,7 +892,7 @@ function getSignedDateDifference(
 
 
 // ======================================================
-// RENDER COMPLETE HOTEL PAGE
+// RENDER PAGE
 // ======================================================
 
 function renderHotel() {
@@ -1128,7 +1114,8 @@ function renderHotelHeading() {
         ) || 0;
 
 
-    const starText =
+    setText(
+        "hotelStars",
         stars > 0
             ? "★".repeat(
                 Math.min(
@@ -1136,19 +1123,14 @@ function renderHotelHeading() {
                     5
                 )
             )
-            : "";
-
-
-    setText(
-        "hotelStars",
-        starText
+            : ""
     );
 
 }
 
 
 // ======================================================
-// IMAGE GALLERY
+// GALLERY
 // ======================================================
 
 function renderGallery() {
@@ -1175,7 +1157,8 @@ function renderGallery() {
     }
 
 
-    thumbnails.innerHTML = "";
+    thumbnails.innerHTML =
+        "";
 
 
     const galleryImages =
@@ -1221,9 +1204,6 @@ function renderGallery() {
             "src"
         );
 
-        mainImage.alt =
-            "No hotel image available";
-
         mainImage.style.display =
             "none";
 
@@ -1237,7 +1217,6 @@ function renderGallery() {
 
     mainImage.style.display =
         "block";
-
 
     thumbnails.style.display =
         "flex";
@@ -1271,7 +1250,6 @@ function renderGallery() {
             button.type =
                 "button";
 
-
             button.className =
                 "gallery-thumbnail";
 
@@ -1297,12 +1275,10 @@ function renderGallery() {
             thumbnailImage.src =
                 image.image_url;
 
-
             thumbnailImage.alt =
                 image.alt_text ||
                 currentHotel.name ||
                 "Hotel image";
-
 
             thumbnailImage.loading =
                 index < 3
@@ -1360,7 +1336,7 @@ function renderGallery() {
 
 
 // ======================================================
-// CHANGE MAIN IMAGE
+// MAIN GALLERY IMAGE
 // ======================================================
 
 function setMainGalleryImage(
@@ -1471,7 +1447,7 @@ function renderHotelFacts() {
 
 
 // ======================================================
-// HOTEL FACILITIES
+// FACILITIES
 // ======================================================
 
 function renderHotelFacilities() {
@@ -1487,7 +1463,8 @@ function renderHotelFacilities() {
     }
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
     const facilities =
@@ -1543,7 +1520,6 @@ function renderHotelFacilities() {
             icon.className =
                 "facility-icon";
 
-
             icon.textContent =
                 "✓";
 
@@ -1562,11 +1538,9 @@ function renderHotelFacilities() {
                 icon
             );
 
-
             item.appendChild(
                 text
             );
-
 
             container.appendChild(
                 item
@@ -1574,19 +1548,6 @@ function renderHotelFacilities() {
 
         }
     );
-
-
-    if (
-        container.children.length ===
-        0
-    ) {
-
-        appendEmptySectionMessage(
-            container,
-            "Hotel facilities have not been added yet."
-        );
-
-    }
 
 }
 
@@ -1608,7 +1569,8 @@ function renderHotelRoomTypes() {
     }
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
     const roomTypes =
@@ -1664,7 +1626,6 @@ function renderHotelRoomTypes() {
             name.className =
                 "room-type-name";
 
-
             name.textContent =
                 roomName;
 
@@ -1691,14 +1652,11 @@ function renderHotelRoomTypes() {
                 descriptionElement.style.margin =
                     "8px 0 0";
 
-
                 descriptionElement.style.color =
                     "#64748b";
 
-
                 descriptionElement.style.lineHeight =
                     "1.5";
-
 
                 descriptionElement.textContent =
                     description;
@@ -1718,24 +1676,11 @@ function renderHotelRoomTypes() {
         }
     );
 
-
-    if (
-        container.children.length ===
-        0
-    ) {
-
-        appendEmptySectionMessage(
-            container,
-            "Room types have not been added yet."
-        );
-
-    }
-
 }
 
 
 // ======================================================
-// EMPTY SECTION MESSAGE
+// EMPTY SECTION
 // ======================================================
 
 function appendEmptySectionMessage(
@@ -1752,7 +1697,6 @@ function appendEmptySectionMessage(
     message.className =
         "empty-section";
 
-
     message.textContent =
         text;
 
@@ -1765,7 +1709,7 @@ function appendEmptySectionMessage(
 
 
 // ======================================================
-// NORMALISE LIST FIELDS
+// NORMALISE LIST
 // ======================================================
 
 function normaliseListField(
@@ -1871,7 +1815,7 @@ function normaliseListField(
 
         } catch (error) {
 
-            // Continue as normal text.
+            // Continue as text.
 
         }
 
@@ -1980,16 +1924,126 @@ function getListItemDescription(
     }
 
 
-    const description =
+    return String(
         item.description ||
         item.details ||
         item.info ||
-        "";
-
-
-    return String(
-        description
+        ""
     ).trim();
+
+}
+
+
+// ======================================================
+// AFFILIATE / OUTBOUND DEAL LINK
+//
+// IMPORTANT:
+// The stored booking URL is used exactly as saved.
+// We do NOT add or remove affiliate parameters.
+// ======================================================
+
+function createDealLink(
+    bookingUrl,
+    supplierName,
+    className,
+    buttonText = "View Deal"
+) {
+
+    if (
+        !isValidHttpUrl(
+            bookingUrl
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    const dealButton =
+        document.createElement(
+            "a"
+        );
+
+
+    dealButton.href =
+        bookingUrl.trim();
+
+
+    dealButton.target =
+        "_blank";
+
+
+    // sponsored = tells search engines this is a
+    // commercial / affiliate-style outbound link.
+    //
+    // noopener = protects the PackageHolidayCompare
+    // tab when opening another website.
+
+    dealButton.rel =
+        "sponsored noopener";
+
+
+    dealButton.className =
+        className;
+
+
+    dealButton.textContent =
+        buttonText;
+
+
+    dealButton.setAttribute(
+        "aria-label",
+        `${buttonText} with ${supplierName} - opens in a new tab`
+    );
+
+
+    dealButton.dataset.supplier =
+        supplierName;
+
+
+    dealButton.dataset.outbound =
+        "true";
+
+
+    return dealButton;
+
+}
+
+
+// ======================================================
+// AFFILIATE DISCLOSURE
+// ======================================================
+
+function createAffiliateDisclosure() {
+
+    const disclosure =
+        document.createElement(
+            "p"
+        );
+
+
+    disclosure.textContent =
+        "We may earn a commission if you book through a supplier link. This does not change the price you pay.";
+
+
+    disclosure.style.margin =
+        "12px 0 0";
+
+
+    disclosure.style.color =
+        "#64748b";
+
+
+    disclosure.style.fontSize =
+        "12px";
+
+
+    disclosure.style.lineHeight =
+        "1.5";
+
+
+    return disclosure;
 
 }
 
@@ -2011,7 +2065,8 @@ function renderCheapestOffer() {
     }
 
 
-    container.innerHTML = "";
+    container.innerHTML =
+        "";
 
 
     if (
@@ -2072,10 +2127,8 @@ function renderCheapestOffer() {
         logo.src =
             supplier.logo_url;
 
-
         logo.alt =
             `${supplierName} logo`;
-
 
         logo.className =
             "supplier-logo";
@@ -2117,7 +2170,6 @@ function renderCheapestOffer() {
 
     supplierElement.className =
         "cheapest-supplier";
-
 
     supplierElement.textContent =
         supplierName;
@@ -2246,40 +2298,23 @@ function renderCheapestOffer() {
         );
 
 
-    if (
-        isValidHttpUrl(
-            bookingUrl
-        )
-    ) {
-
-        const dealButton =
-            document.createElement(
-                "a"
-            );
+    const dealButton =
+        createDealLink(
+            bookingUrl,
+            supplierName,
+            "deal-button"
+        );
 
 
-        dealButton.href =
-            bookingUrl;
-
-
-        dealButton.target =
-            "_blank";
-
-
-        dealButton.rel =
-            "noopener noreferrer sponsored";
-
-
-        dealButton.className =
-            "deal-button";
-
-
-        dealButton.textContent =
-            "View Deal";
-
+    if (dealButton) {
 
         container.appendChild(
             dealButton
+        );
+
+
+        container.appendChild(
+            createAffiliateDisclosure()
         );
 
     } else {
@@ -2324,7 +2359,8 @@ function renderOffersTable() {
     }
 
 
-    table.innerHTML = "";
+    table.innerHTML =
+        "";
 
 
     if (
@@ -2381,6 +2417,12 @@ function renderOffersTable() {
                 );
 
 
+            const supplierName =
+                getOfferSupplierName(
+                    offer
+                );
+
+
             const supplierCell =
                 document.createElement(
                     "td"
@@ -2389,12 +2431,6 @@ function renderOffersTable() {
 
             supplierCell.className =
                 "supplier-cell";
-
-
-            const supplierName =
-                getOfferSupplierName(
-                    offer
-                );
 
 
             const supplier =
@@ -2419,10 +2455,8 @@ function renderOffersTable() {
                 logo.src =
                     supplier.logo_url;
 
-
                 logo.alt =
                     `${supplierName} logo`;
-
 
                 logo.className =
                     "supplier-logo";
@@ -2529,43 +2563,17 @@ function renderOffersTable() {
                 );
 
 
-            const bookingUrl =
-                getOfferBookingUrl(
-                    offer
+            const dealButton =
+                createDealLink(
+                    getOfferBookingUrl(
+                        offer
+                    ),
+                    supplierName,
+                    "small-deal-button"
                 );
 
 
-            if (
-                isValidHttpUrl(
-                    bookingUrl
-                )
-            ) {
-
-                const dealButton =
-                    document.createElement(
-                        "a"
-                    );
-
-
-                dealButton.href =
-                    bookingUrl;
-
-
-                dealButton.target =
-                    "_blank";
-
-
-                dealButton.rel =
-                    "noopener noreferrer sponsored";
-
-
-                dealButton.className =
-                    "small-deal-button";
-
-
-                dealButton.textContent =
-                    "View Deal";
-
+            if (dealButton) {
 
                 dealCell.appendChild(
                     dealButton
