@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Hotel Details | PackageHolidayCompare
+    </title>
+
+    <meta
+        name="description"
+        content="View hotel details, images and compare package holiday offers from multiple suppliers."
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f7fb;
+            color: #1f2937;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            color: inherit;
+        }
+
+
+        /* ==========================================
+           HEADER
+        ========================================== */
+
+        .site-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header-inner {
+            width: min(1200px, calc(100% - 30px));
+            margin: 0 auto;
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .logo {
+            color: #1769d2;
+            font-size: 24px;
+            font-weight: 850;
+            text-decoration: none;
+        }
+
+        .back-link {
+            color: #1769d2;
+            font-weight: 750;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* ==========================================
+           PAGE
+        ========================================== */
+
+        .page {
+            width: min(1200px, calc(100% - 30px));
+            margin: 30px auto 60px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow:
+                0 8px 26px
+                rgba(15, 23, 42, 0.07);
+        }
+
+
+        /* ==========================================
+           LOADING / ERROR
+        ========================================== */
+
+        .status-card {
+            padding: 35px;
+            text-align: center;
+        }
+
+        .status-card h2 {
+            margin-top: 0;
+        }
+
+        .error-message {
+            color: #b42318;
+        }
+
+
+        /* ==========================================
+           HOTEL HEADER
+        ========================================== */
+
+        .hotel-heading {
+            margin-bottom: 22px;
+        }
+
+        .hotel-location {
+            margin: 0 0 7px;
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .hotel-heading h1 {
+            margin: 0 0 10px;
+            font-size: clamp(30px, 5vw, 45px);
+        }
+
+        .hotel-stars {
+            color: #f59e0b;
+            font-size: 21px;
+            letter-spacing: 2px;
+        }
+
+
+        /* ==========================================
+           IMAGE AREA
+        ========================================== */
+
+        .gallery-card {
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .main-image-wrapper {
+            width: 100%;
+            height: 520px;
+            background: #e2e8f0;
+        }
+
+        .main-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .gallery-thumbnails {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 15px;
+        }
+
+        .gallery-thumbnail {
+            flex: 0 0 115px;
+            height: 80px;
+            padding: 0;
+            overflow: hidden;
+            border: 3px solid transparent;
+            border-radius: 9px;
+            background: #f1f5f9;
+            cursor: pointer;
+        }
+
+        .gallery-thumbnail.active {
+            border-color: #1769d2;
+        }
+
+        .gallery-thumbnail img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+
+        /* ==========================================
+           HOTEL CONTENT
+        ========================================== */
+
+        .hotel-grid {
+            display: grid;
+            grid-template-columns:
+                minmax(0, 2fr)
+                minmax(280px, 1fr);
+            gap: 25px;
+            align-items: start;
+        }
+
+        .content-card {
+            padding: 28px;
+            margin-bottom: 25px;
+        }
+
+        .content-card h2 {
+            margin-top: 0;
+            font-size: 25px;
+        }
+
+        .description {
+            margin: 0;
+            color: #475569;
+            font-size: 16px;
+            line-height: 1.7;
+            white-space: pre-line;
+        }
+
+
+        /* ==========================================
+           HOTEL FACTS
+        ========================================== */
+
+        .facts-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .fact {
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8fafc;
+        }
+
+        .fact-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .fact-value {
+            font-weight: 800;
+        }
+
+
+        /* ==========================================
+           CHEAPEST OFFER
+        ========================================== */
+
+        .cheapest-card {
+            position: sticky;
+            top: 20px;
+            padding: 25px;
+        }
+
+        .cheapest-card h2 {
+            margin: 0 0 8px;
+        }
+
+        .cheapest-label {
+            margin-bottom: 7px;
+            color: #64748b;
+        }
+
+        .cheapest-supplier {
+            margin-bottom: 5px;
+            font-size: 20px;
+            font-weight: 850;
+        }
+
+        .cheapest-price {
+            margin: 8px 0 18px;
+            color: #1769d2;
+            font-size: 38px;
+            font-weight: 900;
+        }
+
+        .cheapest-details {
+            margin-bottom: 18px;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .deal-button {
+            display: block;
+            width: 100%;
+            padding: 14px 18px;
+            border: 0;
+            border-radius: 10px;
+            background: #00a86b;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 850;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .deal-button:hover {
+            background: #008f5b;
+        }
+
+        .deal-button.disabled {
+            background: #94a3b8;
+            cursor: default;
+            pointer-events: none;
+        }
+
+
+        /* ==========================================
+           OFFERS TABLE
+        ========================================== */
+
+        .offers-card {
+            padding: 28px;
+            margin-top: 25px;
+        }
+
+        .offers-card h2 {
+            margin-top: 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .offers-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .offers-table th,
+        .offers-table td {
+            padding: 15px 13px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .offers-table th {
+            background: #f8fafc;
+            font-size: 14px;
+        }
+
+        .offer-price {
+            color: #1769d2;
+            font-size: 19px;
+            font-weight: 850;
+        }
+
+        .supplier-cell {
+            min-width: 150px;
+        }
+
+        .supplier-logo {
+            display: block;
+            max-width: 100px;
+            max-height: 38px;
+            margin-bottom: 5px;
+            object-fit: contain;
+        }
+
+        .small-deal-button {
+            display: inline-block;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #00a86b;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 800;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .no-link {
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .empty-offers {
+            padding: 20px 0;
+            color: #64748b;
+        }
+
+
+        /* ==========================================
+           MOBILE
+        ========================================== */
+
+        @media (max-width: 850px) {
+
+            .hotel-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cheapest-card {
+                position: static;
+            }
+
+            .main-image-wrapper {
+                height: 360px;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .header-inner {
+                min-height: 64px;
+            }
+
+            .logo {
+                font-size: 19px;
+            }
+
+            .back-link {
+                font-size: 14px;
+            }
+
+            .page {
+                margin-top: 20px;
+            }
+
+            .main-image-wrapper {
+                height: 270px;
+            }
+
+            .facts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-card,
+            .offers-card,
+            .cheapest-card {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="site-header">
+
+        <div class="header-inner">
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+                ✈ PackageHolidayCompare
+            </a>
+
+            <a
+                href="results.html"
+                class="back-link"
+            >
+                ← Back to Results
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- ==========================================
+         PAGE
+    =========================================== -->
+
+    <main
+        id="hotelPage"
+        class="page"
+    >
+
+
+        <!-- Loading message -->
+
+        <div
+            id="loadingCard"
+            class="card status-card"
+        >
+
+            <h2>
+                Loading hotel...
+            </h2>
+
+            <p>
+                Please wait while we load the hotel
+                and available holiday offers.
+            </p>
+
+        </div>
+
+
+        <!-- Error message -->
+
+        <div
+            id="errorCard"
+            class="card status-card"
+            style="display:none;"
+        >
+
+            <h2>
+                Hotel unavailable
+            </h2>
+
+            <p
+                id="errorMessage"
+                class="error-message"
+            >
+                Unable to load this hotel.
+            </p>
+
+            <a
+                href="results.html"
+                class="back-link"
+            >
+                ← Return to holiday results
+            </a>
+
+        </div>
+
+
+        <!-- Actual hotel content -->
+
+        <div
+            id="hotelContent"
+            style="display:none;"
+        >
+
+
+            <!-- ==================================
+                 HOTEL TITLE
+            =================================== -->
+
+            <section class="hotel-heading">
+
+                <p
+                    id="hotelLocation"
+                    class="hotel-location"
+                ></p>
+
+                <h1 id="hotelName">
+                    Hotel
+                </h1>
+
+                <div
+                    id="hotelStars"
+                    class="hotel-stars"
+                ></div>
+
+            </section>
+
+
+            <!-- ==================================
+                 IMAGE GALLERY
+            =================================== -->
+
+            <section class="card gallery-card">
+
+                <div class="main-image-wrapper">
+
+                    <img
+                        id="mainHotelImage"
+                        src=""
+                        alt=""
+                    >
+
+                </div>
+
+                <div
+                    id="galleryThumbnails"
+                    class="gallery-thumbnails"
+                ></div>
+
+            </section>
+
+
+            <!-- ==================================
+                 CONTENT + CHEAPEST OFFER
+            =================================== -->
+
+            <div class="hotel-grid">
+
+                <div>
+
+
+                    <!-- DESCRIPTION -->
+
+                    <section class="card content-card">
+
+                        <h2>
+                            About this hotel
+                        </h2>
+
+                        <p
+                            id="hotelDescription"
+                            class="description"
+                        ></p>
+
+                    </section>
+
+
+                    <!-- HOTEL DETAILS -->
+
+                    <section class="card content-card">
+
+                        <h2>
+                            Hotel details
+                        </h2>
+
+                        <div class="facts-grid">
+
+                            <div class="fact">
+
+                                <span class="fact-label">
+                                    Destination
+                                </span>
+
+                                <span
+                                    id="hotelDestination"
+                                    class="fact-value"
+                                >
+                                    -
+                                </span>
+
+                            </div>
+
+                            <div class="fact">
+
+                                <span class="fact-label">
+                                    Country
+                                </span>
+
+                                <span
+                                    id="hotelCountry"
+                                    class="fact-value"
+                                >
+                                    -
+                                </span>
+
+                            </div>
+
+                            <div class="fact">
+
+                                <span class="fact-label">
+                                    Board basis
+                                </span>
+
+                                <span
+                                    id="hotelBoard"
+                                    class="fact-value"
+                                >
+                                    -
+                                </span>
+
+                            </div>
+
+                            <div class="fact">
+
+                                <span class="fact-label">
+                                    Rating
+                                </span>
+
+                                <span
+                                    id="hotelRating"
+                                    class="fact-value"
+                                >
+                                    -
+                                </span>
+
+                            </div>
+
+                            <div class="fact">
+
+                                <span class="fact-label">
+                                    Nearest airport
+                                </span>
+
+                                <span
+                                    id="hotelAirport"
+                                    class="fact-value"
+                                >
+                                    -
+                                </span>
+
+                            </div>
+
+                            <div class="fact">
+
+                                <span class="fact-label">
+                                    Transfer time
+                                </span>
+
+                                <span
+                                    id="hotelTransfer"
+                                    class="fact-value"
+                                >
+                                    -
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+
+                <!-- ==================================
+                     CHEAPEST OFFER
+                =================================== -->
+
+                <aside
+                    id="cheapestOfferCard"
+                    class="card cheapest-card"
+                >
+
+                    <h2>
+                        Cheapest Offer
+                    </h2>
+
+                    <div
+                        id="cheapestOfferContent"
+                    >
+
+                        <p>
+                            Checking available offers...
+                        </p>
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+
+            <!-- ==================================
+                 ALL SUPPLIER OFFERS
+            =================================== -->
+
+            <section class="card offers-card">
+
+                <h2>
+                    Compare Holiday Offers
+                </h2>
+
+                <p>
+                    Compare available package prices from
+                    different holiday suppliers.
+                </p>
+
+                <div class="table-wrapper">
+
+                    <table class="offers-table">
+
+                        <thead>
+
+                            <tr>
+                                <th>Supplier</th>
+                                <th>Price</th>
+                                <th>Departure</th>
+                                <th>Airport</th>
+                                <th>Nights</th>
+                                <th>Board</th>
+                                <th>Room</th>
+                                <th>Deal</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="offersTable">
+
+                            <tr>
+
+                                <td colspan="8">
+                                    Loading offers...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <!-- Hotel page functionality -->
+    <script src="js/hotel.js?v=20260923-1"></script>
+
+</body>
+
+</html>

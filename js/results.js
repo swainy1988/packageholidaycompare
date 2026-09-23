@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Holiday Results Page
-// Version: 2026-09-02-2
+// Version: 2026-09-23-1
 // ======================================================
 
 let allHotels = [];
@@ -2626,6 +2626,10 @@ function createAlternativeResultsNotice() {
 }
 
 
+// ======================================================
+// HOTEL RESULT CARD
+// ======================================================
+
 function createHotelCard(group) {
 
     const hotel =
@@ -2638,6 +2642,11 @@ function createHotelCard(group) {
         escapeAttribute(
             String(hotel.id)
         );
+
+    const hotelDetailsUrl =
+        `hotel.html?id=${encodeURIComponent(
+            String(hotel.id || "")
+        )}`;
 
     const hotelName =
         escapeHtml(
@@ -2814,6 +2823,15 @@ function createHotelCard(group) {
                         ${description}
                     </p>
 
+                    <a
+                        class="hotel-details-button"
+                        href="${escapeAttribute(
+                            hotelDetailsUrl
+                        )}"
+                    >
+                        View Hotel
+                    </a>
+
                 </div>
 
                 <div class="price-panel">
@@ -2925,6 +2943,10 @@ function createHotelCard(group) {
 }
 
 
+// ======================================================
+// ALTERNATIVE BADGE
+// ======================================================
+
 function createAlternativeBadge(group) {
 
     if (
@@ -2974,6 +2996,10 @@ function createAlternativeBadge(group) {
     `;
 }
 
+
+// ======================================================
+// SUPPLIER OFFER ROW
+// ======================================================
 
 function createSupplierOfferRow(offer) {
 
@@ -3282,6 +3308,24 @@ function injectResultEnhancementStyles() {
             background: #dbeafe;
         }
 
+        .hotel-details-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 16px;
+            padding: 11px 16px;
+            border: 1px solid #0066cc;
+            border-radius: 9px;
+            background: #ffffff;
+            color: #0066cc;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .hotel-details-button:hover {
+            background: #eef6ff;
+        }
+
         .alternative-results-notice {
             display: flex;
             gap: 16px;
@@ -3362,6 +3406,10 @@ function injectResultEnhancementStyles() {
     document.head.appendChild(style);
 }
 
+
+// ======================================================
+// DEMO MODE NOTICE
+// ======================================================
 
 function showDemoModeNotice() {
 
