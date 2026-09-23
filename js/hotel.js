@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Hotel Details Page
-// Version: 2026-09-23-3
+// Version: 2026-09-23-4
 // ======================================================
 
 let currentHotel = null;
@@ -15,7 +15,6 @@ let searchFilteringActive = false;
 
 // ======================================================
 // SEARCH FLEXIBILITY
-// Keep these the same as results.js
 // ======================================================
 
 const HOTEL_DATE_FLEX_DAYS = 3;
@@ -104,9 +103,6 @@ async function initialiseHotelPage() {
 
 // ======================================================
 // HOTEL REFERENCE FROM URL
-//
-// hotel.html?id=HOTEL_UUID
-// hotel.html?slug=hotel-slug
 // ======================================================
 
 function getHotelReference() {
@@ -213,37 +209,71 @@ async function loadHotel(
 
 
 // ======================================================
+// LOCAL STORAGE HELPER
+// ======================================================
+
+function getStoredValue(
+    ...keys
+) {
+
+    for (
+        const key
+        of keys
+    ) {
+
+        const value =
+            localStorage.getItem(
+                key
+            );
+
+
+        if (
+            value !== null &&
+            String(value).trim() !== ""
+        ) {
+
+            return String(
+                value
+            ).trim();
+
+        }
+
+    }
+
+
+    return "";
+
+}
+
+
+// ======================================================
 // CURRENT SEARCH
 // ======================================================
 
 function getCurrentSearchCriteria() {
 
     const departureDate =
-        (
-            localStorage.getItem(
-                "departureDate"
-            ) || ""
-        ).trim();
+        getStoredValue(
+            "departureDate",
+            "departDate",
+            "departure"
+        );
 
 
     const returnDate =
-        (
-            localStorage.getItem(
-                "returnDate"
-            ) || ""
-        ).trim();
+        getStoredValue(
+            "returnDate",
+            "return"
+        );
 
 
     let nights =
         Number(
-            localStorage.getItem(
+            getStoredValue(
                 "nights"
             )
         ) || 0;
 
-
-    // If nights was not saved for any reason,
-    // calculate it from departure and return dates.
 
     if (
         !nights &&
@@ -260,14 +290,34 @@ function getCurrentSearchCriteria() {
     }
 
 
+    const adults =
+        Number(
+            getStoredValue(
+                "adults"
+            )
+        ) || 0;
+
+
+    const children =
+        Number(
+            getStoredValue(
+                "children"
+            )
+        ) || 0;
+
+
     return {
 
         airport:
-            (
-                localStorage.getItem(
-                    "airport"
-                ) || ""
-            ).trim(),
+            getStoredValue(
+                "airport",
+                "departureAirport"
+            ),
+
+        destination:
+            getStoredValue(
+                "destination"
+            ),
 
         departureDate,
 
@@ -275,16 +325,20 @@ function getCurrentSearchCriteria() {
 
         nights,
 
+        adults,
+
+        children,
+
         board:
-            (
-                localStorage.getItem(
-                    "board"
-                ) || ""
-            ).trim(),
+            getStoredValue(
+                "board",
+                "boardBasis",
+                "board_basis"
+            ),
 
         budget:
             Number(
-                localStorage.getItem(
+                getStoredValue(
                     "budget"
                 )
             ) || 0
@@ -306,6 +360,29 @@ function hasOfferSearchCriteria(
         search.airport ||
         search.departureDate ||
         search.nights ||
+        search.board ||
+        search.budget
+    );
+
+}
+
+
+// ======================================================
+// CHECK WHETHER SEARCH SUMMARY SHOULD SHOW
+// ======================================================
+
+function hasSearchSummaryCriteria(
+    search
+) {
+
+    return Boolean(
+        search.airport ||
+        search.destination ||
+        search.departureDate ||
+        search.returnDate ||
+        search.nights ||
+        search.adults ||
+        search.children ||
         search.board ||
         search.budget
     );
@@ -404,17 +481,15 @@ async function loadHotelImages() {
             error
         } = await window.db
             .from("hotel_images")
-            .select(
-                `
-                    id,
-                    hotel_id,
-                    image_url,
-                    alt_text,
-                    is_main,
-                    sort_order,
-                    created_at
-                `
-            )
+            .select(`
+                id,
+                hotel_id,
+                image_url,
+                alt_text,
+                is_main,
+                sort_order,
+                created_at
+            `)
             .eq(
                 "hotel_id",
                 currentHotel.id
@@ -479,15 +554,13 @@ async function loadSuppliers() {
             error
         } = await window.db
             .from("suppliers")
-            .select(
-                `
-                    name,
-                    slug,
-                    logo_url,
-                    website_url,
-                    active
-                `
-            );
+            .select(`
+                name,
+                slug,
+                logo_url,
+                website_url,
+                active
+            `);
 
 
         if (error) {
@@ -567,10 +640,6 @@ async function loadHotelOffers() {
             : [];
 
 
-    // ==================================================
-    // FILTER BY CUSTOMER'S CURRENT SEARCH
-    // ==================================================
-
     if (searchFilteringActive) {
 
         offers =
@@ -584,8 +653,6 @@ async function loadHotelOffers() {
 
     }
 
-
-    // Cheapest first
 
     offers.sort(
         (
@@ -612,9 +679,7 @@ function offerMatchesCurrentSearch(
     search
 ) {
 
-    // --------------------------------------------------
     // AIRPORT
-    // --------------------------------------------------
 
     if (search.airport) {
 
@@ -634,9 +699,7 @@ function offerMatchesCurrentSearch(
     }
 
 
-    // --------------------------------------------------
-    // BOARD BASIS
-    // --------------------------------------------------
+    // BOARD
 
     if (search.board) {
 
@@ -658,9 +721,7 @@ function offerMatchesCurrentSearch(
     }
 
 
-    // --------------------------------------------------
-    // MAXIMUM BUDGET
-    // --------------------------------------------------
+    // BUDGET
 
     if (search.budget) {
 
@@ -682,10 +743,7 @@ function offerMatchesCurrentSearch(
     }
 
 
-    // --------------------------------------------------
-    // DURATION
-    // Same ±3 nights used on results page
-    // --------------------------------------------------
+    // NIGHTS
 
     if (search.nights) {
 
@@ -721,10 +779,7 @@ function offerMatchesCurrentSearch(
     }
 
 
-    // --------------------------------------------------
     // DEPARTURE DATE
-    // Same ±3 days used on results page
-    // --------------------------------------------------
 
     if (search.departureDate) {
 
@@ -856,6 +911,8 @@ function getSignedDateDifference(
 
 function renderHotel() {
 
+    renderSearchSummary();
+
     renderHotelHeading();
 
     renderGallery();
@@ -873,6 +930,167 @@ function renderHotel() {
     renderOffersTable();
 
     updateDocumentTitle();
+
+}
+
+
+// ======================================================
+// SEARCH SUMMARY
+// ======================================================
+
+function renderSearchSummary() {
+
+    const card =
+        document.getElementById(
+            "searchSummaryCard"
+        );
+
+
+    if (!card) {
+        return;
+    }
+
+
+    if (
+        !hasSearchSummaryCriteria(
+            currentSearchCriteria
+        )
+    ) {
+
+        card.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    card.style.display =
+        "block";
+
+
+    setText(
+        "summaryAirport",
+        currentSearchCriteria.airport ||
+        "Any airport"
+    );
+
+
+    setText(
+        "summaryDestination",
+        currentSearchCriteria.destination ||
+        currentHotel?.country ||
+        currentHotel?.destination ||
+        "Anywhere"
+    );
+
+
+    setText(
+        "summaryDeparture",
+        currentSearchCriteria.departureDate
+            ? formatDate(
+                currentSearchCriteria.departureDate
+            )
+            : "Any date"
+    );
+
+
+    setText(
+        "summaryReturn",
+        currentSearchCriteria.returnDate
+            ? formatDate(
+                currentSearchCriteria.returnDate
+            )
+            : "Flexible"
+    );
+
+
+    setText(
+        "summaryNights",
+        currentSearchCriteria.nights
+            ? `${currentSearchCriteria.nights} nights`
+            : "Any duration"
+    );
+
+
+    setText(
+        "summaryGuests",
+        formatGuests(
+            currentSearchCriteria.adults,
+            currentSearchCriteria.children
+        )
+    );
+
+
+    setText(
+        "summaryBoard",
+        currentSearchCriteria.board ||
+        "Any board"
+    );
+
+
+    setText(
+        "summaryBudget",
+        currentSearchCriteria.budget
+            ? `Up to ${formatPrice(
+                currentSearchCriteria.budget
+            )}`
+            : "Any budget"
+    );
+
+}
+
+
+// ======================================================
+// FORMAT GUESTS
+// ======================================================
+
+function formatGuests(
+    adults,
+    children
+) {
+
+    const parts = [];
+
+
+    if (adults) {
+
+        parts.push(
+            `${adults} ${
+                adults === 1
+                    ? "adult"
+                    : "adults"
+            }`
+        );
+
+    }
+
+
+    if (children) {
+
+        parts.push(
+            `${children} ${
+                children === 1
+                    ? "child"
+                    : "children"
+            }`
+        );
+
+    }
+
+
+    if (
+        parts.length === 0
+    ) {
+
+        return "Guests not specified";
+
+    }
+
+
+    return parts.join(
+        ", "
+    );
 
 }
 
@@ -968,8 +1186,6 @@ function renderGallery() {
                 )
         );
 
-
-    // Fall back to hotels.main_image
 
     if (
         galleryImages.length === 0 &&
@@ -1549,7 +1765,7 @@ function appendEmptySectionMessage(
 
 
 // ======================================================
-// NORMALISE JSON / LIST FIELDS
+// NORMALISE LIST FIELDS
 // ======================================================
 
 function normaliseListField(
@@ -2092,7 +2308,7 @@ function renderCheapestOffer() {
 
 
 // ======================================================
-// ALL OFFERS TABLE
+// OFFERS TABLE
 // ======================================================
 
 function renderOffersTable() {
@@ -2164,10 +2380,6 @@ function renderOffersTable() {
                     "tr"
                 );
 
-
-            // ==========================================
-            // SUPPLIER
-            // ==========================================
 
             const supplierCell =
                 document.createElement(
@@ -2243,10 +2455,6 @@ function renderOffersTable() {
             );
 
 
-            // ==========================================
-            // PRICE
-            // ==========================================
-
             const priceCell =
                 document.createElement(
                     "td"
@@ -2270,8 +2478,6 @@ function renderOffersTable() {
             );
 
 
-            // Departure
-
             appendTextCell(
                 row,
                 formatDate(
@@ -2282,16 +2488,12 @@ function renderOffersTable() {
             );
 
 
-            // Airport
-
             appendTextCell(
                 row,
                 offer.airport ||
                 "-"
             );
 
-
-            // Nights
 
             appendTextCell(
                 row,
@@ -2303,8 +2505,6 @@ function renderOffersTable() {
             );
 
 
-            // Board
-
             appendTextCell(
                 row,
                 getOfferBoard(
@@ -2314,8 +2514,6 @@ function renderOffersTable() {
             );
 
 
-            // Room
-
             appendTextCell(
                 row,
                 getOfferRoomType(
@@ -2324,10 +2522,6 @@ function renderOffersTable() {
                 "-"
             );
 
-
-            // ==========================================
-            // DEAL
-            // ==========================================
 
             const dealCell =
                 document.createElement(
@@ -2416,7 +2610,7 @@ function renderOffersTable() {
 
 
 // ======================================================
-// OFFER FIELD HELPERS
+// OFFER HELPERS
 // ======================================================
 
 function getOfferPrice(
