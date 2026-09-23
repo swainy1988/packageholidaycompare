@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Hotel Details Page
-// Version: 2026-09-23-5
+// Version: 2026-09-23-6
 // ======================================================
 
 let currentHotel = null;
@@ -1936,10 +1936,6 @@ function getListItemDescription(
 
 // ======================================================
 // AFFILIATE / OUTBOUND DEAL LINK
-//
-// IMPORTANT:
-// The stored booking URL is used exactly as saved.
-// We do NOT add or remove affiliate parameters.
 // ======================================================
 
 function createDealLink(
@@ -1973,12 +1969,6 @@ function createDealLink(
     dealButton.target =
         "_blank";
 
-
-    // sponsored = tells search engines this is a
-    // commercial / affiliate-style outbound link.
-    //
-    // noopener = protects the PackageHolidayCompare
-    // tab when opening another website.
 
     dealButton.rel =
         "sponsored noopener";
@@ -2044,6 +2034,91 @@ function createAffiliateDisclosure() {
 
 
     return disclosure;
+
+}
+
+
+// ======================================================
+// OFFERS TABLE DISCLOSURE
+// ======================================================
+
+function renderOffersAffiliateDisclosure() {
+
+    const tableBody =
+        document.getElementById(
+            "offersTable"
+        );
+
+
+    if (!tableBody) {
+        return;
+    }
+
+
+    const table =
+        tableBody.closest(
+            "table"
+        );
+
+
+    if (!table) {
+        return;
+    }
+
+
+    const wrapper =
+        table.parentElement;
+
+
+    if (!wrapper) {
+        return;
+    }
+
+
+    const existing =
+        document.getElementById(
+            "offersAffiliateDisclosure"
+        );
+
+
+    if (existing) {
+
+        existing.remove();
+
+    }
+
+
+    const hasDealLink =
+        currentOffers.some(
+            offer =>
+                isValidHttpUrl(
+                    getOfferBookingUrl(
+                        offer
+                    )
+                )
+        );
+
+
+    if (!hasDealLink) {
+        return;
+    }
+
+
+    const disclosure =
+        createAffiliateDisclosure();
+
+
+    disclosure.id =
+        "offersAffiliateDisclosure";
+
+
+    disclosure.style.margin =
+        "14px 2px 0";
+
+
+    wrapper.appendChild(
+        disclosure
+    );
 
 }
 
@@ -2403,6 +2478,8 @@ function renderOffersTable() {
         );
 
 
+        renderOffersAffiliateDisclosure();
+
         return;
 
     }
@@ -2613,6 +2690,9 @@ function renderOffersTable() {
 
         }
     );
+
+
+    renderOffersAffiliateDisclosure();
 
 }
 
