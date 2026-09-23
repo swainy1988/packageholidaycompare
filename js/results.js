@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Holiday Results Page
-// Version: 2026-09-23-1
+// Version: 2026-09-23-2
 // ======================================================
 
 let allHotels = [];
@@ -1868,12 +1868,6 @@ function offerMatchesSearch(
         return false;
     }
 
-    // ==================================================
-    // FLEXIBLE DURATION
-    // Example:
-    // Search 14 nights = allow 11 to 17 nights
-    // ==================================================
-
     if (search.nights) {
 
         const offerNights =
@@ -1898,11 +1892,6 @@ function offerMatchesSearch(
             return false;
         }
     }
-
-    // ==================================================
-    // FLEXIBLE DEPARTURE DATE
-    // Allow ±3 days
-    // ==================================================
 
     if (search.departureDate) {
 
@@ -2626,9 +2615,21 @@ function createAlternativeResultsNotice() {
 }
 
 
-// ======================================================
-// HOTEL RESULT CARD
-// ======================================================
+function createAffiliateDisclosureMarkup(extraClass = "") {
+
+    const className =
+        extraClass
+            ? `affiliate-disclosure ${extraClass}`
+            : "affiliate-disclosure";
+
+    return `
+        <p class="${className}">
+            We may earn a commission if you book through a supplier link.
+            This does not change the price you pay.
+        </p>
+    `;
+}
+
 
 function createHotelCard(group) {
 
@@ -2703,6 +2704,22 @@ function createHotelCard(group) {
             group
         );
 
+    const supplierName =
+        String(
+            cheapest.supplier ||
+            "Supplier"
+        );
+
+    const hasBookableOffer =
+        group.offers.some(
+            offer =>
+                Boolean(
+                    createSafeBookingUrl(
+                        offer.booking_url
+                    )
+                )
+        );
+
     const bookingButton =
         bookingUrl
             ? `
@@ -2710,7 +2727,14 @@ function createHotelCard(group) {
                     class="book-button"
                     href="${bookingUrl}"
                     target="_blank"
-                    rel="noopener sponsored"
+                    rel="sponsored noopener"
+                    aria-label="View Deal with ${escapeAttribute(
+                        supplierName
+                    )} - opens in a new tab"
+                    data-supplier="${escapeAttribute(
+                        supplierName
+                    )}"
+                    data-outbound="true"
                 >
                     View Deal
                 </a>
@@ -2723,6 +2747,20 @@ function createHotelCard(group) {
                     No booking link
                 </span>
             `;
+
+    const cheapestAffiliateDisclosure =
+        bookingUrl
+            ? createAffiliateDisclosureMarkup(
+                "price-panel-disclosure"
+            )
+            : "";
+
+    const comparisonAffiliateDisclosure =
+        hasBookableOffer
+            ? createAffiliateDisclosureMarkup(
+                "comparison-disclosure"
+            )
+            : "";
 
     return `
         <article class="hotel-result-card">
@@ -2890,6 +2928,8 @@ function createHotelCard(group) {
 
                     ${bookingButton}
 
+                    ${cheapestAffiliateDisclosure}
+
                 </div>
 
             </div>
@@ -2936,16 +2976,14 @@ function createHotelCard(group) {
 
                 </div>
 
+                ${comparisonAffiliateDisclosure}
+
             </div>
 
         </article>
     `;
 }
 
-
-// ======================================================
-// ALTERNATIVE BADGE
-// ======================================================
 
 function createAlternativeBadge(group) {
 
@@ -2997,10 +3035,6 @@ function createAlternativeBadge(group) {
 }
 
 
-// ======================================================
-// SUPPLIER OFFER ROW
-// ======================================================
-
 function createSupplierOfferRow(offer) {
 
     const bookingUrl =
@@ -3014,6 +3048,12 @@ function createSupplierOfferRow(offer) {
             "small"
         );
 
+    const supplierName =
+        String(
+            offer.supplier ||
+            "Supplier"
+        );
+
     const bookingLink =
         bookingUrl
             ? `
@@ -3021,7 +3061,14 @@ function createSupplierOfferRow(offer) {
                     class="small-book-link"
                     href="${bookingUrl}"
                     target="_blank"
-                    rel="noopener sponsored"
+                    rel="sponsored noopener"
+                    aria-label="View Deal with ${escapeAttribute(
+                        supplierName
+                    )} - opens in a new tab"
+                    data-supplier="${escapeAttribute(
+                        supplierName
+                    )}"
+                    data-outbound="true"
                 >
                     View Deal
                 </a>
@@ -3326,6 +3373,22 @@ function injectResultEnhancementStyles() {
             background: #eef6ff;
         }
 
+        .affiliate-disclosure {
+            margin: 12px 0 0;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .price-panel-disclosure {
+            max-width: 220px;
+            text-align: center;
+        }
+
+        .comparison-disclosure {
+            margin-top: 14px;
+        }
+
         .alternative-results-notice {
             display: flex;
             gap: 16px;
@@ -3406,10 +3469,6 @@ function injectResultEnhancementStyles() {
     document.head.appendChild(style);
 }
 
-
-// ======================================================
-// DEMO MODE NOTICE
-// ======================================================
 
 function showDemoModeNotice() {
 
