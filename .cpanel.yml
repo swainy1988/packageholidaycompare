@@ -9,6 +9,7 @@ deployment:
     - /bin/cp admin.html "$DEPLOYPATH"
     - /bin/cp calendar.html "$DEPLOYPATH"
     - /bin/cp holiday.html "$DEPLOYPATH"
+    - /bin/cp hotel.html "$DEPLOYPATH"
     - /bin/cp holidays.json "$DEPLOYPATH"
     - /bin/cp index.html "$DEPLOYPATH"
     - /bin/cp results.html "$DEPLOYPATH"
