@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Hotel Details Page
-// Version: 2026-10-20-1
+// Version: 2026-10-20-2
 // ======================================================
 
 let currentHotel = null;
@@ -14,11 +14,17 @@ let searchFilteringActive = false;
 
 
 // ======================================================
-// SEARCH FLEXIBILITY
+// SETTINGS
 // ======================================================
 
 const HOTEL_DATE_FLEX_DAYS = 3;
 const HOTEL_NIGHT_FLEX = 3;
+
+
+// Keep TRUE while manually entered test offers are used.
+// Change to FALSE when genuine supplier feeds /
+// affiliate offers are connected.
+const DEMO_MODE = true;
 
 
 // ======================================================
@@ -62,6 +68,7 @@ async function initialiseHotelPage() {
         currentSearchCriteria =
             getCurrentSearchCriteria();
 
+
         searchFilteringActive =
             hasOfferSearchCriteria(
                 currentSearchCriteria
@@ -74,15 +81,25 @@ async function initialiseHotelPage() {
 
 
         await Promise.all([
+
             loadHotelImages(),
-            loadSuppliers(),
-            loadHotelOffers()
+
+            loadSuppliers()
+
         ]);
+
+
+        // Suppliers must load first so offers from
+        // inactive suppliers can be removed.
+        await loadHotelOffers();
 
 
         renderHotel();
 
+        renderDemoNotice();
+
         hideLoading();
+
 
     } catch (error) {
 
@@ -91,18 +108,17 @@ async function initialiseHotelPage() {
             error
         );
 
+
         showError(
             error?.message ||
             "Unable to load this hotel."
         );
-
     }
-
 }
 
 
 // ======================================================
-// HOTEL REFERENCE FROM URL
+// HOTEL REFERENCE
 // ======================================================
 
 function getHotelReference() {
@@ -114,35 +130,46 @@ function getHotelReference() {
 
 
     const id =
-        params.get("id");
+        params.get(
+            "id"
+        );
 
 
     const slug =
-        params.get("slug");
+        params.get(
+            "slug"
+        );
 
 
     if (id) {
 
         return {
-            type: "id",
-            value: id
-        };
 
+            type:
+                "id",
+
+            value:
+                id
+
+        };
     }
 
 
     if (slug) {
 
         return {
-            type: "slug",
-            value: slug
-        };
 
+            type:
+                "slug",
+
+            value:
+                slug
+
+        };
     }
 
 
     return null;
-
 }
 
 
@@ -154,10 +181,21 @@ async function loadHotel(
     reference
 ) {
 
+    // IMPORTANT:
+    // Public hotel pages only expose published hotels.
+
     let query =
         window.db
-            .from("hotels")
-            .select("*");
+            .from(
+                "hotels"
+            )
+            .select(
+                "*"
+            )
+            .eq(
+                "published",
+                true
+            );
 
 
     if (
@@ -178,38 +216,34 @@ async function loadHotel(
                 "slug",
                 reference.value
             );
-
     }
 
 
     const {
         data,
         error
-    } = await query.single();
+    } =
+        await query.single();
 
 
-    if (error) {
-        throw error;
-    }
-
-
-    if (!data) {
+    if (
+        error ||
+        !data
+    ) {
 
         throw new Error(
-            "This hotel could not be found."
+            "This hotel is not currently available."
         );
-
     }
 
 
     currentHotel =
         data;
-
 }
 
 
 // ======================================================
-// LOCAL STORAGE HELPER
+// LOCAL STORAGE
 // ======================================================
 
 function getStoredValue(
@@ -229,20 +263,20 @@ function getStoredValue(
 
         if (
             value !== null &&
-            String(value).trim() !== ""
+            String(
+                value
+            ).trim() !==
+            ""
         ) {
 
             return String(
                 value
             ).trim();
-
         }
-
     }
 
 
     return "";
-
 }
 
 
@@ -272,7 +306,8 @@ function getCurrentSearchCriteria() {
             getStoredValue(
                 "nights"
             )
-        ) || 0;
+        ) ||
+        0;
 
 
     if (
@@ -286,24 +321,7 @@ function getCurrentSearchCriteria() {
                 departureDate,
                 returnDate
             );
-
     }
-
-
-    const adults =
-        Number(
-            getStoredValue(
-                "adults"
-            )
-        ) || 0;
-
-
-    const children =
-        Number(
-            getStoredValue(
-                "children"
-            )
-        ) || 0;
 
 
     return {
@@ -325,9 +343,21 @@ function getCurrentSearchCriteria() {
 
         nights,
 
-        adults,
+        adults:
+            Number(
+                getStoredValue(
+                    "adults"
+                )
+            ) ||
+            0,
 
-        children,
+        children:
+            Number(
+                getStoredValue(
+                    "children"
+                )
+            ) ||
+            0,
 
         board:
             getStoredValue(
@@ -341,15 +371,15 @@ function getCurrentSearchCriteria() {
                 getStoredValue(
                     "budget"
                 )
-            ) || 0
+            ) ||
+            0
 
     };
-
 }
 
 
 // ======================================================
-// CHECK WHETHER WE HAVE OFFER FILTERS
+// SEARCH FILTER CHECK
 // ======================================================
 
 function hasOfferSearchCriteria(
@@ -357,36 +387,46 @@ function hasOfferSearchCriteria(
 ) {
 
     return Boolean(
-        search.airport ||
-        search.departureDate ||
-        search.nights ||
-        search.board ||
-        search.budget
-    );
 
+        search.airport ||
+
+        search.departureDate ||
+
+        search.nights ||
+
+        search.board ||
+
+        search.budget
+
+    );
 }
 
-
-// ======================================================
-// SEARCH SUMMARY CHECK
-// ======================================================
 
 function hasSearchSummaryCriteria(
     search
 ) {
 
     return Boolean(
-        search.airport ||
-        search.destination ||
-        search.departureDate ||
-        search.returnDate ||
-        search.nights ||
-        search.adults ||
-        search.children ||
-        search.board ||
-        search.budget
-    );
 
+        search.airport ||
+
+        search.destination ||
+
+        search.departureDate ||
+
+        search.returnDate ||
+
+        search.nights ||
+
+        search.adults ||
+
+        search.children ||
+
+        search.board ||
+
+        search.budget
+
+    );
 }
 
 
@@ -405,7 +445,6 @@ function calculateNightsBetweenDates(
     ) {
 
         return 0;
-
     }
 
 
@@ -431,7 +470,6 @@ function calculateNightsBetweenDates(
     ) {
 
         return 0;
-
     }
 
 
@@ -440,36 +478,44 @@ function calculateNightsBetweenDates(
         departure.getTime();
 
 
-    if (difference <= 0) {
+    if (
+        difference <=
+        0
+    ) {
 
         return 0;
-
     }
 
 
     return Math.round(
+
         difference /
+
         (
             1000 *
             60 *
             60 *
             24
         )
-    );
 
+    );
 }
 
 
 // ======================================================
-// LOAD HOTEL IMAGES
+// HOTEL IMAGES
 // ======================================================
 
 async function loadHotelImages() {
 
-    currentImages = [];
+    currentImages =
+        [];
 
 
-    if (!currentHotel?.id) {
+    if (
+        !currentHotel?.id
+    ) {
+
         return;
     }
 
@@ -479,50 +525,62 @@ async function loadHotelImages() {
         const {
             data,
             error
-        } = await window.db
-            .from("hotel_images")
-            .select(`
-                id,
-                hotel_id,
-                image_url,
-                alt_text,
-                is_main,
-                sort_order,
-                created_at
-            `)
-            .eq(
-                "hotel_id",
-                currentHotel.id
-            )
-            .order(
-                "is_main",
-                {
-                    ascending: false
-                }
-            )
-            .order(
-                "sort_order",
-                {
-                    ascending: true
-                }
-            )
-            .order(
-                "created_at",
-                {
-                    ascending: true
-                }
-            );
+        } =
+            await window.db
+                .from(
+                    "hotel_images"
+                )
+                .select(`
+                    id,
+                    hotel_id,
+                    image_url,
+                    alt_text,
+                    is_main,
+                    sort_order,
+                    created_at
+                `)
+                .eq(
+                    "hotel_id",
+                    currentHotel.id
+                )
+                .order(
+                    "is_main",
+                    {
+                        ascending:
+                            false
+                    }
+                )
+                .order(
+                    "sort_order",
+                    {
+                        ascending:
+                            true
+                    }
+                )
+                .order(
+                    "created_at",
+                    {
+                        ascending:
+                            true
+                    }
+                );
 
 
-        if (error) {
+        if (
+            error
+        ) {
+
             throw error;
         }
 
 
         currentImages =
-            Array.isArray(data)
+            Array.isArray(
+                data
+            )
                 ? data
                 : [];
+
 
     } catch (error) {
 
@@ -531,75 +589,75 @@ async function loadHotelImages() {
             error
         );
 
-        currentImages = [];
 
+        currentImages =
+            [];
     }
-
 }
 
 
 // ======================================================
-// LOAD SUPPLIERS
+// ACTIVE SUPPLIERS ONLY
 // ======================================================
 
 async function loadSuppliers() {
 
-    supplierMap = {};
+    supplierMap =
+        {};
 
 
-    try {
-
-        const {
-            data,
-            error
-        } = await window.db
-            .from("suppliers")
+    const {
+        data,
+        error
+    } =
+        await window.db
+            .from(
+                "suppliers"
+            )
             .select(`
                 name,
                 slug,
                 logo_url,
                 website_url,
                 active
-            `);
+            `)
+            .eq(
+                "active",
+                true
+            );
 
 
-        if (error) {
-            throw error;
-        }
+    if (
+        error
+    ) {
 
-
-        (
-            data || []
-        ).forEach(
-            supplier => {
-
-                const key =
-                    normaliseText(
-                        supplier.name
-                    );
-
-
-                if (key) {
-
-                    supplierMap[key] =
-                        supplier;
-
-                }
-
-            }
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Suppliers could not be loaded:",
-            error
-        );
-
-        supplierMap = {};
-
+        throw error;
     }
 
+
+    (
+        data ||
+        []
+    ).forEach(
+        supplier => {
+
+            const key =
+                normaliseText(
+                    supplier.name
+                );
+
+
+            if (
+                key
+            ) {
+
+                supplierMap[
+                    key
+                ] =
+                    supplier;
+            }
+        }
+    );
 }
 
 
@@ -609,10 +667,14 @@ async function loadSuppliers() {
 
 async function loadHotelOffers() {
 
-    currentOffers = [];
+    currentOffers =
+        [];
 
 
-    if (!currentHotel?.id) {
+    if (
+        !currentHotel?.id
+    ) {
+
         return;
     }
 
@@ -620,27 +682,62 @@ async function loadHotelOffers() {
     const {
         data,
         error
-    } = await window.db
-        .from("holiday_offers")
-        .select("*")
-        .eq(
-            "hotel_id",
-            currentHotel.id
-        );
+    } =
+        await window.db
+            .from(
+                "holiday_offers"
+            )
+            .select(
+                "*"
+            )
+            .eq(
+                "hotel_id",
+                currentHotel.id
+            );
 
 
-    if (error) {
+    if (
+        error
+    ) {
+
         throw error;
     }
 
 
     let offers =
-        Array.isArray(data)
+        Array.isArray(
+            data
+        )
             ? data
             : [];
 
 
-    if (searchFilteringActive) {
+    // IMPORTANT:
+    // Offers belonging to inactive suppliers
+    // are completely removed from public pages.
+
+    offers =
+        offers.filter(
+            offer => {
+
+                const supplierName =
+                    getOfferSupplierName(
+                        offer
+                    );
+
+
+                return Boolean(
+                    getSupplierRecord(
+                        supplierName
+                    )
+                );
+            }
+        );
+
+
+    if (
+        searchFilteringActive
+    ) {
 
         offers =
             offers.filter(
@@ -650,7 +747,6 @@ async function loadHotelOffers() {
                         currentSearchCriteria
                     )
             );
-
     }
 
 
@@ -659,19 +755,22 @@ async function loadHotelOffers() {
             first,
             second
         ) =>
-            getOfferPrice(first) -
-            getOfferPrice(second)
+            getOfferPrice(
+                first
+            ) -
+            getOfferPrice(
+                second
+            )
     );
 
 
     currentOffers =
         offers;
-
 }
 
 
 // ======================================================
-// CHECK OFFER AGAINST SEARCH
+// OFFER SEARCH MATCHING
 // ======================================================
 
 function offerMatchesCurrentSearch(
@@ -679,76 +778,64 @@ function offerMatchesCurrentSearch(
     search
 ) {
 
-    if (search.airport) {
+    if (
+        search.airport &&
+        normaliseText(
+            offer?.airport
+        ) !==
+        normaliseText(
+            search.airport
+        )
+    ) {
 
-        if (
-            normaliseText(
-                offer?.airport
-            ) !==
-            normaliseText(
-                search.airport
-            )
-        ) {
-
-            return false;
-
-        }
-
+        return false;
     }
 
 
-    if (search.board) {
-
-        if (
-            normaliseText(
-                getOfferBoard(
-                    offer
-                )
-            ) !==
-            normaliseText(
-                search.board
-            )
-        ) {
-
-            return false;
-
-        }
-
-    }
-
-
-    if (search.budget) {
-
-        const price =
-            getOfferPrice(
+    if (
+        search.board &&
+        normaliseText(
+            getOfferBoard(
                 offer
-            );
+            )
+        ) !==
+        normaliseText(
+            search.board
+        )
+    ) {
 
-
-        if (
-            price >
-            search.budget
-        ) {
-
-            return false;
-
-        }
-
+        return false;
     }
 
 
-    if (search.nights) {
+    if (
+        search.budget &&
+        getOfferPrice(
+            offer
+        ) >
+        search.budget
+    ) {
+
+        return false;
+    }
+
+
+    if (
+        search.nights
+    ) {
 
         const offerNights =
             Number(
                 offer?.nights
-            ) || 0;
+            ) ||
+            0;
 
 
-        if (!offerNights) {
+        if (
+            !offerNights
+        ) {
 
             return false;
-
         }
 
 
@@ -765,29 +852,32 @@ function offerMatchesCurrentSearch(
         ) {
 
             return false;
-
         }
-
     }
 
 
-    if (search.departureDate) {
+    if (
+        search.departureDate
+    ) {
 
         const difference =
             getSignedDateDifference(
+
                 getOfferDeparture(
                     offer
                 ),
+
                 search.departureDate
+
             );
 
 
         if (
-            difference === null
+            difference ===
+            null
         ) {
 
             return false;
-
         }
 
 
@@ -799,14 +889,11 @@ function offerMatchesCurrentSearch(
         ) {
 
             return false;
-
         }
-
     }
 
 
     return true;
-
 }
 
 
@@ -821,7 +908,8 @@ function getSignedDateDifference(
 
     const offerDateValue =
         String(
-            offerValue || ""
+            offerValue ||
+            ""
         ).slice(
             0,
             10
@@ -830,7 +918,8 @@ function getSignedDateDifference(
 
     const requestedDateValue =
         String(
-            requestedValue || ""
+            requestedValue ||
+            ""
         ).slice(
             0,
             10
@@ -843,7 +932,6 @@ function getSignedDateDifference(
     ) {
 
         return null;
-
     }
 
 
@@ -869,25 +957,24 @@ function getSignedDateDifference(
     ) {
 
         return null;
-
     }
 
 
-    const millisecondsPerDay =
-        1000 *
-        60 *
-        60 *
-        24;
-
-
     return Math.round(
+
         (
             offerDate.getTime() -
             requestedDate.getTime()
         ) /
-        millisecondsPerDay
-    );
 
+        (
+            1000 *
+            60 *
+            60 *
+            24
+        )
+
+    );
 }
 
 
@@ -916,7 +1003,104 @@ function renderHotel() {
     renderOffersTable();
 
     updateDocumentTitle();
+}
 
+
+// ======================================================
+// DEMO NOTICE
+// ======================================================
+
+function renderDemoNotice() {
+
+    const content =
+        document.getElementById(
+            "hotelContent"
+        );
+
+
+    if (
+        !content
+    ) {
+
+        return;
+    }
+
+
+    const existing =
+        document.getElementById(
+            "hotelDemoNotice"
+        );
+
+
+    if (
+        existing
+    ) {
+
+        existing.remove();
+    }
+
+
+    if (
+        !DEMO_MODE
+    ) {
+
+        return;
+    }
+
+
+    const notice =
+        document.createElement(
+            "div"
+        );
+
+
+    notice.id =
+        "hotelDemoNotice";
+
+
+    notice.textContent =
+        "Demo mode: the supplier names, holiday offers and prices currently shown are test data. They are not live prices or confirmed availability.";
+
+
+    notice.style.margin =
+        "0 0 24px";
+
+
+    notice.style.padding =
+        "14px 16px";
+
+
+    notice.style.border =
+        "1px solid #f4c95d";
+
+
+    notice.style.borderRadius =
+        "10px";
+
+
+    notice.style.background =
+        "#fff8df";
+
+
+    notice.style.color =
+        "#6f5200";
+
+
+    notice.style.fontSize =
+        "14px";
+
+
+    notice.style.fontWeight =
+        "700";
+
+
+    notice.style.lineHeight =
+        "1.5";
+
+
+    content.prepend(
+        notice
+    );
 }
 
 
@@ -932,7 +1116,10 @@ function renderSearchSummary() {
         );
 
 
-    if (!card) {
+    if (
+        !card
+    ) {
+
         return;
     }
 
@@ -947,7 +1134,6 @@ function renderSearchSummary() {
             "none";
 
         return;
-
     }
 
 
@@ -957,6 +1143,7 @@ function renderSearchSummary() {
 
     setText(
         "summaryAirport",
+
         currentSearchCriteria.airport ||
         "Any airport"
     );
@@ -964,15 +1151,20 @@ function renderSearchSummary() {
 
     setText(
         "summaryDestination",
+
         currentSearchCriteria.destination ||
+
         currentHotel?.country ||
+
         currentHotel?.destination ||
+
         "Anywhere"
     );
 
 
     setText(
         "summaryDeparture",
+
         currentSearchCriteria.departureDate
             ? formatDate(
                 currentSearchCriteria.departureDate
@@ -983,6 +1175,7 @@ function renderSearchSummary() {
 
     setText(
         "summaryReturn",
+
         currentSearchCriteria.returnDate
             ? formatDate(
                 currentSearchCriteria.returnDate
@@ -993,6 +1186,7 @@ function renderSearchSummary() {
 
     setText(
         "summaryNights",
+
         currentSearchCriteria.nights
             ? `${currentSearchCriteria.nights} nights`
             : "Any duration"
@@ -1001,15 +1195,20 @@ function renderSearchSummary() {
 
     setText(
         "summaryGuests",
+
         formatGuests(
+
             currentSearchCriteria.adults,
+
             currentSearchCriteria.children
+
         )
     );
 
 
     setText(
         "summaryBoard",
+
         currentSearchCriteria.board ||
         "Any board"
     );
@@ -1017,18 +1216,18 @@ function renderSearchSummary() {
 
     setText(
         "summaryBudget",
+
         currentSearchCriteria.budget
             ? `Up to ${formatPrice(
                 currentSearchCriteria.budget
             )}`
             : "Any budget"
     );
-
 }
 
 
 // ======================================================
-// FORMAT GUESTS
+// GUESTS
 // ======================================================
 
 function formatGuests(
@@ -1036,10 +1235,13 @@ function formatGuests(
     children
 ) {
 
-    const parts = [];
+    const parts =
+        [];
 
 
-    if (adults) {
+    if (
+        adults
+    ) {
 
         parts.push(
             `${adults} ${
@@ -1048,11 +1250,12 @@ function formatGuests(
                     : "adults"
             }`
         );
-
     }
 
 
-    if (children) {
+    if (
+        children
+    ) {
 
         parts.push(
             `${children} ${
@@ -1061,23 +1264,14 @@ function formatGuests(
                     : "children"
             }`
         );
-
     }
 
 
-    if (
-        parts.length === 0
-    ) {
-
-        return "Guests not specified";
-
-    }
-
-
-    return parts.join(
-        ", "
-    );
-
+    return parts.length > 0
+        ? parts.join(
+            ", "
+        )
+        : "Guests not specified";
 }
 
 
@@ -1089,6 +1283,7 @@ function renderHotelHeading() {
 
     setText(
         "hotelName",
+
         currentHotel?.name ||
         "Hotel"
     );
@@ -1096,36 +1291,46 @@ function renderHotelHeading() {
 
     const locationParts =
         [
+
             currentHotel?.destination,
+
             currentHotel?.country
-        ]
-        .filter(Boolean);
+
+        ].filter(
+            Boolean
+        );
 
 
     setText(
         "hotelLocation",
-        locationParts.join(", ")
+
+        locationParts.join(
+            ", "
+        )
     );
 
 
     const stars =
         Number(
             currentHotel?.stars
-        ) || 0;
+        ) ||
+        0;
 
 
     setText(
         "hotelStars",
+
         stars > 0
             ? "★".repeat(
                 Math.min(
-                    Math.round(stars),
+                    Math.round(
+                        stars
+                    ),
                     5
                 )
             )
             : ""
     );
-
 }
 
 
@@ -1153,7 +1358,6 @@ function renderGallery() {
     ) {
 
         return;
-
     }
 
 
@@ -1171,7 +1375,8 @@ function renderGallery() {
 
 
     if (
-        galleryImages.length === 0 &&
+        galleryImages.length ===
+        0 &&
         isValidHttpUrl(
             currentHotel?.main_image
         )
@@ -1192,41 +1397,47 @@ function renderGallery() {
                 true
 
         });
-
     }
 
 
     if (
-        galleryImages.length === 0
+        galleryImages.length ===
+        0
     ) {
 
         mainImage.removeAttribute(
             "src"
         );
 
+
         mainImage.style.display =
             "none";
+
 
         thumbnails.style.display =
             "none";
 
-        return;
 
+        return;
     }
 
 
     mainImage.style.display =
         "block";
 
+
     thumbnails.style.display =
         "flex";
 
 
     const firstImage =
+
         galleryImages.find(
             image =>
-                image.is_main === true
+                image.is_main ===
+                true
         ) ||
+
         galleryImages[0];
 
 
@@ -1250,6 +1461,7 @@ function renderGallery() {
             button.type =
                 "button";
 
+
             button.className =
                 "gallery-thumbnail";
 
@@ -1262,7 +1474,6 @@ function renderGallery() {
                 button.classList.add(
                     "active"
                 );
-
             }
 
 
@@ -1275,10 +1486,15 @@ function renderGallery() {
             thumbnailImage.src =
                 image.image_url;
 
+
             thumbnailImage.alt =
+
                 image.alt_text ||
+
                 currentHotel.name ||
+
                 "Hotel image";
+
 
             thumbnailImage.loading =
                 index < 3
@@ -1312,7 +1528,6 @@ function renderGallery() {
                                     .remove(
                                         "active"
                                     );
-
                             }
                         );
 
@@ -1320,7 +1535,6 @@ function renderGallery() {
                     button.classList.add(
                         "active"
                     );
-
                 }
             );
 
@@ -1328,10 +1542,8 @@ function renderGallery() {
             thumbnails.appendChild(
                 button
             );
-
         }
     );
-
 }
 
 
@@ -1349,7 +1561,11 @@ function setMainGalleryImage(
         );
 
 
-    if (!mainImage) {
+    if (
+        !mainImage ||
+        !image
+    ) {
+
         return;
     }
 
@@ -1359,10 +1575,12 @@ function setMainGalleryImage(
 
 
     mainImage.alt =
-        image.alt_text ||
-        currentHotel?.name ||
-        "Hotel image";
 
+        image.alt_text ||
+
+        currentHotel?.name ||
+
+        "Hotel image";
 }
 
 
@@ -1374,17 +1592,21 @@ function renderHotelDescription() {
 
     const description =
         String(
+
             currentHotel?.description ||
+
             ""
+
         ).trim();
 
 
     setText(
         "hotelDescription",
+
         description ||
+
         "More information about this hotel will be added soon."
     );
-
 }
 
 
@@ -1396,6 +1618,7 @@ function renderHotelFacts() {
 
     setText(
         "hotelDestination",
+
         currentHotel?.destination ||
         "-"
     );
@@ -1403,6 +1626,7 @@ function renderHotelFacts() {
 
     setText(
         "hotelCountry",
+
         currentHotel?.country ||
         "-"
     );
@@ -1410,6 +1634,7 @@ function renderHotelFacts() {
 
     setText(
         "hotelBoard",
+
         currentHotel?.board_basis ||
         "-"
     );
@@ -1423,15 +1648,21 @@ function renderHotelFacts() {
 
     setText(
         "hotelRating",
-        Number.isFinite(rating) &&
+
+        Number.isFinite(
+            rating
+        ) &&
         rating > 0
-            ? String(rating)
+            ? String(
+                rating
+            )
             : "-"
     );
 
 
     setText(
         "hotelAirport",
+
         currentHotel?.airport ||
         "-"
     );
@@ -1439,10 +1670,10 @@ function renderHotelFacts() {
 
     setText(
         "hotelTransfer",
+
         currentHotel?.transfer_time ||
         "-"
     );
-
 }
 
 
@@ -1458,7 +1689,10 @@ function renderHotelFacilities() {
         );
 
 
-    if (!container) {
+    if (
+        !container
+    ) {
+
         return;
     }
 
@@ -1474,16 +1708,20 @@ function renderHotelFacilities() {
 
 
     if (
-        facilities.length === 0
+        facilities.length ===
+        0
     ) {
 
         appendEmptySectionMessage(
+
             container,
+
             "Hotel facilities have not been added yet."
+
         );
 
-        return;
 
+        return;
     }
 
 
@@ -1496,7 +1734,10 @@ function renderHotelFacilities() {
                 );
 
 
-            if (!name) {
+            if (
+                !name
+            ) {
+
                 return;
             }
 
@@ -1520,6 +1761,7 @@ function renderHotelFacilities() {
             icon.className =
                 "facility-icon";
 
+
             icon.textContent =
                 "✓";
 
@@ -1538,17 +1780,17 @@ function renderHotelFacilities() {
                 icon
             );
 
+
             item.appendChild(
                 text
             );
 
+
             container.appendChild(
                 item
             );
-
         }
     );
-
 }
 
 
@@ -1564,7 +1806,10 @@ function renderHotelRoomTypes() {
         );
 
 
-    if (!container) {
+    if (
+        !container
+    ) {
+
         return;
     }
 
@@ -1580,16 +1825,20 @@ function renderHotelRoomTypes() {
 
 
     if (
-        roomTypes.length === 0
+        roomTypes.length ===
+        0
     ) {
 
         appendEmptySectionMessage(
+
             container,
+
             "Room types have not been added yet."
+
         );
 
-        return;
 
+        return;
     }
 
 
@@ -1602,7 +1851,10 @@ function renderHotelRoomTypes() {
                 );
 
 
-            if (!roomName) {
+            if (
+                !roomName
+            ) {
+
                 return;
             }
 
@@ -1626,6 +1878,7 @@ function renderHotelRoomTypes() {
             name.className =
                 "room-type-name";
 
+
             name.textContent =
                 roomName;
 
@@ -1641,7 +1894,9 @@ function renderHotelRoomTypes() {
                 );
 
 
-            if (description) {
+            if (
+                description
+            ) {
 
                 const descriptionElement =
                     document.createElement(
@@ -1652,11 +1907,14 @@ function renderHotelRoomTypes() {
                 descriptionElement.style.margin =
                     "8px 0 0";
 
+
                 descriptionElement.style.color =
                     "#64748b";
 
+
                 descriptionElement.style.lineHeight =
                     "1.5";
+
 
                 descriptionElement.textContent =
                     description;
@@ -1665,17 +1923,14 @@ function renderHotelRoomTypes() {
                 item.appendChild(
                     descriptionElement
                 );
-
             }
 
 
             container.appendChild(
                 item
             );
-
         }
     );
-
 }
 
 
@@ -1697,6 +1952,7 @@ function appendEmptySectionMessage(
     message.className =
         "empty-section";
 
+
     message.textContent =
         text;
 
@@ -1704,12 +1960,11 @@ function appendEmptySectionMessage(
     container.appendChild(
         message
     );
-
 }
 
 
 // ======================================================
-// NORMALISE LIST
+// NORMALISE LIST FIELD
 // ======================================================
 
 function normaliseListField(
@@ -1723,16 +1978,16 @@ function normaliseListField(
     ) {
 
         return [];
-
     }
 
 
     if (
-        Array.isArray(value)
+        Array.isArray(
+            value
+        )
     ) {
 
         return value;
-
     }
 
 
@@ -1748,14 +2003,12 @@ function normaliseListField(
         ) {
 
             return value.items;
-
         }
 
 
         return Object.values(
             value
         );
-
     }
 
 
@@ -1768,7 +2021,10 @@ function normaliseListField(
             value.trim();
 
 
-        if (!trimmed) {
+        if (
+            !trimmed
+        ) {
+
             return [];
         }
 
@@ -1782,11 +2038,12 @@ function normaliseListField(
 
 
             if (
-                Array.isArray(parsed)
+                Array.isArray(
+                    parsed
+                )
             ) {
 
                 return parsed;
-
             }
 
 
@@ -1803,36 +2060,36 @@ function normaliseListField(
                 ) {
 
                     return parsed.items;
-
                 }
 
 
                 return Object.values(
                     parsed
                 );
-
             }
+
 
         } catch (error) {
 
-            // Continue as text.
-
+            // Continue as plain text.
         }
 
 
         return trimmed
-            .split(/[\n,;]+/)
+            .split(
+                /[\n,;]+/
+            )
             .map(
                 item =>
                     item.trim()
             )
-            .filter(Boolean);
-
+            .filter(
+                Boolean
+            );
     }
 
 
     return [];
-
 }
 
 
@@ -1850,7 +2107,6 @@ function getListItemName(
     ) {
 
         return "";
-
     }
 
 
@@ -1864,7 +2120,6 @@ function getListItemName(
         return String(
             item
         ).trim();
-
     }
 
 
@@ -1874,12 +2129,19 @@ function getListItemName(
     ) {
 
         const possibleName =
+
             item.name ||
+
             item.title ||
+
             item.label ||
+
             item.room_type ||
+
             item.roomType ||
+
             item.facility ||
+
             item.value;
 
 
@@ -1893,14 +2155,11 @@ function getListItemName(
             return String(
                 possibleName
             ).trim();
-
         }
-
     }
 
 
     return "";
-
 }
 
 
@@ -1916,26 +2175,31 @@ function getListItemDescription(
         !item ||
         typeof item !==
         "object" ||
-        Array.isArray(item)
+        Array.isArray(
+            item
+        )
     ) {
 
         return "";
-
     }
 
 
     return String(
-        item.description ||
-        item.details ||
-        item.info ||
-        ""
-    ).trim();
 
+        item.description ||
+
+        item.details ||
+
+        item.info ||
+
+        ""
+
+    ).trim();
 }
 
 
 // ======================================================
-// AFFILIATE / OUTBOUND DEAL LINK
+// DEAL LINKS
 // ======================================================
 
 function createDealLink(
@@ -1953,7 +2217,6 @@ function createDealLink(
     ) {
 
         return null;
-
     }
 
 
@@ -1985,6 +2248,7 @@ function createDealLink(
 
     dealButton.setAttribute(
         "aria-label",
+
         `${buttonText} with ${supplierName} - opens in a new tab`
     );
 
@@ -1999,11 +2263,14 @@ function createDealLink(
 
     const cleanOfferId =
         String(
-            offerId || ""
+            offerId ||
+            ""
         ).trim();
 
 
-    if (cleanOfferId) {
+    if (
+        cleanOfferId
+    ) {
 
         dealButton.dataset.offerId =
             cleanOfferId;
@@ -2017,20 +2284,17 @@ function createDealLink(
                     cleanOfferId,
                     "hotel"
                 );
-
             }
         );
-
     }
 
 
     return dealButton;
-
 }
 
 
 // ======================================================
-// OUTBOUND DEAL CLICK TRACKING
+// OUTBOUND CLICK TRACKING
 // ======================================================
 
 async function trackDealClick(
@@ -2044,33 +2308,38 @@ async function trackDealClick(
     ) {
 
         return;
-
     }
 
 
     try {
 
-        const { error } =
+        const {
+            error
+        } =
             await window.db.rpc(
                 "track_deal_click",
                 {
+
                     p_offer_id:
                         offerId,
 
                     p_source_page:
                         sourcePage
+
                 }
             );
 
 
-        if (error) {
+        if (
+            error
+        ) {
 
             console.warn(
                 "Deal click tracking failed:",
                 error
             );
-
         }
+
 
     } catch (error) {
 
@@ -2078,9 +2347,7 @@ async function trackDealClick(
             "Deal click tracking failed:",
             error
         );
-
     }
-
 }
 
 
@@ -2117,7 +2384,6 @@ function createAffiliateDisclosure() {
 
 
     return disclosure;
-
 }
 
 
@@ -2133,7 +2399,10 @@ function renderOffersAffiliateDisclosure() {
         );
 
 
-    if (!tableBody) {
+    if (
+        !tableBody
+    ) {
+
         return;
     }
 
@@ -2144,7 +2413,10 @@ function renderOffersAffiliateDisclosure() {
         );
 
 
-    if (!table) {
+    if (
+        !table
+    ) {
+
         return;
     }
 
@@ -2153,7 +2425,10 @@ function renderOffersAffiliateDisclosure() {
         table.parentElement;
 
 
-    if (!wrapper) {
+    if (
+        !wrapper
+    ) {
+
         return;
     }
 
@@ -2164,10 +2439,11 @@ function renderOffersAffiliateDisclosure() {
         );
 
 
-    if (existing) {
+    if (
+        existing
+    ) {
 
         existing.remove();
-
     }
 
 
@@ -2182,7 +2458,10 @@ function renderOffersAffiliateDisclosure() {
         );
 
 
-    if (!hasDealLink) {
+    if (
+        !hasDealLink
+    ) {
+
         return;
     }
 
@@ -2202,7 +2481,6 @@ function renderOffersAffiliateDisclosure() {
     wrapper.appendChild(
         disclosure
     );
-
 }
 
 
@@ -2218,7 +2496,10 @@ function renderCheapestOffer() {
         );
 
 
-    if (!container) {
+    if (
+        !container
+    ) {
+
         return;
     }
 
@@ -2228,7 +2509,8 @@ function renderCheapestOffer() {
 
 
     if (
-        currentOffers.length === 0
+        currentOffers.length ===
+        0
     ) {
 
         const message =
@@ -2249,7 +2531,6 @@ function renderCheapestOffer() {
 
 
         return;
-
     }
 
 
@@ -2285,8 +2566,10 @@ function renderCheapestOffer() {
         logo.src =
             supplier.logo_url;
 
+
         logo.alt =
             `${supplierName} logo`;
+
 
         logo.className =
             "supplier-logo";
@@ -2295,7 +2578,6 @@ function renderCheapestOffer() {
         container.appendChild(
             logo
         );
-
     }
 
 
@@ -2310,9 +2592,13 @@ function renderCheapestOffer() {
 
 
     label.textContent =
-        searchFilteringActive
-            ? "Lowest price matching your search"
-            : "Current lowest listed price";
+        DEMO_MODE
+            ? searchFilteringActive
+                ? "Example lowest price matching your search"
+                : "Example lowest listed price"
+            : searchFilteringActive
+                ? "Lowest price matching your search"
+                : "Current lowest listed price";
 
 
     container.appendChild(
@@ -2328,6 +2614,7 @@ function renderCheapestOffer() {
 
     supplierElement.className =
         "cheapest-supplier";
+
 
     supplierElement.textContent =
         supplierName;
@@ -2371,7 +2658,8 @@ function renderCheapestOffer() {
         "cheapest-details";
 
 
-    const detailParts = [];
+    const detailParts =
+        [];
 
 
     const departure =
@@ -2380,32 +2668,35 @@ function renderCheapestOffer() {
         );
 
 
-    if (departure) {
+    if (
+        departure
+    ) {
 
         detailParts.push(
             `Departure: ${formatDate(
                 departure
             )}`
         );
-
     }
 
 
-    if (offer.airport) {
+    if (
+        offer.airport
+    ) {
 
         detailParts.push(
             `Airport: ${offer.airport}`
         );
-
     }
 
 
-    if (offer.nights) {
+    if (
+        offer.nights
+    ) {
 
         detailParts.push(
             `${offer.nights} nights`
         );
-
     }
 
 
@@ -2415,12 +2706,13 @@ function renderCheapestOffer() {
         );
 
 
-    if (board) {
+    if (
+        board
+    ) {
 
         detailParts.push(
             board
         );
-
     }
 
 
@@ -2430,12 +2722,13 @@ function renderCheapestOffer() {
         );
 
 
-    if (roomType) {
+    if (
+        roomType
+    ) {
 
         detailParts.push(
             roomType
         );
-
     }
 
 
@@ -2450,22 +2743,25 @@ function renderCheapestOffer() {
     );
 
 
-    const bookingUrl =
-        getOfferBookingUrl(
-            offer
-        );
-
-
     const dealButton =
         createDealLink(
-            bookingUrl,
+
+            getOfferBookingUrl(
+                offer
+            ),
+
             supplierName,
+
             "deal-button",
+
             offer.id
+
         );
 
 
-    if (dealButton) {
+    if (
+        dealButton
+    ) {
 
         container.appendChild(
             dealButton
@@ -2475,6 +2771,7 @@ function renderCheapestOffer() {
         container.appendChild(
             createAffiliateDisclosure()
         );
+
 
     } else {
 
@@ -2495,9 +2792,7 @@ function renderCheapestOffer() {
         container.appendChild(
             disabledButton
         );
-
     }
-
 }
 
 
@@ -2513,7 +2808,10 @@ function renderOffersTable() {
         );
 
 
-    if (!table) {
+    if (
+        !table
+    ) {
+
         return;
     }
 
@@ -2523,7 +2821,8 @@ function renderOffersTable() {
 
 
     if (
-        currentOffers.length === 0
+        currentOffers.length ===
+        0
     ) {
 
         const row =
@@ -2564,8 +2863,8 @@ function renderOffersTable() {
 
         renderOffersAffiliateDisclosure();
 
-        return;
 
+        return;
     }
 
 
@@ -2584,6 +2883,12 @@ function renderOffersTable() {
                 );
 
 
+            const supplier =
+                getSupplierRecord(
+                    supplierName
+                );
+
+
             const supplierCell =
                 document.createElement(
                     "td"
@@ -2592,12 +2897,6 @@ function renderOffersTable() {
 
             supplierCell.className =
                 "supplier-cell";
-
-
-            const supplier =
-                getSupplierRecord(
-                    supplierName
-                );
 
 
             if (
@@ -2616,8 +2915,10 @@ function renderOffersTable() {
                 logo.src =
                     supplier.logo_url;
 
+
                 logo.alt =
                     `${supplierName} logo`;
+
 
                 logo.className =
                     "supplier-logo";
@@ -2626,7 +2927,6 @@ function renderOffersTable() {
                 supplierCell.appendChild(
                     logo
                 );
-
             }
 
 
@@ -2674,47 +2974,62 @@ function renderOffersTable() {
 
 
             appendTextCell(
+
                 row,
+
                 formatDate(
                     getOfferDeparture(
                         offer
                     )
                 )
+
             );
 
 
             appendTextCell(
+
                 row,
+
                 offer.airport ||
                 "-"
+
             );
 
 
             appendTextCell(
+
                 row,
+
                 offer.nights
                     ? String(
                         offer.nights
                     )
                     : "-"
+
             );
 
 
             appendTextCell(
+
                 row,
+
                 getOfferBoard(
                     offer
                 ) ||
                 "-"
+
             );
 
 
             appendTextCell(
+
                 row,
+
                 getOfferRoomType(
                     offer
                 ) ||
                 "-"
+
             );
 
 
@@ -2726,20 +3041,28 @@ function renderOffersTable() {
 
             const dealButton =
                 createDealLink(
+
                     getOfferBookingUrl(
                         offer
                     ),
+
                     supplierName,
+
                     "small-deal-button",
+
                     offer.id
+
                 );
 
 
-            if (dealButton) {
+            if (
+                dealButton
+            ) {
 
                 dealCell.appendChild(
                     dealButton
                 );
+
 
             } else {
 
@@ -2760,7 +3083,6 @@ function renderOffersTable() {
                 dealCell.appendChild(
                     noLink
                 );
-
             }
 
 
@@ -2772,13 +3094,11 @@ function renderOffersTable() {
             table.appendChild(
                 row
             );
-
         }
     );
 
 
     renderOffersAffiliateDisclosure();
-
 }
 
 
@@ -2801,7 +3121,6 @@ function getOfferPrice(
     )
         ? price
         : 0;
-
 }
 
 
@@ -2813,7 +3132,6 @@ function getOfferSupplierName(
         offer?.supplier ||
         "Supplier"
     );
-
 }
 
 
@@ -2822,11 +3140,14 @@ function getOfferDeparture(
 ) {
 
     return (
-        offer?.departure_date ||
-        offer?.depart_date ||
-        ""
-    );
 
+        offer?.departure_date ||
+
+        offer?.depart_date ||
+
+        ""
+
+    );
 }
 
 
@@ -2835,11 +3156,14 @@ function getOfferBoard(
 ) {
 
     return (
-        offer?.board_basis ||
-        offer?.board ||
-        ""
-    );
 
+        offer?.board_basis ||
+
+        offer?.board ||
+
+        ""
+
+    );
 }
 
 
@@ -2848,11 +3172,14 @@ function getOfferRoomType(
 ) {
 
     return (
-        offer?.room_type ||
-        offer?.room ||
-        ""
-    );
 
+        offer?.room_type ||
+
+        offer?.room ||
+
+        ""
+
+    );
 }
 
 
@@ -2861,11 +3188,14 @@ function getOfferBookingUrl(
 ) {
 
     return (
-        offer?.booking_url ||
-        offer?.booking_link ||
-        ""
-    );
 
+        offer?.booking_url ||
+
+        offer?.booking_link ||
+
+        ""
+
+    );
 }
 
 
@@ -2884,10 +3214,11 @@ function getSupplierRecord(
 
 
     return (
-        supplierMap[key] ||
+        supplierMap[
+            key
+        ] ||
         null
     );
-
 }
 
 
@@ -2897,19 +3228,21 @@ function getSupplierRecord(
 
 function updateDocumentTitle() {
 
-    if (!currentHotel?.name) {
+    if (
+        !currentHotel?.name
+    ) {
+
         return;
     }
 
 
     document.title =
         `${currentHotel.name} | PackageHolidayCompare`;
-
 }
 
 
 // ======================================================
-// FORMAT PRICE
+// PRICE FORMAT
 // ======================================================
 
 function formatPrice(
@@ -2929,13 +3262,13 @@ function formatPrice(
     ) {
 
         return "-";
-
     }
 
 
     return new Intl.NumberFormat(
         "en-GB",
         {
+
             style:
                 "currency",
 
@@ -2946,23 +3279,26 @@ function formatPrice(
                 value % 1 === 0
                     ? 0
                     : 2
+
         }
     ).format(
         value
     );
-
 }
 
 
 // ======================================================
-// FORMAT DATE
+// DATE FORMAT
 // ======================================================
 
 function formatDate(
     dateValue
 ) {
 
-    if (!dateValue) {
+    if (
+        !dateValue
+    ) {
+
         return "-";
     }
 
@@ -2991,13 +3327,13 @@ function formatDate(
         return String(
             dateValue
         );
-
     }
 
 
     return new Intl.DateTimeFormat(
         "en-GB",
         {
+
             day:
                 "numeric",
 
@@ -3006,16 +3342,16 @@ function formatDate(
 
             year:
                 "numeric"
+
         }
     ).format(
         date
     );
-
 }
 
 
 // ======================================================
-// VALID URL
+// URL VALIDATION
 // ======================================================
 
 function isValidHttpUrl(
@@ -3028,7 +3364,6 @@ function isValidHttpUrl(
     ) {
 
         return false;
-
     }
 
 
@@ -3036,7 +3371,10 @@ function isValidHttpUrl(
         value.trim();
 
 
-    if (!trimmed) {
+    if (
+        !trimmed
+    ) {
+
         return false;
     }
 
@@ -3050,18 +3388,20 @@ function isValidHttpUrl(
 
 
         return (
+
             url.protocol ===
-                "http:" ||
+            "http:" ||
+
             url.protocol ===
-                "https:"
+            "https:"
+
         );
+
 
     } catch (error) {
 
         return false;
-
     }
-
 }
 
 
@@ -3074,11 +3414,11 @@ function normaliseText(
 ) {
 
     return String(
-        value || ""
+        value ||
+        ""
     )
         .trim()
         .toLowerCase();
-
 }
 
 
@@ -3104,7 +3444,6 @@ function appendTextCell(
     row.appendChild(
         cell
     );
-
 }
 
 
@@ -3123,14 +3462,16 @@ function setText(
         );
 
 
-    if (!element) {
+    if (
+        !element
+    ) {
+
         return;
     }
 
 
     element.textContent =
         value;
-
 }
 
 
@@ -3158,29 +3499,31 @@ function hideLoading() {
         );
 
 
-    if (loading) {
+    if (
+        loading
+    ) {
 
         loading.style.display =
             "none";
-
     }
 
 
-    if (error) {
+    if (
+        error
+    ) {
 
         error.style.display =
             "none";
-
     }
 
 
-    if (content) {
+    if (
+        content
+    ) {
 
         content.style.display =
             "block";
-
     }
-
 }
 
 
@@ -3216,35 +3559,38 @@ function showError(
         );
 
 
-    if (loading) {
+    if (
+        loading
+    ) {
 
         loading.style.display =
             "none";
-
     }
 
 
-    if (content) {
+    if (
+        content
+    ) {
 
         content.style.display =
             "none";
-
     }
 
 
-    if (errorCard) {
+    if (
+        errorCard
+    ) {
 
         errorCard.style.display =
             "block";
-
     }
 
 
-    if (errorMessage) {
+    if (
+        errorMessage
+    ) {
 
         errorMessage.textContent =
             message;
-
     }
-
 }
