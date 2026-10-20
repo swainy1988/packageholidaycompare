@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Admin Click Analytics
-// Version: 2026-10-20-2
+// Version: 2026-10-20-3
 // ======================================================
 
 let allDealClicks = [];
@@ -150,6 +150,10 @@ function applyDateFilter() {
 
 
     renderSummaryCards();
+
+    renderClickTrendChart(
+        selectedRange
+    );
 
     renderSupplierStats();
 
@@ -650,6 +654,1029 @@ function renderSummaryCards() {
         formatNumber(
             hotelClicks
         )
+    );
+
+}
+
+
+// ======================================================
+// CLICK TREND CHART
+// ======================================================
+
+function renderClickTrendChart(
+    selectedRange
+) {
+
+    const chart =
+        document.getElementById(
+            "clickTrendChart"
+        );
+
+
+    if (!chart) {
+        return;
+    }
+
+
+    chart.innerHTML =
+        "";
+
+
+    setText(
+        "chartTotal",
+        formatNumber(
+            filteredDealClicks.length
+        )
+    );
+
+
+    if (
+        filteredDealClicks.length ===
+        0
+    ) {
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+
+        empty.className =
+            "chart-empty";
+
+
+        empty.textContent =
+            "No deal clicks were recorded in this date range.";
+
+
+        chart.appendChild(
+            empty
+        );
+
+
+        updateChartDescription(
+            selectedRange
+        );
+
+
+        return;
+
+    }
+
+
+    const chartData =
+        buildChartData(
+            selectedRange
+        );
+
+
+    if (
+        chartData.length ===
+        0
+    ) {
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+
+        empty.className =
+            "chart-empty";
+
+
+        empty.textContent =
+            "There is not enough data to display the chart.";
+
+
+        chart.appendChild(
+            empty
+        );
+
+
+        return;
+
+    }
+
+
+    const maximum =
+        Math.max(
+            ...chartData.map(
+                item =>
+                    item.count
+            ),
+            1
+        );
+
+
+    chartData.forEach(
+        item => {
+
+            const column =
+                document.createElement(
+                    "div"
+                );
+
+
+            column.className =
+                "chart-column";
+
+
+            const value =
+                document.createElement(
+                    "div"
+                );
+
+
+            value.className =
+                "chart-value";
+
+
+            value.textContent =
+                formatNumber(
+                    item.count
+                );
+
+
+            const barArea =
+                document.createElement(
+                    "div"
+                );
+
+
+            barArea.className =
+                "chart-bar-area";
+
+
+            const bar =
+                document.createElement(
+                    "div"
+                );
+
+
+            bar.className =
+                "chart-bar";
+
+
+            if (
+                item.count > 0
+            ) {
+
+                const percentage =
+                    item.count /
+                    maximum;
+
+
+                const height =
+                    Math.max(
+                        8,
+                        Math.round(
+                            percentage *
+                            180
+                        )
+                    );
+
+
+                bar.style.height =
+                    `${height}px`;
+
+            } else {
+
+                bar.style.height =
+                    "0px";
+
+                bar.style.minHeight =
+                    "0px";
+
+            }
+
+
+            bar.title =
+                `${item.fullLabel}: ${item.count} click${
+                    item.count === 1
+                        ? ""
+                        : "s"
+                }`;
+
+
+            const label =
+                document.createElement(
+                    "div"
+                );
+
+
+            label.className =
+                "chart-label";
+
+
+            label.textContent =
+                item.label;
+
+
+            barArea.appendChild(
+                bar
+            );
+
+
+            column.appendChild(
+                value
+            );
+
+
+            column.appendChild(
+                barArea
+            );
+
+
+            column.appendChild(
+                label
+            );
+
+
+            chart.appendChild(
+                column
+            );
+
+        }
+    );
+
+
+    updateChartDescription(
+        selectedRange
+    );
+
+}
+
+
+// ======================================================
+// BUILD CHART DATA
+// ======================================================
+
+function buildChartData(
+    selectedRange
+) {
+
+    if (
+        selectedRange ===
+        "today"
+    ) {
+
+        return buildHourlyChartData();
+
+    }
+
+
+    if (
+        selectedRange ===
+        "7"
+    ) {
+
+        return buildDailyChartData(
+            7
+        );
+
+    }
+
+
+    if (
+        selectedRange ===
+        "30"
+    ) {
+
+        return buildDailyChartData(
+            30
+        );
+
+    }
+
+
+    return buildAllTimeChartData();
+
+}
+
+
+// ======================================================
+// HOURLY CHART
+// ======================================================
+
+function buildHourlyChartData() {
+
+    const now =
+        new Date();
+
+
+    const data =
+        [];
+
+
+    for (
+        let hour = 0;
+        hour <= now.getHours();
+        hour++
+    ) {
+
+        data.push({
+            key:
+                String(hour),
+
+            label:
+                `${String(hour).padStart(
+                    2,
+                    "0"
+                )}:00`,
+
+            fullLabel:
+                `${String(hour).padStart(
+                    2,
+                    "0"
+                )}:00 today`,
+
+            count:
+                0
+        });
+
+    }
+
+
+    filteredDealClicks.forEach(
+        click => {
+
+            const date =
+                new Date(
+                    click.clicked_at
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+                return;
+            }
+
+
+            const item =
+                data[
+                    date.getHours()
+                ];
+
+
+            if (item) {
+                item.count++;
+            }
+
+        }
+    );
+
+
+    return data;
+
+}
+
+
+// ======================================================
+// DAILY CHART
+// ======================================================
+
+function buildDailyChartData(
+    days
+) {
+
+    const data =
+        [];
+
+
+    const today =
+        new Date();
+
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    for (
+        let index =
+            days - 1;
+        index >= 0;
+        index--
+    ) {
+
+        const date =
+            new Date(
+                today
+            );
+
+
+        date.setDate(
+            today.getDate() -
+            index
+        );
+
+
+        data.push({
+            key:
+                getLocalDateKey(
+                    date
+                ),
+
+            label:
+                formatShortChartDate(
+                    date
+                ),
+
+            fullLabel:
+                formatLongChartDate(
+                    date
+                ),
+
+            count:
+                0
+        });
+
+    }
+
+
+    const lookup =
+        new Map(
+            data.map(
+                item => [
+                    item.key,
+                    item
+                ]
+            )
+        );
+
+
+    filteredDealClicks.forEach(
+        click => {
+
+            const date =
+                new Date(
+                    click.clicked_at
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+                return;
+            }
+
+
+            const key =
+                getLocalDateKey(
+                    date
+                );
+
+
+            const item =
+                lookup.get(
+                    key
+                );
+
+
+            if (item) {
+                item.count++;
+            }
+
+        }
+    );
+
+
+    return data;
+
+}
+
+
+// ======================================================
+// ALL TIME CHART
+// ======================================================
+
+function buildAllTimeChartData() {
+
+    if (
+        filteredDealClicks.length ===
+        0
+    ) {
+        return [];
+    }
+
+
+    const validDates =
+        filteredDealClicks
+            .map(
+                click =>
+                    new Date(
+                        click.clicked_at
+                    )
+            )
+            .filter(
+                date =>
+                    !Number.isNaN(
+                        date.getTime()
+                    )
+            );
+
+
+    if (
+        validDates.length ===
+        0
+    ) {
+        return [];
+    }
+
+
+    const earliest =
+        new Date(
+            Math.min(
+                ...validDates.map(
+                    date =>
+                        date.getTime()
+                )
+            )
+        );
+
+
+    const latest =
+        new Date(
+            Math.max(
+                ...validDates.map(
+                    date =>
+                        date.getTime()
+                )
+            )
+        );
+
+
+    const spanDays =
+        Math.floor(
+            (
+                latest.getTime() -
+                earliest.getTime()
+            ) /
+            86400000
+        ) + 1;
+
+
+    if (
+        spanDays <=
+        31
+    ) {
+
+        return buildAllTimeDailyData(
+            earliest,
+            latest
+        );
+
+    }
+
+
+    return buildMonthlyChartData(
+        earliest,
+        latest
+    );
+
+}
+
+
+// ======================================================
+// ALL TIME DAILY DATA
+// ======================================================
+
+function buildAllTimeDailyData(
+    earliest,
+    latest
+) {
+
+    const start =
+        new Date(
+            earliest
+        );
+
+
+    start.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const end =
+        new Date(
+            latest
+        );
+
+
+    end.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const data =
+        [];
+
+
+    const current =
+        new Date(
+            start
+        );
+
+
+    while (
+        current <= end
+    ) {
+
+        data.push({
+            key:
+                getLocalDateKey(
+                    current
+                ),
+
+            label:
+                formatShortChartDate(
+                    current
+                ),
+
+            fullLabel:
+                formatLongChartDate(
+                    current
+                ),
+
+            count:
+                0
+        });
+
+
+        current.setDate(
+            current.getDate() +
+            1
+        );
+
+    }
+
+
+    const lookup =
+        new Map(
+            data.map(
+                item => [
+                    item.key,
+                    item
+                ]
+            )
+        );
+
+
+    filteredDealClicks.forEach(
+        click => {
+
+            const date =
+                new Date(
+                    click.clicked_at
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+                return;
+            }
+
+
+            const item =
+                lookup.get(
+                    getLocalDateKey(
+                        date
+                    )
+                );
+
+
+            if (item) {
+                item.count++;
+            }
+
+        }
+    );
+
+
+    return data;
+
+}
+
+
+// ======================================================
+// MONTHLY CHART
+// ======================================================
+
+function buildMonthlyChartData(
+    earliest,
+    latest
+) {
+
+    const data =
+        [];
+
+
+    const current =
+        new Date(
+            earliest.getFullYear(),
+            earliest.getMonth(),
+            1
+        );
+
+
+    const end =
+        new Date(
+            latest.getFullYear(),
+            latest.getMonth(),
+            1
+        );
+
+
+    while (
+        current <= end
+    ) {
+
+        data.push({
+            key:
+                getMonthKey(
+                    current
+                ),
+
+            label:
+                new Intl.DateTimeFormat(
+                    "en-GB",
+                    {
+                        month:
+                            "short",
+
+                        year:
+                            "2-digit"
+                    }
+                ).format(
+                    current
+                ),
+
+            fullLabel:
+                new Intl.DateTimeFormat(
+                    "en-GB",
+                    {
+                        month:
+                            "long",
+
+                        year:
+                            "numeric"
+                    }
+                ).format(
+                    current
+                ),
+
+            count:
+                0
+        });
+
+
+        current.setMonth(
+            current.getMonth() +
+            1
+        );
+
+    }
+
+
+    const lookup =
+        new Map(
+            data.map(
+                item => [
+                    item.key,
+                    item
+                ]
+            )
+        );
+
+
+    filteredDealClicks.forEach(
+        click => {
+
+            const date =
+                new Date(
+                    click.clicked_at
+                );
+
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+                return;
+            }
+
+
+            const item =
+                lookup.get(
+                    getMonthKey(
+                        date
+                    )
+                );
+
+
+            if (item) {
+                item.count++;
+            }
+
+        }
+    );
+
+
+    return data;
+
+}
+
+
+// ======================================================
+// CHART DESCRIPTION
+// ======================================================
+
+function updateChartDescription(
+    selectedRange
+) {
+
+    const element =
+        document.getElementById(
+            "chartDescription"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    if (
+        selectedRange ===
+        "today"
+    ) {
+
+        element.textContent =
+            "Deal clicks by hour today.";
+
+        return;
+
+    }
+
+
+    if (
+        selectedRange ===
+        "7"
+    ) {
+
+        element.textContent =
+            "Deal clicks by day over the last 7 days.";
+
+        return;
+
+    }
+
+
+    if (
+        selectedRange ===
+        "30"
+    ) {
+
+        element.textContent =
+            "Deal clicks by day over the last 30 days.";
+
+        return;
+
+    }
+
+
+    element.textContent =
+        "Deal clicks across all recorded history.";
+
+}
+
+
+// ======================================================
+// LOCAL DATE KEY
+// ======================================================
+
+function getLocalDateKey(
+    date
+) {
+
+    const year =
+        date.getFullYear();
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+// ======================================================
+// MONTH KEY
+// ======================================================
+
+function getMonthKey(
+    date
+) {
+
+    const year =
+        date.getFullYear();
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return `${year}-${month}`;
+
+}
+
+
+// ======================================================
+// SHORT CHART DATE
+// ======================================================
+
+function formatShortChartDate(
+    date
+) {
+
+    return new Intl.DateTimeFormat(
+        "en-GB",
+        {
+            day:
+                "2-digit",
+
+            month:
+                "short"
+        }
+    ).format(
+        date
+    );
+
+}
+
+
+// ======================================================
+// LONG CHART DATE
+// ======================================================
+
+function formatLongChartDate(
+    date
+) {
+
+    return new Intl.DateTimeFormat(
+        "en-GB",
+        {
+            day:
+                "2-digit",
+
+            month:
+                "long",
+
+            year:
+                "numeric"
+        }
+    ).format(
+        date
     );
 
 }
@@ -1288,6 +2315,12 @@ function showAnalyticsError(
         );
 
 
+    const chart =
+        document.getElementById(
+            "clickTrendChart"
+        );
+
+
     if (
         supplierTable
     ) {
@@ -1320,6 +2353,21 @@ function showAnalyticsError(
                 </td>
 
             </tr>
+
+        `;
+
+    }
+
+
+    if (
+        chart
+    ) {
+
+        chart.innerHTML = `
+
+            <div class="chart-empty">
+                Chart could not be loaded.
+            </div>
 
         `;
 
