@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Admin Click Analytics
-// Version: 2026-10-20-5
+// Version: 2026-10-20-6
 // ======================================================
 
 let allDealClicks = [];
@@ -304,6 +304,8 @@ function applyDateFilter() {
     );
 
     renderSupplierStats();
+
+    renderSupplierConversionPerformance();
 
     renderHotelStats();
 
@@ -2078,6 +2080,310 @@ function renderSupplierStats() {
 
 
 // ======================================================
+// SUPPLIER CONVERSION PERFORMANCE
+// ======================================================
+
+function renderSupplierConversionPerformance() {
+
+    const table =
+        document.getElementById(
+            "supplierConversionBody"
+        );
+
+
+    if (!table) {
+        return;
+    }
+
+
+    table.innerHTML =
+        "";
+
+
+    if (
+        filteredDealClicks.length ===
+        0
+    ) {
+
+        appendEmptyRow(
+            table,
+            6,
+            "No supplier performance data is available for this date range."
+        );
+
+        return;
+
+    }
+
+
+    const stats =
+        {};
+
+
+    filteredDealClicks.forEach(
+        click => {
+
+            const supplier =
+                String(
+                    click.supplier ||
+                    "Unknown supplier"
+                ).trim();
+
+
+            if (
+                !stats[
+                    supplier
+                ]
+            ) {
+
+                stats[
+                    supplier
+                ] = {
+
+                    supplier,
+
+                    clicks:
+                        0,
+
+                    confirmedBookings:
+                        0,
+
+                    bookingValue:
+                        0,
+
+                    commissionValue:
+                        0
+
+                };
+
+            }
+
+
+            stats[
+                supplier
+            ].clicks++;
+
+        }
+    );
+
+
+    filteredDealConversions.forEach(
+        conversion => {
+
+            if (
+                conversion.status !==
+                "confirmed"
+            ) {
+                return;
+            }
+
+
+            const click =
+                getClickById(
+                    conversion.click_id
+                );
+
+
+            if (!click) {
+                return;
+            }
+
+
+            const supplier =
+                String(
+                    click.supplier ||
+                    "Unknown supplier"
+                ).trim();
+
+
+            if (
+                !stats[
+                    supplier
+                ]
+            ) {
+
+                stats[
+                    supplier
+                ] = {
+
+                    supplier,
+
+                    clicks:
+                        0,
+
+                    confirmedBookings:
+                        0,
+
+                    bookingValue:
+                        0,
+
+                    commissionValue:
+                        0
+
+                };
+
+            }
+
+
+            stats[
+                supplier
+            ].confirmedBookings++;
+
+
+            stats[
+                supplier
+            ].bookingValue +=
+                safeNumber(
+                    conversion.booking_value
+                );
+
+
+            stats[
+                supplier
+            ].commissionValue +=
+                safeNumber(
+                    conversion.commission_value
+                );
+
+        }
+    );
+
+
+    const performance =
+        Object
+            .values(
+                stats
+            )
+            .map(
+                supplier => {
+
+                    const conversionRate =
+                        supplier.clicks > 0
+                            ? (
+                                supplier.confirmedBookings /
+                                supplier.clicks
+                            ) * 100
+                            : 0;
+
+
+                    return {
+
+                        ...supplier,
+
+                        conversionRate
+
+                    };
+
+                }
+            )
+            .sort(
+                (
+                    first,
+                    second
+                ) => {
+
+                    if (
+                        second.confirmedBookings !==
+                        first.confirmedBookings
+                    ) {
+
+                        return (
+                            second.confirmedBookings -
+                            first.confirmedBookings
+                        );
+
+                    }
+
+
+                    if (
+                        second.commissionValue !==
+                        first.commissionValue
+                    ) {
+
+                        return (
+                            second.commissionValue -
+                            first.commissionValue
+                        );
+
+                    }
+
+
+                    return (
+                        second.clicks -
+                        first.clicks
+                    );
+
+                }
+            );
+
+
+    performance.forEach(
+        supplier => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            appendTextCell(
+                row,
+                supplier.supplier,
+                true
+            );
+
+
+            appendTextCell(
+                row,
+                formatNumber(
+                    supplier.clicks
+                )
+            );
+
+
+            appendTextCell(
+                row,
+                formatNumber(
+                    supplier.confirmedBookings
+                )
+            );
+
+
+            appendTextCell(
+                row,
+                `${supplier.conversionRate.toFixed(
+                    1
+                )}%`
+            );
+
+
+            appendTextCell(
+                row,
+                formatMoney(
+                    supplier.bookingValue
+                )
+            );
+
+
+            appendTextCell(
+                row,
+                formatMoney(
+                    supplier.commissionValue
+                )
+            );
+
+
+            table.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+// ======================================================
 // HOTEL STATS
 // ======================================================
 
@@ -2726,6 +3032,9 @@ function openConversionModal(
 
         deleteButton.hidden =
             !conversion;
+
+        deleteButton.disabled =
+            false;
 
     }
 
@@ -4062,6 +4371,12 @@ function showAnalyticsError(
         );
 
 
+    const supplierConversionTable =
+        document.getElementById(
+            "supplierConversionBody"
+        );
+
+
     const hotelTable =
         document.getElementById(
             "hotelStatsBody"
@@ -4094,6 +4409,20 @@ function showAnalyticsError(
             supplierTable,
             4,
             "Analytics could not be loaded."
+        );
+
+    }
+
+
+    if (supplierConversionTable) {
+
+        supplierConversionTable.innerHTML =
+            "";
+
+        appendEmptyRow(
+            supplierConversionTable,
+            6,
+            "Supplier conversion performance could not be loaded."
         );
 
     }
