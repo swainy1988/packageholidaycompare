@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Click Analytics | PackageHolidayCompare
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="../css/admin.css"
+    >
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/supabase.js"></script>
+
+    <script src="../js/admin-auth.js"></script>
+
+    <style>
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .analytics-stat {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow:
+                0 4px 16px
+                rgba(15, 23, 42, 0.08);
+        }
+
+        .analytics-stat-label {
+            margin: 0 0 10px;
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .analytics-stat-value {
+            margin: 0;
+            color: #0f172a;
+            font-size: 34px;
+            font-weight: 800;
+        }
+
+        .analytics-section {
+            margin-bottom: 25px;
+        }
+
+        .analytics-section h2 {
+            margin-top: 0;
+        }
+
+        .analytics-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .analytics-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .analytics-table th,
+        .analytics-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .analytics-table th {
+            background: #f8fafc;
+            color: #334155;
+            font-size: 14px;
+        }
+
+        .source-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #eef6ff;
+            color: #0059b3;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .analytics-message {
+            margin-top: 15px;
+            color: #64748b;
+        }
+
+        @media (max-width: 1000px) {
+
+            .analytics-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                PackageHolidayCompare
+            </div>
+
+            <nav>
+
+                <a href="index.html">
+                    📊 Dashboard
+                </a>
+
+                <a href="hotels.html">
+                    🏨 Hotels
+                </a>
+
+                <a href="holiday-offers.html">
+                    🌴 Holiday Offers
+                </a>
+
+                <a href="images.html">
+                    🖼 Images
+                </a>
+
+                <a href="suppliers.html">
+                    ✈ Suppliers
+                </a>
+
+                <a
+                    class="active"
+                    href="click-analytics.html"
+                >
+                    📈 Click Analytics
+                </a>
+
+                <a href="settings.html">
+                    ⚙ Settings
+                </a>
+
+            </nav>
+
+        </aside>
+
+
+        <main class="main">
+
+            <header class="topbar">
+
+                <div>
+
+                    <h1>
+                        Click Analytics
+                    </h1>
+
+                    <p>
+                        Track outbound supplier deal clicks
+                        from PackageHolidayCompare.
+                    </p>
+
+                </div>
+
+                <a
+                    class="btn"
+                    href="../index.html"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    View Site
+                </a>
+
+            </header>
+
+
+            <!-- ======================================
+                 SUMMARY
+            ======================================= -->
+
+            <section class="analytics-grid">
+
+                <div class="analytics-stat">
+
+                    <p class="analytics-stat-label">
+                        Total Deal Clicks
+                    </p>
+
+                    <p
+                        id="totalClicks"
+                        class="analytics-stat-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="analytics-stat">
+
+                    <p class="analytics-stat-label">
+                        Clicks Today
+                    </p>
+
+                    <p
+                        id="todayClicks"
+                        class="analytics-stat-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="analytics-stat">
+
+                    <p class="analytics-stat-label">
+                        Results Page Clicks
+                    </p>
+
+                    <p
+                        id="resultsClicks"
+                        class="analytics-stat-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="analytics-stat">
+
+                    <p class="analytics-stat-label">
+                        Hotel Page Clicks
+                    </p>
+
+                    <p
+                        id="hotelClicks"
+                        class="analytics-stat-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- ======================================
+                 SUPPLIER TOTALS
+            ======================================= -->
+
+            <section class="card analytics-section">
+
+                <h2>
+                    Clicks by Supplier
+                </h2>
+
+                <p>
+                    See which holiday suppliers receive
+                    the most outbound deal clicks.
+                </p>
+
+                <div class="analytics-table-wrapper">
+
+                    <table class="analytics-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Supplier
+                                </th>
+
+                                <th>
+                                    Total Clicks
+                                </th>
+
+                                <th>
+                                    Results Page
+                                </th>
+
+                                <th>
+                                    Hotel Page
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="supplierStatsBody">
+
+                            <tr>
+
+                                <td colspan="4">
+                                    Loading analytics...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ======================================
+                 RECENT CLICKS
+            ======================================= -->
+
+            <section class="card analytics-section">
+
+                <h2>
+                    Recent Deal Clicks
+                </h2>
+
+                <p>
+                    Most recent supplier clicks recorded
+                    by the website.
+                </p>
+
+                <div class="analytics-table-wrapper">
+
+                    <table class="analytics-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Supplier
+                                </th>
+
+                                <th>
+                                    Source
+                                </th>
+
+                                <th>
+                                    Hotel
+                                </th>
+
+                                <th>
+                                    Date & Time
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="recentClicksBody">
+
+                            <tr>
+
+                                <td colspan="4">
+                                    Loading recent clicks...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <p
+                    id="analyticsMessage"
+                    class="analytics-message"
+                    aria-live="polite"
+                ></p>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="../js/click-analytics.js?v=20261020-1"></script>
+
+</body>
+
+</html>
