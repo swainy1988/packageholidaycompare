@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Admin Click Analytics
-// Version: 2026-10-20-3
+// Version: 2026-10-20-4
 // ======================================================
 
 let allDealClicks = [];
@@ -156,6 +156,8 @@ function applyDateFilter() {
     );
 
     renderSupplierStats();
+
+    renderHotelStats();
 
     renderRecentClicks();
 
@@ -1873,6 +1875,238 @@ function renderSupplierStats() {
 
 
 // ======================================================
+// HOTEL STATS
+// ======================================================
+
+function renderHotelStats() {
+
+    const table =
+        document.getElementById(
+            "hotelStatsBody"
+        );
+
+
+    if (!table) {
+        return;
+    }
+
+
+    table.innerHTML =
+        "";
+
+
+    if (
+        filteredDealClicks.length ===
+        0
+    ) {
+
+        const row =
+            document.createElement(
+                "tr"
+            );
+
+
+        const cell =
+            document.createElement(
+                "td"
+            );
+
+
+        cell.colSpan =
+            4;
+
+
+        cell.textContent =
+            "No hotel clicks were recorded in this date range.";
+
+
+        row.appendChild(
+            cell
+        );
+
+
+        table.appendChild(
+            row
+        );
+
+
+        return;
+
+    }
+
+
+    const stats =
+        {};
+
+
+    filteredDealClicks.forEach(
+        click => {
+
+            const hotelId =
+                click.hotel_id
+                    ? String(
+                        click.hotel_id
+                    )
+                    : "removed";
+
+
+            const hotelName =
+                hotelId ===
+                "removed"
+                    ? "Hotel removed"
+                    : hotelNames[
+                        hotelId
+                    ] ||
+                    "Unknown hotel";
+
+
+            if (
+                !stats[
+                    hotelId
+                ]
+            ) {
+
+                stats[
+                    hotelId
+                ] = {
+
+                    hotelId,
+
+                    hotelName,
+
+                    total:
+                        0,
+
+                    results:
+                        0,
+
+                    hotel:
+                        0
+
+                };
+
+            }
+
+
+            stats[
+                hotelId
+            ].total++;
+
+
+            if (
+                click.source_page ===
+                "results"
+            ) {
+
+                stats[
+                    hotelId
+                ].results++;
+
+            }
+
+
+            if (
+                click.source_page ===
+                "hotel"
+            ) {
+
+                stats[
+                    hotelId
+                ].hotel++;
+
+            }
+
+        }
+    );
+
+
+    const hotelStats =
+        Object
+            .values(
+                stats
+            )
+            .sort(
+                (
+                    first,
+                    second
+                ) => {
+
+                    if (
+                        second.total !==
+                        first.total
+                    ) {
+
+                        return (
+                            second.total -
+                            first.total
+                        );
+
+                    }
+
+
+                    return (
+                        first.hotelName ||
+                        ""
+                    ).localeCompare(
+                        second.hotelName ||
+                        ""
+                    );
+
+                }
+            );
+
+
+    hotelStats.forEach(
+        hotel => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            appendTextCell(
+                row,
+                hotel.hotelName,
+                true
+            );
+
+
+            appendTextCell(
+                row,
+                formatNumber(
+                    hotel.total
+                )
+            );
+
+
+            appendTextCell(
+                row,
+                formatNumber(
+                    hotel.results
+                )
+            );
+
+
+            appendTextCell(
+                row,
+                formatNumber(
+                    hotel.hotel
+                )
+            );
+
+
+            table.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+// ======================================================
 // RECENT CLICKS
 // ======================================================
 
@@ -2309,6 +2543,12 @@ function showAnalyticsError(
         );
 
 
+    const hotelTable =
+        document.getElementById(
+            "hotelStatsBody"
+        );
+
+
     const recentTable =
         document.getElementById(
             "recentClicksBody"
@@ -2331,6 +2571,25 @@ function showAnalyticsError(
 
                 <td colspan="4">
                     Analytics could not be loaded.
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    if (
+        hotelTable
+    ) {
+
+        hotelTable.innerHTML = `
+
+            <tr>
+
+                <td colspan="4">
+                    Hotel analytics could not be loaded.
                 </td>
 
             </tr>
