@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Hotel Details Page
-// Version: 2026-09-23-6
+// Version: 2026-10-20-1
 // ======================================================
 
 let currentHotel = null;
@@ -1942,6 +1942,7 @@ function createDealLink(
     bookingUrl,
     supplierName,
     className,
+    offerId,
     buttonText = "View Deal"
 ) {
 
@@ -1996,7 +1997,89 @@ function createDealLink(
         "true";
 
 
+    const cleanOfferId =
+        String(
+            offerId || ""
+        ).trim();
+
+
+    if (cleanOfferId) {
+
+        dealButton.dataset.offerId =
+            cleanOfferId;
+
+
+        dealButton.addEventListener(
+            "click",
+            () => {
+
+                trackDealClick(
+                    cleanOfferId,
+                    "hotel"
+                );
+
+            }
+        );
+
+    }
+
+
     return dealButton;
+
+}
+
+
+// ======================================================
+// OUTBOUND DEAL CLICK TRACKING
+// ======================================================
+
+async function trackDealClick(
+    offerId,
+    sourcePage = "hotel"
+) {
+
+    if (
+        !window.db ||
+        !offerId
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+        const { error } =
+            await window.db.rpc(
+                "track_deal_click",
+                {
+                    p_offer_id:
+                        offerId,
+
+                    p_source_page:
+                        sourcePage
+                }
+            );
+
+
+        if (error) {
+
+            console.warn(
+                "Deal click tracking failed:",
+                error
+            );
+
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "Deal click tracking failed:",
+            error
+        );
+
+    }
 
 }
 
@@ -2377,7 +2460,8 @@ function renderCheapestOffer() {
         createDealLink(
             bookingUrl,
             supplierName,
-            "deal-button"
+            "deal-button",
+            offer.id
         );
 
 
@@ -2646,7 +2730,8 @@ function renderOffersTable() {
                         offer
                     ),
                     supplierName,
-                    "small-deal-button"
+                    "small-deal-button",
+                    offer.id
                 );
 
 
