@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Affiliate Disclosure | PackageHolidayCompare
+    </title>
+
+    <meta
+        name="description"
+        content="Learn how PackageHolidayCompare may earn commission from holiday supplier and affiliate links."
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f7fb;
+            color: #1f2937;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        /* ==========================================
+           HEADER
+        ========================================== */
+
+        .site-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header-inner {
+            width: min(1200px, calc(100% - 30px));
+            min-height: 72px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+        }
+
+        .logo {
+            color: #1769d2;
+            font-size: 23px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .navigation a {
+            color: #475569;
+            font-size: 15px;
+            font-weight: 750;
+        }
+
+        .navigation a:hover {
+            color: #1769d2;
+        }
+
+        .search-button {
+            padding: 10px 16px;
+            border-radius: 9px;
+            background: #1769d2;
+            color: #ffffff !important;
+        }
+
+        .search-button:hover {
+            background: #1259b3;
+        }
+
+
+        /* ==========================================
+           HERO
+        ========================================== */
+
+        .hero {
+            padding: 66px 20px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #0059b3,
+                    #00a86b
+                );
+            color: #ffffff;
+        }
+
+        .hero-inner {
+            width: min(900px, 100%);
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            margin-bottom: 18px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .hero h1 {
+            margin: 0 0 16px;
+            font-size: clamp(36px, 6vw, 54px);
+            line-height: 1.08;
+        }
+
+        .hero p {
+            max-width: 730px;
+            margin: 0 auto;
+            color: rgba(255, 255, 255, 0.94);
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+
+        /* ==========================================
+           PAGE
+        ========================================== */
+
+        .page {
+            width: min(1000px, calc(100% - 30px));
+            margin: 45px auto 70px;
+        }
+
+        .updated {
+            margin-bottom: 22px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: #eef6ff;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .policy-card {
+            margin-bottom: 22px;
+            padding: 32px;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow:
+                0 8px 28px
+                rgba(15, 23, 42, 0.07);
+        }
+
+        .policy-card h2 {
+            margin: 0 0 16px;
+            color: #1e293b;
+            font-size: 25px;
+        }
+
+        .policy-card p {
+            margin: 0 0 14px;
+            color: #475569;
+            font-size: 16px;
+            line-height: 1.75;
+        }
+
+        .policy-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .policy-card ul {
+            margin: 14px 0 0;
+            padding-left: 22px;
+            color: #475569;
+        }
+
+        .policy-card li {
+            margin-bottom: 11px;
+            line-height: 1.7;
+        }
+
+        .policy-card li:last-child {
+            margin-bottom: 0;
+        }
+
+        .highlight-card {
+            border-left: 5px solid #00a86b;
+        }
+
+        .important-card {
+            border-left: 5px solid #1769d2;
+        }
+
+        .email-link {
+            color: #1769d2;
+            font-weight: 800;
+        }
+
+        .email-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* ==========================================
+           EXAMPLE
+        ========================================== */
+
+        .example-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .example-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-weight: 850;
+        }
+
+        .example-box p {
+            margin: 0;
+        }
+
+
+        /* ==========================================
+           FOOTER
+        ========================================== */
+
+        .site-footer {
+            padding: 42px 20px 25px;
+            background: #0f172a;
+            color: #cbd5e1;
+        }
+
+        .footer-inner {
+            width: min(1200px, 100%);
+            margin: 0 auto;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 35px;
+            margin-bottom: 30px;
+        }
+
+        .footer-brand {
+            max-width: 430px;
+        }
+
+        .footer-logo {
+            margin-bottom: 12px;
+            color: #ffffff;
+            font-size: 21px;
+            font-weight: 850;
+        }
+
+        .footer-brand p {
+            margin: 0;
+            color: #94a3b8;
+            line-height: 1.65;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 22px;
+            align-content: flex-start;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .footer-bottom {
+            padding-top: 22px;
+            border-top: 1px solid #334155;
+            color: #94a3b8;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
+
+        @media (max-width: 800px) {
+
+            .header-inner {
+                padding: 14px 0;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .navigation {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 14px 20px;
+            }
+
+            .footer-top {
+                flex-direction: column;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .logo {
+                font-size: 19px;
+            }
+
+            .hero {
+                padding: 50px 18px;
+            }
+
+            .policy-card {
+                padding: 24px;
+            }
+
+            .search-button {
+                width: 100%;
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="site-header">
+
+        <div class="header-inner">
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+                ✈ PackageHolidayCompare
+            </a>
+
+
+            <nav
+                class="navigation"
+                aria-label="Main navigation"
+            >
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="about.html">
+                    About
+                </a>
+
+                <a href="contact.html">
+                    Contact
+                </a>
+
+                <a
+                    href="index.html"
+                    class="search-button"
+                >
+                    Search Holidays
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- ==========================================
+         HERO
+    =========================================== -->
+
+    <section class="hero">
+
+        <div class="hero-inner">
+
+            <div class="hero-badge">
+                💷 Affiliate Disclosure
+            </div>
+
+            <h1>
+                How We May Earn Commission
+            </h1>
+
+            <p>
+                PackageHolidayCompare is free for travellers
+                to use. We may earn commission when users
+                follow certain supplier links and make a
+                qualifying booking.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         MAIN
+    =========================================== -->
+
+    <main class="page">
+
+        <div class="updated">
+            Last updated: 20 October 2026
+        </div>
+
+
+        <section class="policy-card highlight-card">
+
+            <h2>
+                Our affiliate disclosure
+            </h2>
+
+            <p>
+                Some links from PackageHolidayCompare to
+                holiday suppliers may be affiliate links.
+            </p>
+
+            <p>
+                This means that if you click a supplier link
+                and later complete a qualifying booking,
+                PackageHolidayCompare may receive a
+                commission from the supplier or an affiliate
+                network.
+            </p>
+
+            <p>
+                You do not pay PackageHolidayCompare for
+                using our comparison service.
+            </p>
+
+            <p>
+                Receiving a commission does not increase the
+                price you pay to PackageHolidayCompare.
+                You should always check the final price shown
+                by the supplier before completing a booking.
+            </p>
+
+        </section>
+
+
+        <section class="policy-card">
+
+            <h2>
+                Why we use affiliate links
+            </h2>
+
+            <p>
+                Running a holiday comparison website involves
+                costs including website hosting, database
+                services, development, security and ongoing
+                maintenance.
+            </p>
+
+            <p>
+                Affiliate commissions can help support the
+                operation and development of
+                PackageHolidayCompare while allowing
+                travellers to use the comparison service
+                without paying us a search or comparison fee.
+            </p>
+
+        </section>
+
+
+        <section class="policy-card">
+
+            <h2>
+                How supplier links work
+            </h2>
+
+            <p>
+                When you find a holiday offer on
+                PackageHolidayCompare, you may be given a
+                link to continue to the holiday supplier.
+            </p>
+
+            <p>
+                When you select that link:
+            </p>
+
+            <ul>
+
+                <li>
+                    you leave PackageHolidayCompare;
+                </li>
+
+                <li>
+                    you visit the supplier or relevant
+                    booking website;
+                </li>
+
+                <li>
+                    you should check the latest price,
+                    availability and holiday details;
+                </li>
+
+                <li>
+                    any booking is completed with the
+                    supplier rather than with
+                    PackageHolidayCompare;
+                </li>
+
+                <li>
+                    we may receive a commission if the
+                    booking qualifies under our commercial
+                    arrangement with that supplier or
+                    affiliate network.
+                </li>
+
+            </ul>
+
+        </section>
+
+
+        <section class="policy-card">
+
+            <h2>
+                Affiliate notices on our comparison pages
+            </h2>
+
+            <p>
+                Where supplier booking links are displayed,
+                PackageHolidayCompare may show an affiliate
+                disclosure near those links.
+            </p>
+
+            <div class="example-box">
+
+                <span class="example-label">
+                    Example disclosure:
+                </span>
+
+                <p>
+                    We may earn a commission if you book
+                    through a supplier link. This does not
+                    change the price you pay.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section class="policy-card">
+
+            <h2>
+                Supplier relationships
+            </h2>
+
+            <p>
+                PackageHolidayCompare may have commercial or
+                affiliate relationships with some of the
+                suppliers displayed on the website.
+            </p>
+
+            <p>
+                We may not have a commercial relationship
+                with every holiday supplier in the market,
+                and not every supplier or package holiday
+                will necessarily be available through our
+                comparison service.
+            </p>
+
+            <p>
+                The suppliers available for comparison may
+                therefore change as new commercial
+                relationships, affiliate programmes or data
+                arrangements are introduced.
+            </p>
+
+        </section>
+
+
+        <section class="policy-card">
+
+            <h2>
+                Holiday prices
+            </h2>
+
+            <p>
+                Prices displayed on PackageHolidayCompare are
+                intended to help travellers compare available
+                offers.
+            </p>
+
+            <p>
+                Holiday prices and availability can change,
+                sometimes quickly.
+            </p>
+
+            <p>
+                PackageHolidayCompare does not take payment
+                for the holiday and cannot guarantee that a
+                price displayed on our website will still be
+                available when you visit the supplier.
+            </p>
+
+            <p>
+                The final price displayed by the supplier
+                before you complete your booking should
+                always be checked carefully.
+            </p>
+
+        </section>
+
+
+        <section class="policy-card">
+
+            <h2>
+                Bookings are made with the supplier
+            </h2>
+
+            <p>
+                PackageHolidayCompare acts as a comparison
+                service.
+            </p>
+
+            <p>
+                We do not become a party to the holiday
+                booking contract simply because you found an
+                offer through our website.
+            </p>
+
+            <p>
+                Your booking, payment and contractual
+                relationship are with the holiday supplier
+                you choose.
+            </p>
+
+            <p>
+                The supplier's own terms, booking conditions,
+                cancellation policies and privacy policies
+                will apply.
+            </p>
+
+        </section>
+
+
+        <section class="policy-card">
+
+            <h2>
+                Click and conversion reporting
+            </h2>
+
+            <p>
+                PackageHolidayCompare may record when a
+                supplier deal link is selected so that we can
+                understand how our comparison service and
+                supplier offers are being used.
+            </p>
+
+            <p>
+                We may also receive or record information
+                confirming that a qualifying booking or
+                conversion has taken place.
+            </p>
+
+            <p>
+                This information can be used for affiliate
+                reporting, supplier performance measurement
+                and calculating commission.
+            </p>
+
+            <p>
+                More information about data handling is
+                available in our
+                <a
+                    href="privacy.html"
+                    class="email-link"
+                >
+                    Privacy Policy
+                </a>.
+            </p>
+
+        </section>
+
+
+        <section class="policy-card">
+
+            <h2>
+                External supplier websites
+            </h2>
+
+            <p>
+                Once you follow a supplier link, you are
+                visiting a website operated by another
+                organisation.
+            </p>
+
+            <p>
+                PackageHolidayCompare does not control how
+                that external website operates or the
+                technologies it uses.
+            </p>
+
+            <p>
+                The supplier or affiliate network may use its
+                own cookies or tracking technologies.
+                Their own privacy, cookie and booking terms
+                will apply.
+            </p>
+
+        </section>
+
+
+        <section class="policy-card">
+
+            <h2>
+                Changes to affiliate relationships
+            </h2>
+
+            <p>
+                Our commercial relationships may change over
+                time.
+            </p>
+
+            <p>
+                We may add or remove holiday suppliers,
+                affiliate networks or other commercial
+                partners as PackageHolidayCompare develops.
+            </p>
+
+            <p>
+                We may update this disclosure to reflect
+                material changes to how our affiliate
+                relationships operate.
+            </p>
+
+        </section>
+
+
+        <section class="policy-card important-card">
+
+            <h2>
+                Questions about our affiliate relationships
+            </h2>
+
+            <p>
+                If you have a question about affiliate links,
+                supplier partnerships or commercial
+                relationships on PackageHolidayCompare,
+                contact:
+            </p>
+
+            <p>
+
+                <a
+                    href="mailto:support@packageholidaycompare.co.uk?subject=Affiliate%20or%20Supplier%20Enquiry"
+                    class="email-link"
+                >
+                    support@packageholidaycompare.co.uk
+                </a>
+
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <!-- ==========================================
+         FOOTER
+    =========================================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-inner">
+
+            <div class="footer-top">
+
+                <div class="footer-brand">
+
+                    <div class="footer-logo">
+                        ✈ PackageHolidayCompare
+                    </div>
+
+                    <p>
+                        Compare package holiday offers before
+                        continuing to your chosen supplier to
+                        complete your booking.
+                    </p>
+
+                </div>
+
+
+                <nav
+                    class="footer-links"
+                    aria-label="Footer navigation"
+                >
+
+                    <a href="about.html">
+                        About
+                    </a>
+
+                    <a href="contact.html">
+                        Contact
+                    </a>
+
+                    <a href="privacy.html">
+                        Privacy
+                    </a>
+
+                    <a href="cookies.html">
+                        Cookies
+                    </a>
+
+                    <a href="terms.html">
+                        Terms
+                    </a>
+
+                    <a href="affiliate-disclosure.html">
+                        Affiliate Disclosure
+                    </a>
+
+                </nav>
+
+            </div>
+
+
+            <div class="footer-bottom">
+
+                <div>
+                    © <span id="currentYear"></span>
+                    PackageHolidayCompare.
+                    All rights reserved.
+                </div>
+
+                <div>
+                    PackageHolidayCompare is a holiday comparison
+                    service. Bookings and payments are completed
+                    directly with the selected holiday supplier.
+                </div>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <script>
+
+        document.getElementById(
+            "currentYear"
+        ).textContent =
+            new Date().getFullYear();
+
+    </script>
+
+
+</body>
+
+</html>

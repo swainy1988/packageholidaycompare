@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Contact PackageHolidayCompare
+    </title>
+
+    <meta
+        name="description"
+        content="Contact PackageHolidayCompare for customer support, supplier enquiries, partnerships and general questions."
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f7fb;
+            color: #1f2937;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        /* ==========================================
+           HEADER
+        ========================================== */
+
+        .site-header {
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header-inner {
+            width: min(1200px, calc(100% - 30px));
+            min-height: 72px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+        }
+
+        .logo {
+            color: #1769d2;
+            font-size: 23px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .navigation {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .navigation a {
+            color: #475569;
+            font-size: 15px;
+            font-weight: 750;
+        }
+
+        .navigation a:hover,
+        .navigation a.active {
+            color: #1769d2;
+        }
+
+        .search-button {
+            padding: 10px 16px;
+            border-radius: 9px;
+            background: #1769d2;
+            color: #ffffff !important;
+        }
+
+        .search-button:hover {
+            background: #1259b3;
+        }
+
+
+        /* ==========================================
+           HERO
+        ========================================== */
+
+        .hero {
+            padding: 70px 20px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #0059b3,
+                    #00a86b
+                );
+            color: #ffffff;
+        }
+
+        .hero-inner {
+            width: min(900px, 100%);
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            margin-bottom: 18px;
+            padding: 8px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.12);
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .hero h1 {
+            margin: 0 0 17px;
+            font-size: clamp(36px, 6vw, 54px);
+            line-height: 1.08;
+        }
+
+        .hero p {
+            max-width: 700px;
+            margin: 0 auto;
+            color: rgba(255, 255, 255, 0.94);
+            font-size: 18px;
+            line-height: 1.7;
+        }
+
+
+        /* ==========================================
+           PAGE
+        ========================================== */
+
+        .page {
+            width: min(1000px, calc(100% - 30px));
+            margin: 45px auto 70px;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            padding: 30px;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow:
+                0 8px 28px
+                rgba(15, 23, 42, 0.07);
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            margin-bottom: 18px;
+            border-radius: 13px;
+            background: #eef6ff;
+            font-size: 25px;
+        }
+
+        .card h2 {
+            margin: 0 0 12px;
+            color: #1e293b;
+            font-size: 23px;
+        }
+
+        .card p {
+            margin: 0 0 16px;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .email-link {
+            display: inline-block;
+            color: #1769d2;
+            font-size: 16px;
+            font-weight: 850;
+            word-break: break-word;
+        }
+
+        .email-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* ==========================================
+           CONTACT BOX
+        ========================================== */
+
+        .main-contact {
+            margin-bottom: 24px;
+            padding: 36px;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow:
+                0 8px 28px
+                rgba(15, 23, 42, 0.07);
+            text-align: center;
+        }
+
+        .main-contact h2 {
+            margin: 0 0 12px;
+            font-size: 28px;
+        }
+
+        .main-contact p {
+            max-width: 680px;
+            margin: 0 auto 22px;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .email-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 22px;
+            border-radius: 10px;
+            background: #00a86b;
+            color: #ffffff;
+            font-weight: 850;
+        }
+
+        .email-button:hover {
+            background: #008f5b;
+        }
+
+
+        /* ==========================================
+           INFORMATION
+        ========================================== */
+
+        .information-card {
+            padding: 32px;
+            border-left: 5px solid #1769d2;
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow:
+                0 8px 28px
+                rgba(15, 23, 42, 0.07);
+        }
+
+        .information-card h2 {
+            margin: 0 0 14px;
+            font-size: 25px;
+        }
+
+        .information-card p {
+            margin: 0 0 14px;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .information-card p:last-child {
+            margin-bottom: 0;
+        }
+
+
+        /* ==========================================
+           FOOTER
+        ========================================== */
+
+        .site-footer {
+            padding: 42px 20px 25px;
+            background: #0f172a;
+            color: #cbd5e1;
+        }
+
+        .footer-inner {
+            width: min(1200px, 100%);
+            margin: 0 auto;
+        }
+
+        .footer-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 35px;
+            margin-bottom: 30px;
+        }
+
+        .footer-brand {
+            max-width: 430px;
+        }
+
+        .footer-logo {
+            margin-bottom: 12px;
+            color: #ffffff;
+            font-size: 21px;
+            font-weight: 850;
+        }
+
+        .footer-brand p {
+            margin: 0;
+            color: #94a3b8;
+            line-height: 1.65;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px 22px;
+            align-content: flex-start;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .footer-bottom {
+            padding-top: 22px;
+            border-top: 1px solid #334155;
+            color: #94a3b8;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+
+        /* ==========================================
+           RESPONSIVE
+        ========================================== */
+
+        @media (max-width: 800px) {
+
+            .header-inner {
+                padding: 14px 0;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .navigation {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 14px 20px;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-top {
+                flex-direction: column;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .logo {
+                font-size: 19px;
+            }
+
+            .hero {
+                padding: 52px 18px;
+            }
+
+            .card,
+            .information-card,
+            .main-contact {
+                padding: 24px;
+            }
+
+            .search-button {
+                width: 100%;
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <header class="site-header">
+
+        <div class="header-inner">
+
+            <a
+                href="index.html"
+                class="logo"
+            >
+                ✈ PackageHolidayCompare
+            </a>
+
+
+            <nav
+                class="navigation"
+                aria-label="Main navigation"
+            >
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="about.html">
+                    About
+                </a>
+
+                <a
+                    href="contact.html"
+                    class="active"
+                >
+                    Contact
+                </a>
+
+                <a
+                    href="index.html"
+                    class="search-button"
+                >
+                    Search Holidays
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- ==========================================
+         HERO
+    =========================================== -->
+
+    <section class="hero">
+
+        <div class="hero-inner">
+
+            <div class="hero-badge">
+                ✉ Contact Us
+            </div>
+
+            <h1>
+                Contact PackageHolidayCompare
+            </h1>
+
+            <p>
+                Get in touch with us about the website,
+                holiday comparison service, supplier
+                partnerships or general enquiries.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         MAIN
+    =========================================== -->
+
+    <main class="page">
+
+
+        <section class="main-contact">
+
+            <h2>
+                Get in touch
+            </h2>
+
+            <p>
+                The easiest way to contact
+                PackageHolidayCompare is by email.
+                Send us your enquiry and include as much
+                information as possible so we can understand
+                what you need help with.
+            </p>
+
+            <a
+                href="mailto:support@packageholidaycompare.co.uk"
+                class="email-button"
+            >
+                ✉ support@packageholidaycompare.co.uk
+            </a>
+
+        </section>
+
+
+        <div class="contact-grid">
+
+
+            <section class="card">
+
+                <div class="card-icon">
+                    👤
+                </div>
+
+                <h2>
+                    Customer enquiries
+                </h2>
+
+                <p>
+                    Contact us if you have a question about
+                    PackageHolidayCompare, something displayed
+                    on our website or how our comparison
+                    service works.
+                </p>
+
+                <a
+                    href="mailto:support@packageholidaycompare.co.uk?subject=Customer%20Enquiry"
+                    class="email-link"
+                >
+                    support@packageholidaycompare.co.uk
+                </a>
+
+            </section>
+
+
+            <section class="card">
+
+                <div class="card-icon">
+                    ✈
+                </div>
+
+                <h2>
+                    Supplier & partnership enquiries
+                </h2>
+
+                <p>
+                    Holiday suppliers, affiliate networks and
+                    potential commercial partners can contact
+                    us about being included on
+                    PackageHolidayCompare.
+                </p>
+
+                <a
+                    href="mailto:support@packageholidaycompare.co.uk?subject=Supplier%20or%20Partnership%20Enquiry"
+                    class="email-link"
+                >
+                    support@packageholidaycompare.co.uk
+                </a>
+
+            </section>
+
+
+            <section class="card">
+
+                <div class="card-icon">
+                    💷
+                </div>
+
+                <h2>
+                    Price or offer information
+                </h2>
+
+                <p>
+                    If you believe information displayed on
+                    PackageHolidayCompare is incorrect or out
+                    of date, please let us know and include
+                    the hotel, supplier and offer details.
+                </p>
+
+                <a
+                    href="mailto:support@packageholidaycompare.co.uk?subject=Price%20or%20Offer%20Information"
+                    class="email-link"
+                >
+                    Report an offer
+                </a>
+
+            </section>
+
+
+            <section class="card">
+
+                <div class="card-icon">
+                    🔒
+                </div>
+
+                <h2>
+                    Privacy enquiries
+                </h2>
+
+                <p>
+                    For questions relating to privacy,
+                    personal information or data protection,
+                    contact us using the email address below.
+                </p>
+
+                <a
+                    href="mailto:support@packageholidaycompare.co.uk?subject=Privacy%20Enquiry"
+                    class="email-link"
+                >
+                    support@packageholidaycompare.co.uk
+                </a>
+
+            </section>
+
+        </div>
+
+
+        <section class="information-card">
+
+            <h2>
+                Already booked a holiday?
+            </h2>
+
+            <p>
+                PackageHolidayCompare is a comparison service.
+                We do not take payment for package holidays
+                and we do not manage the booking after you
+                continue to a supplier.
+            </p>
+
+            <p>
+                If you have already completed a booking and
+                need help with payment, cancellation,
+                amendments, baggage, accommodation, transfers
+                or another booking issue, you should contact
+                the holiday supplier you booked with directly.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <!-- ==========================================
+         FOOTER
+    =========================================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-inner">
+
+            <div class="footer-top">
+
+                <div class="footer-brand">
+
+                    <div class="footer-logo">
+                        ✈ PackageHolidayCompare
+                    </div>
+
+                    <p>
+                        Compare package holiday offers before
+                        continuing to your chosen supplier to
+                        complete your booking.
+                    </p>
+
+                </div>
+
+
+                <nav
+                    class="footer-links"
+                    aria-label="Footer navigation"
+                >
+
+                    <a href="about.html">
+                        About
+                    </a>
+
+                    <a href="contact.html">
+                        Contact
+                    </a>
+
+                    <a href="privacy.html">
+                        Privacy
+                    </a>
+
+                    <a href="cookies.html">
+                        Cookies
+                    </a>
+
+                    <a href="terms.html">
+                        Terms
+                    </a>
+
+                </nav>
+
+            </div>
+
+
+            <div class="footer-bottom">
+
+                <div>
+                    © <span id="currentYear"></span>
+                    PackageHolidayCompare.
+                    All rights reserved.
+                </div>
+
+                <div>
+                    PackageHolidayCompare is a holiday comparison
+                    service. Bookings and payments are completed
+                    directly with the selected holiday supplier.
+                </div>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <script>
+
+        document.getElementById(
+            "currentYear"
+        ).textContent =
+            new Date().getFullYear();
+
+    </script>
+
+
+</body>
+
+</html>
