@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Admin Click Analytics
-// Version: 2026-10-20-6
+// Version: 2026-10-20-7
 // ======================================================
 
 let allDealClicks = [];
@@ -2107,7 +2107,7 @@ function renderSupplierConversionPerformance() {
 
         appendEmptyRow(
             table,
-            6,
+            8,
             "No supplier performance data is available for this date range."
         );
 
@@ -2266,11 +2266,33 @@ function renderSupplierConversionPerformance() {
                             : 0;
 
 
+                    const averageBookingValue =
+                        supplier.confirmedBookings > 0
+                            ? (
+                                supplier.bookingValue /
+                                supplier.confirmedBookings
+                            )
+                            : 0;
+
+
+                    const earningsPerClick =
+                        supplier.clicks > 0
+                            ? (
+                                supplier.commissionValue /
+                                supplier.clicks
+                            )
+                            : 0;
+
+
                     return {
 
                         ...supplier,
 
-                        conversionRate
+                        conversionRate,
+
+                        averageBookingValue,
+
+                        earningsPerClick
 
                     };
 
@@ -2283,13 +2305,13 @@ function renderSupplierConversionPerformance() {
                 ) => {
 
                     if (
-                        second.confirmedBookings !==
-                        first.confirmedBookings
+                        second.earningsPerClick !==
+                        first.earningsPerClick
                     ) {
 
                         return (
-                            second.confirmedBookings -
-                            first.confirmedBookings
+                            second.earningsPerClick -
+                            first.earningsPerClick
                         );
 
                     }
@@ -2303,6 +2325,19 @@ function renderSupplierConversionPerformance() {
                         return (
                             second.commissionValue -
                             first.commissionValue
+                        );
+
+                    }
+
+
+                    if (
+                        second.confirmedBookings !==
+                        first.confirmedBookings
+                    ) {
+
+                        return (
+                            second.confirmedBookings -
+                            first.confirmedBookings
                         );
 
                     }
@@ -2368,7 +2403,23 @@ function renderSupplierConversionPerformance() {
             appendTextCell(
                 row,
                 formatMoney(
+                    supplier.averageBookingValue
+                )
+            );
+
+
+            appendTextCell(
+                row,
+                formatMoney(
                     supplier.commissionValue
+                )
+            );
+
+
+            appendTextCell(
+                row,
+                formatMoney(
+                    supplier.earningsPerClick
                 )
             );
 
@@ -4421,7 +4472,7 @@ function showAnalyticsError(
 
         appendEmptyRow(
             supplierConversionTable,
-            6,
+            8,
             "Supplier conversion performance could not be loaded."
         );
 
