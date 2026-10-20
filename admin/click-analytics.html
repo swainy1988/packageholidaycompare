@@ -123,6 +123,70 @@
 
 
         /* ==========================================
+           TOP SUPPLIERS
+        ========================================== */
+
+        .top-suppliers-section {
+            margin-bottom: 25px;
+        }
+
+        .top-suppliers-header {
+            margin-bottom: 18px;
+        }
+
+        .top-suppliers-header h2 {
+            margin: 0 0 6px;
+        }
+
+        .top-suppliers-header p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .top-supplier-card {
+            position: relative;
+            overflow: hidden;
+            border-top: 4px solid #0066cc;
+        }
+
+        .top-supplier-icon {
+            margin-bottom: 12px;
+            font-size: 26px;
+            line-height: 1;
+        }
+
+        .top-supplier-label {
+            margin: 0 0 8px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .top-supplier-name {
+            margin: 0 0 7px;
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .top-supplier-value {
+            margin: 0;
+            color: #007a4d;
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        .top-supplier-note {
+            margin: 7px 0 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+
+        /* ==========================================
            CLICK TREND CHART
         ========================================== */
 
@@ -842,6 +906,156 @@
 
 
             <!-- ======================================
+                 TOP PERFORMING SUPPLIERS
+            ======================================= -->
+
+            <section class="top-suppliers-section">
+
+                <div class="top-suppliers-header">
+
+                    <h2>
+                        Top Performing Suppliers
+                    </h2>
+
+                    <p>
+                        See which suppliers are producing
+                        the strongest commercial results.
+                    </p>
+
+                </div>
+
+
+                <div class="analytics-grid">
+
+                    <div class="analytics-stat top-supplier-card">
+
+                        <div class="top-supplier-icon">
+                            💷
+                        </div>
+
+                        <p class="top-supplier-label">
+                            Highest EPC
+                        </p>
+
+                        <p
+                            id="topEpcSupplierName"
+                            class="top-supplier-name"
+                        >
+                            -
+                        </p>
+
+                        <p
+                            id="topEpcSupplierValue"
+                            class="top-supplier-value"
+                        >
+                            -
+                        </p>
+
+                        <p class="top-supplier-note">
+                            Commission earned per click
+                        </p>
+
+                    </div>
+
+
+                    <div class="analytics-stat top-supplier-card">
+
+                        <div class="top-supplier-icon">
+                            💰
+                        </div>
+
+                        <p class="top-supplier-label">
+                            Most Commission
+                        </p>
+
+                        <p
+                            id="topCommissionSupplierName"
+                            class="top-supplier-name"
+                        >
+                            -
+                        </p>
+
+                        <p
+                            id="topCommissionSupplierValue"
+                            class="top-supplier-value"
+                        >
+                            -
+                        </p>
+
+                        <p class="top-supplier-note">
+                            Total confirmed commission
+                        </p>
+
+                    </div>
+
+
+                    <div class="analytics-stat top-supplier-card">
+
+                        <div class="top-supplier-icon">
+                            📈
+                        </div>
+
+                        <p class="top-supplier-label">
+                            Best Conversion Rate
+                        </p>
+
+                        <p
+                            id="topConversionSupplierName"
+                            class="top-supplier-name"
+                        >
+                            -
+                        </p>
+
+                        <p
+                            id="topConversionSupplierValue"
+                            class="top-supplier-value"
+                        >
+                            -
+                        </p>
+
+                        <p class="top-supplier-note">
+                            Confirmed bookings from clicks
+                        </p>
+
+                    </div>
+
+
+                    <div class="analytics-stat top-supplier-card">
+
+                        <div class="top-supplier-icon">
+                            🏆
+                        </div>
+
+                        <p class="top-supplier-label">
+                            Most Bookings
+                        </p>
+
+                        <p
+                            id="topBookingsSupplierName"
+                            class="top-supplier-name"
+                        >
+                            -
+                        </p>
+
+                        <p
+                            id="topBookingsSupplierValue"
+                            class="top-supplier-value"
+                        >
+                            -
+                        </p>
+
+                        <p class="top-supplier-note">
+                            Confirmed bookings
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ======================================
                  CLICK TREND
             ======================================= -->
 
@@ -1457,7 +1671,7 @@
     </div>
 
 
-    <script src="../js/click-analytics.js?v=20261020-7"></script>
+    <script src="../js/click-analytics.js?v=20261020-8"></script>
 
 </body>
 
