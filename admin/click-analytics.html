@@ -27,6 +27,48 @@
 
     <style>
 
+        .analytics-filter-card {
+            margin-bottom: 25px;
+        }
+
+        .analytics-filter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .analytics-filter-copy h2 {
+            margin: 0 0 6px;
+        }
+
+        .analytics-filter-copy p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .analytics-filter-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analytics-filter-control label {
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .analytics-filter-control select {
+            min-width: 170px;
+            min-height: 42px;
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            font: inherit;
+        }
+
         .analytics-grid {
             display: grid;
             grid-template-columns:
@@ -119,6 +161,16 @@
                 grid-template-columns: 1fr;
             }
 
+            .analytics-filter-control {
+                width: 100%;
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .analytics-filter-control select {
+                width: 100%;
+            }
+
         }
 
     </style>
@@ -203,6 +255,63 @@
 
 
             <!-- ======================================
+                 DATE FILTER
+            ======================================= -->
+
+            <section class="card analytics-filter-card">
+
+                <div class="analytics-filter-row">
+
+                    <div class="analytics-filter-copy">
+
+                        <h2>
+                            Date Range
+                        </h2>
+
+                        <p id="activeDateRangeText">
+                            Showing all recorded deal clicks.
+                        </p>
+
+                    </div>
+
+
+                    <div class="analytics-filter-control">
+
+                        <label for="dateRangeFilter">
+                            Show:
+                        </label>
+
+                        <select id="dateRangeFilter">
+
+                            <option value="today">
+                                Today
+                            </option>
+
+                            <option value="7">
+                                Last 7 Days
+                            </option>
+
+                            <option value="30">
+                                Last 30 Days
+                            </option>
+
+                            <option
+                                value="all"
+                                selected
+                            >
+                                All Time
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ======================================
                  SUMMARY
             ======================================= -->
 
@@ -210,7 +319,10 @@
 
                 <div class="analytics-stat">
 
-                    <p class="analytics-stat-label">
+                    <p
+                        id="totalClicksLabel"
+                        class="analytics-stat-label"
+                    >
                         Total Deal Clicks
                     </p>
 
@@ -348,7 +460,7 @@
 
                 <p>
                     Most recent supplier clicks recorded
-                    by the website.
+                    within the selected date range.
                 </p>
 
                 <div class="analytics-table-wrapper">
@@ -409,7 +521,7 @@
     </div>
 
 
-    <script src="../js/click-analytics.js?v=20261020-1"></script>
+    <script src="../js/click-analytics.js?v=20261020-2"></script>
 
 </body>
 

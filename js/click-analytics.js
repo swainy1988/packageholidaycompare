@@ -1,10 +1,11 @@
 // ======================================================
 // PackageHolidayCompare
 // Admin Click Analytics
-// Version: 2026-10-20-1
+// Version: 2026-10-20-2
 // ======================================================
 
 let allDealClicks = [];
+let filteredDealClicks = [];
 let hotelNames = {};
 
 
@@ -50,16 +51,15 @@ async function initialiseClickAnalytics() {
         }
 
 
+        attachDateFilter();
+
+
         await loadHotels();
 
         await loadDealClicks();
 
 
-        renderSummaryCards();
-
-        renderSupplierStats();
-
-        renderRecentClicks();
+        applyDateFilter();
 
 
         setAnalyticsMessage(
@@ -87,6 +87,288 @@ async function initialiseClickAnalytics() {
 
 
 // ======================================================
+// DATE FILTER EVENT
+// ======================================================
+
+function attachDateFilter() {
+
+    const filter =
+        document.getElementById(
+            "dateRangeFilter"
+        );
+
+
+    if (!filter) {
+        return;
+    }
+
+
+    filter.addEventListener(
+        "change",
+        applyDateFilter
+    );
+
+}
+
+
+// ======================================================
+// APPLY DATE FILTER
+// ======================================================
+
+function applyDateFilter() {
+
+    const filter =
+        document.getElementById(
+            "dateRangeFilter"
+        );
+
+
+    const selectedRange =
+        filter
+            ? filter.value
+            : "all";
+
+
+    filteredDealClicks =
+        allDealClicks.filter(
+            click =>
+                clickMatchesDateRange(
+                    click.clicked_at,
+                    selectedRange
+                )
+        );
+
+
+    updateDateRangeText(
+        selectedRange
+    );
+
+
+    updateTotalClicksLabel(
+        selectedRange
+    );
+
+
+    renderSummaryCards();
+
+    renderSupplierStats();
+
+    renderRecentClicks();
+
+}
+
+
+// ======================================================
+// CLICK MATCHES DATE RANGE
+// ======================================================
+
+function clickMatchesDateRange(
+    dateValue,
+    range
+) {
+
+    if (
+        range === "all"
+    ) {
+        return true;
+    }
+
+
+    if (!dateValue) {
+        return false;
+    }
+
+
+    const clickDate =
+        new Date(
+            dateValue
+        );
+
+
+    if (
+        Number.isNaN(
+            clickDate.getTime()
+        )
+    ) {
+        return false;
+    }
+
+
+    const now =
+        new Date();
+
+
+    const start =
+        new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate()
+        );
+
+
+    if (
+        range === "today"
+    ) {
+
+        return (
+            clickDate >= start &&
+            clickDate <= now
+        );
+
+    }
+
+
+    const days =
+        Number(
+            range
+        );
+
+
+    if (
+        !Number.isFinite(days) ||
+        days < 1
+    ) {
+        return true;
+    }
+
+
+    start.setDate(
+        start.getDate() -
+        (days - 1)
+    );
+
+
+    return (
+        clickDate >= start &&
+        clickDate <= now
+    );
+
+}
+
+
+// ======================================================
+// DATE RANGE TEXT
+// ======================================================
+
+function updateDateRangeText(
+    range
+) {
+
+    const element =
+        document.getElementById(
+            "activeDateRangeText"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    if (
+        range === "today"
+    ) {
+
+        element.textContent =
+            "Showing deal clicks recorded today.";
+
+        return;
+
+    }
+
+
+    if (
+        range === "7"
+    ) {
+
+        element.textContent =
+            "Showing deal clicks from the last 7 days.";
+
+        return;
+
+    }
+
+
+    if (
+        range === "30"
+    ) {
+
+        element.textContent =
+            "Showing deal clicks from the last 30 days.";
+
+        return;
+
+    }
+
+
+    element.textContent =
+        "Showing all recorded deal clicks.";
+
+}
+
+
+// ======================================================
+// TOTAL CARD LABEL
+// ======================================================
+
+function updateTotalClicksLabel(
+    range
+) {
+
+    const element =
+        document.getElementById(
+            "totalClicksLabel"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    if (
+        range === "today"
+    ) {
+
+        element.textContent =
+            "Deal Clicks Today";
+
+        return;
+
+    }
+
+
+    if (
+        range === "7"
+    ) {
+
+        element.textContent =
+            "Deal Clicks - Last 7 Days";
+
+        return;
+
+    }
+
+
+    if (
+        range === "30"
+    ) {
+
+        element.textContent =
+            "Deal Clicks - Last 30 Days";
+
+        return;
+
+    }
+
+
+    element.textContent =
+        "Total Deal Clicks";
+
+}
+
+
+// ======================================================
 // WAIT FOR ADMIN SESSION
 // ======================================================
 
@@ -101,7 +383,8 @@ async function waitForAdminSession() {
         const {
             data,
             error
-        } = await window.db.auth.getSession();
+        } =
+            await window.db.auth.getSession();
 
 
         if (error) {
@@ -116,7 +399,9 @@ async function waitForAdminSession() {
         }
 
 
-        if (data?.session) {
+        if (
+            data?.session
+        ) {
 
             return data.session;
 
@@ -169,15 +454,16 @@ async function loadHotels() {
     const {
         data,
         error
-    } = await window.db
-        .from("hotels")
-        .select("id, name")
-        .order(
-            "name",
-            {
-                ascending: true
-            }
-        );
+    } =
+        await window.db
+            .from("hotels")
+            .select("id, name")
+            .order(
+                "name",
+                {
+                    ascending: true
+                }
+            );
 
 
     if (error) {
@@ -245,26 +531,27 @@ async function loadDealClicks() {
         const {
             data,
             error
-        } = await window.db
-            .from("deal_clicks")
-            .select(`
-                id,
-                offer_id,
-                hotel_id,
-                supplier,
-                source_page,
-                clicked_at
-            `)
-            .order(
-                "clicked_at",
-                {
-                    ascending: false
-                }
-            )
-            .range(
-                from,
-                to
-            );
+        } =
+            await window.db
+                .from("deal_clicks")
+                .select(`
+                    id,
+                    offer_id,
+                    hotel_id,
+                    supplier,
+                    source_page,
+                    clicked_at
+                `)
+                .order(
+                    "clicked_at",
+                    {
+                        ascending: false
+                    }
+                )
+                .range(
+                    from,
+                    to
+                );
 
 
         if (error) {
@@ -287,9 +574,7 @@ async function loadDealClicks() {
             rows.length <
             pageSize
         ) {
-
             break;
-
         }
 
 
@@ -308,7 +593,7 @@ async function loadDealClicks() {
 function renderSummaryCards() {
 
     const totalClicks =
-        allDealClicks.length;
+        filteredDealClicks.length;
 
 
     const todayClicks =
@@ -321,7 +606,7 @@ function renderSummaryCards() {
 
 
     const resultsClicks =
-        allDealClicks.filter(
+        filteredDealClicks.filter(
             click =>
                 click.source_page ===
                 "results"
@@ -329,7 +614,7 @@ function renderSummaryCards() {
 
 
     const hotelClicks =
-        allDealClicks.filter(
+        filteredDealClicks.filter(
             click =>
                 click.source_page ===
                 "hotel"
@@ -392,7 +677,8 @@ function renderSupplierStats() {
 
 
     if (
-        allDealClicks.length === 0
+        filteredDealClicks.length ===
+        0
     ) {
 
         const row =
@@ -412,7 +698,7 @@ function renderSupplierStats() {
 
 
         cell.textContent =
-            "No deal clicks have been recorded yet.";
+            "No deal clicks were recorded in this date range.";
 
 
         row.appendChild(
@@ -430,10 +716,11 @@ function renderSupplierStats() {
     }
 
 
-    const stats = {};
+    const stats =
+        {};
 
 
-    allDealClicks.forEach(
+    filteredDealClicks.forEach(
         click => {
 
             const supplier =
@@ -495,7 +782,9 @@ function renderSupplierStats() {
 
     const supplierStats =
         Object
-            .values(stats)
+            .values(
+                stats
+            )
             .sort(
                 (
                     first,
@@ -578,7 +867,8 @@ function renderRecentClicks() {
 
 
     if (
-        allDealClicks.length === 0
+        filteredDealClicks.length ===
+        0
     ) {
 
         const row =
@@ -598,7 +888,7 @@ function renderRecentClicks() {
 
 
         cell.textContent =
-            "No recent deal clicks.";
+            "No deal clicks were recorded in this date range.";
 
 
         row.appendChild(
@@ -617,7 +907,7 @@ function renderRecentClicks() {
 
 
     const recentClicks =
-        allDealClicks.slice(
+        filteredDealClicks.slice(
             0,
             50
         );
@@ -765,9 +1055,7 @@ function isToday(
             date.getTime()
         )
     ) {
-
         return false;
-
     }
 
 
@@ -862,7 +1150,9 @@ function formatNumber(
     return new Intl.NumberFormat(
         "en-GB"
     ).format(
-        Number(value) || 0
+        Number(
+            value
+        ) || 0
     );
 
 }
@@ -884,7 +1174,9 @@ function appendTextCell(
         );
 
 
-    if (strong) {
+    if (
+        strong
+    ) {
 
         const text =
             document.createElement(
@@ -996,7 +1288,9 @@ function showAnalyticsError(
         );
 
 
-    if (supplierTable) {
+    if (
+        supplierTable
+    ) {
 
         supplierTable.innerHTML = `
 
@@ -1013,7 +1307,9 @@ function showAnalyticsError(
     }
 
 
-    if (recentTable) {
+    if (
+        recentTable
+    ) {
 
         recentTable.innerHTML = `
 
