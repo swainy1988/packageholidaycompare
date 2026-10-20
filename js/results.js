@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Holiday Results Page
-// Version: 2026-09-23-2
+// Version: 2026-10-20-1
 // ======================================================
 
 let allHotels = [];
@@ -1195,7 +1195,6 @@ function createAlternativeGroupedResults(
             return;
         }
 
-        // Keep destination relevant.
         if (
             search.destination &&
             !hotelMatchesDestination(
@@ -1206,7 +1205,6 @@ function createAlternativeGroupedResults(
             return;
         }
 
-        // Keep the requested departure airport.
         if (
             search.airport &&
             normaliseText(
@@ -1219,7 +1217,6 @@ function createAlternativeGroupedResults(
             return;
         }
 
-        // Keep the requested board basis.
         if (
             search.board &&
             normaliseText(
@@ -1369,10 +1366,6 @@ function calculateAlternativeInfo(
     let nightDifference = 0;
     let budgetDifference = 0;
 
-    // --------------------------------------------------
-    // DATE DIFFERENCE
-    // --------------------------------------------------
-
     if (search.departureDate) {
 
         dateDifference =
@@ -1418,10 +1411,6 @@ function calculateAlternativeInfo(
             Math.abs(dateDifference) *
             10;
     }
-
-    // --------------------------------------------------
-    // NIGHT DIFFERENCE
-    // --------------------------------------------------
 
     if (search.nights) {
 
@@ -1472,10 +1461,6 @@ function calculateAlternativeInfo(
             8;
     }
 
-    // --------------------------------------------------
-    // BUDGET DIFFERENCE
-    // --------------------------------------------------
-
     if (search.budget) {
 
         const offerPrice =
@@ -1519,8 +1504,6 @@ function calculateAlternativeInfo(
         }
     }
 
-    // This should only be used when the normal search
-    // returned zero matches.
     if (reasons.length === 0) {
 
         reasons.push(
@@ -2584,6 +2567,7 @@ function renderResults(results) {
         ).join("");
 
     attachComparisonButtons();
+    attachOutboundDealTracking();
 }
 
 
@@ -2710,6 +2694,11 @@ function createHotelCard(group) {
             "Supplier"
         );
 
+    const offerId =
+        String(
+            cheapest.id || ""
+        );
+
     const hasBookableOffer =
         group.offers.some(
             offer =>
@@ -2721,7 +2710,7 @@ function createHotelCard(group) {
         );
 
     const bookingButton =
-        bookingUrl
+        bookingUrl && offerId
             ? `
                 <a
                     class="book-button"
@@ -2733,6 +2722,9 @@ function createHotelCard(group) {
                     )} - opens in a new tab"
                     data-supplier="${escapeAttribute(
                         supplierName
+                    )}"
+                    data-offer-id="${escapeAttribute(
+                        offerId
                     )}"
                     data-outbound="true"
                 >
@@ -3054,8 +3046,13 @@ function createSupplierOfferRow(offer) {
             "Supplier"
         );
 
+    const offerId =
+        String(
+            offer.id || ""
+        );
+
     const bookingLink =
-        bookingUrl
+        bookingUrl && offerId
             ? `
                 <a
                     class="small-book-link"
@@ -3067,6 +3064,9 @@ function createSupplierOfferRow(offer) {
                     )} - opens in a new tab"
                     data-supplier="${escapeAttribute(
                         supplierName
+                    )}"
+                    data-offer-id="${escapeAttribute(
+                        offerId
                     )}"
                     data-outbound="true"
                 >
@@ -3167,6 +3167,97 @@ function createSupplierOfferRow(offer) {
 
         </tr>
     `;
+}
+
+
+// ======================================================
+// OUTBOUND DEAL CLICK TRACKING
+// ======================================================
+
+function attachOutboundDealTracking() {
+
+    const links =
+        document.querySelectorAll(
+            'a[data-outbound="true"][data-offer-id]'
+        );
+
+    links.forEach(link => {
+
+        if (
+            link.dataset.trackingBound ===
+            "true"
+        ) {
+            return;
+        }
+
+        link.dataset.trackingBound =
+            "true";
+
+        link.addEventListener(
+            "click",
+            () => {
+
+                const offerId =
+                    String(
+                        link.dataset.offerId ||
+                        ""
+                    ).trim();
+
+                if (!offerId) {
+                    return;
+                }
+
+                trackDealClick(
+                    offerId,
+                    "results"
+                );
+            }
+        );
+    });
+}
+
+
+async function trackDealClick(
+    offerId,
+    sourcePage
+) {
+
+    if (
+        !window.db ||
+        !offerId
+    ) {
+        return;
+    }
+
+    try {
+
+        const { error } =
+            await window.db.rpc(
+                "track_deal_click",
+                {
+                    p_offer_id:
+                        offerId,
+
+                    p_source_page:
+                        sourcePage
+                }
+            );
+
+        if (error) {
+
+            console.warn(
+                "Deal click tracking failed:",
+                error
+            );
+        }
+
+    } catch (error) {
+
+        console.warn(
+            "Deal click tracking failed:",
+            error
+        );
+    }
 }
 
 
