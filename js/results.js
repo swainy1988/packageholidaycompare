@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Holiday Results Page
-// Version: 2026-10-20-1
+// Version: 2026-10-20-2
 // ======================================================
 
 let allHotels = [];
@@ -15,27 +15,36 @@ let visibleResults = [];
 
 let resultsMode = "matches";
 
-// Keep this true while offers are manually entered test data.
-// Change it to false after approved live supplier feeds are connected.
+
+// ======================================================
+// SETTINGS
+// ======================================================
+
+// Keep this TRUE while the offers are test/demo data.
+// Change to FALSE after approved supplier feeds or
+// genuine affiliate offers are connected.
 const DEMO_MODE = true;
+
 
 // Main search flexibility.
 const PRIMARY_DATE_FLEX_DAYS = 3;
 const PRIMARY_NIGHT_FLEX = 3;
 
-// Alternative search flexibility.
+
+// Wider fallback search.
 const ALTERNATIVE_DATE_FLEX_DAYS = 14;
 const ALTERNATIVE_NIGHT_FLEX = 7;
+
+
+// ======================================================
+// START
+// ======================================================
 
 document.addEventListener(
     "DOMContentLoaded",
     initialiseResultsPage
 );
 
-
-// ======================================================
-// INITIALISE PAGE
-// ======================================================
 
 async function initialiseResultsPage() {
 
@@ -49,15 +58,31 @@ async function initialiseResultsPage() {
         return;
     }
 
+
     injectResultEnhancementStyles();
+
     setMinimumSearchDates();
+
     restoreSearchForm();
+
+    validateRestoredSearchDates();
+
+    syncReturnDateMinimum();
+
     createSearchChildAgeFields();
+
     updateSearchDuration();
+
     syncMaximumPriceFilter();
+
     attachEventListeners();
+
+    initialiseMobileRefineState();
+
     updateSearchSummary();
+
     showDemoModeNotice();
+
 
     await loadHolidayResults();
 }
@@ -74,50 +99,60 @@ function attachEventListeners() {
             "refineSearchForm"
         );
 
+
     const childrenSelect =
         document.getElementById(
             "searchChildren"
         );
+
 
     const departureDate =
         document.getElementById(
             "searchDepartureDate"
         );
 
+
     const returnDate =
         document.getElementById(
             "searchReturnDate"
         );
+
 
     const applyFiltersButton =
         document.getElementById(
             "applyFiltersButton"
         );
 
+
     const clearFiltersButton =
         document.getElementById(
             "clearFiltersButton"
         );
+
 
     const resetSearchButton =
         document.getElementById(
             "resetSearchButton"
         );
 
+
     const sortResults =
         document.getElementById(
             "sortResults"
         );
+
 
     const refineToggle =
         document.getElementById(
             "refineToggle"
         );
 
+
     const searchBudget =
         document.getElementById(
             "searchBudget"
         );
+
 
     if (refineForm) {
 
@@ -127,6 +162,7 @@ function attachEventListeners() {
         );
     }
 
+
     if (childrenSelect) {
 
         childrenSelect.addEventListener(
@@ -134,6 +170,7 @@ function attachEventListeners() {
             createSearchChildAgeFields
         );
     }
+
 
     if (departureDate) {
 
@@ -143,6 +180,7 @@ function attachEventListeners() {
         );
     }
 
+
     if (returnDate) {
 
         returnDate.addEventListener(
@@ -150,6 +188,7 @@ function attachEventListeners() {
             updateSearchDuration
         );
     }
+
 
     if (applyFiltersButton) {
 
@@ -159,6 +198,7 @@ function attachEventListeners() {
         );
     }
 
+
     if (clearFiltersButton) {
 
         clearFiltersButton.addEventListener(
@@ -166,6 +206,7 @@ function attachEventListeners() {
             clearResultFilters
         );
     }
+
 
     if (resetSearchButton) {
 
@@ -175,6 +216,7 @@ function attachEventListeners() {
         );
     }
 
+
     if (sortResults) {
 
         sortResults.addEventListener(
@@ -183,6 +225,7 @@ function attachEventListeners() {
         );
     }
 
+
     if (refineToggle) {
 
         refineToggle.addEventListener(
@@ -190,6 +233,7 @@ function attachEventListeners() {
             toggleRefineSearch
         );
     }
+
 
     if (searchBudget) {
 
@@ -212,22 +256,30 @@ function setMinimumSearchDates() {
             new Date()
         );
 
+
     const departureInput =
         document.getElementById(
             "searchDepartureDate"
         );
+
 
     const returnInput =
         document.getElementById(
             "searchReturnDate"
         );
 
+
     if (departureInput) {
-        departureInput.min = today;
+
+        departureInput.min =
+            today;
     }
 
+
     if (returnInput) {
-        returnInput.min = today;
+
+        returnInput.min =
+            today;
     }
 }
 
@@ -236,53 +288,169 @@ function restoreSearchForm() {
 
     setElementValue(
         "searchAirport",
-        localStorage.getItem("airport") || ""
+        localStorage.getItem(
+            "airport"
+        ) || ""
     );
+
 
     setElementValue(
         "searchDestination",
-        localStorage.getItem("destination") || ""
+        localStorage.getItem(
+            "destination"
+        ) || ""
     );
+
 
     setElementValue(
         "searchDepartureDate",
-        localStorage.getItem("departureDate") || ""
+        localStorage.getItem(
+            "departureDate"
+        ) || ""
     );
+
 
     setElementValue(
         "searchReturnDate",
-        localStorage.getItem("returnDate") || ""
+        localStorage.getItem(
+            "returnDate"
+        ) || ""
     );
+
 
     setElementValue(
         "searchAdults",
-        localStorage.getItem("adults") || "2"
+        localStorage.getItem(
+            "adults"
+        ) || "2"
     );
+
 
     setElementValue(
         "searchChildren",
-        localStorage.getItem("children") || "0"
+        localStorage.getItem(
+            "children"
+        ) || "0"
     );
+
 
     setElementValue(
         "searchBoard",
-        localStorage.getItem("board") || ""
+        localStorage.getItem(
+            "board"
+        ) || ""
     );
+
 
     setElementValue(
         "searchBudget",
-        localStorage.getItem("budget") || ""
+        localStorage.getItem(
+            "budget"
+        ) || ""
     );
 }
 
 
-function setElementValue(id, value) {
+function setElementValue(
+    id,
+    value
+) {
 
     const element =
-        document.getElementById(id);
+        document.getElementById(
+            id
+        );
 
-    if (element) {
-        element.value = value;
+
+    if (!element) {
+        return;
+    }
+
+
+    element.value =
+        value;
+}
+
+
+// ======================================================
+// RESTORED DATE VALIDATION
+// ======================================================
+
+function validateRestoredSearchDates() {
+
+    const departure =
+        document.getElementById(
+            "searchDepartureDate"
+        );
+
+
+    const returnDate =
+        document.getElementById(
+            "searchReturnDate"
+        );
+
+
+    if (
+        !departure ||
+        !returnDate
+    ) {
+        return;
+    }
+
+
+    const today =
+        formatDateForInput(
+            new Date()
+        );
+
+
+    if (
+        departure.value &&
+        departure.value < today
+    ) {
+
+        departure.value =
+            "";
+
+        returnDate.value =
+            "";
+
+
+        localStorage.removeItem(
+            "departureDate"
+        );
+
+        localStorage.removeItem(
+            "returnDate"
+        );
+
+        localStorage.removeItem(
+            "nights"
+        );
+
+
+        return;
+    }
+
+
+    if (
+        departure.value &&
+        returnDate.value &&
+        returnDate.value <=
+            departure.value
+    ) {
+
+        returnDate.value =
+            "";
+
+
+        localStorage.removeItem(
+            "returnDate"
+        );
+
+        localStorage.removeItem(
+            "nights"
+        );
     }
 }
 
@@ -298,15 +466,18 @@ function createSearchChildAgeFields() {
             "searchChildren"
         );
 
+
     const agesSection =
         document.getElementById(
             "searchChildAges"
         );
 
+
     const fieldsContainer =
         document.getElementById(
             "searchChildAgeFields"
         );
+
 
     if (
         !childrenSelect ||
@@ -316,15 +487,24 @@ function createSearchChildAgeFields() {
         return;
     }
 
+
     const childCount =
-        Number(childrenSelect.value) || 0;
+        Number(
+            childrenSelect.value
+        ) || 0;
+
 
     const savedAges =
         getSavedChildAges();
 
-    fieldsContainer.innerHTML = "";
 
-    if (childCount === 0) {
+    fieldsContainer.innerHTML =
+        "";
+
+
+    if (
+        childCount === 0
+    ) {
 
         agesSection.style.display =
             "none";
@@ -332,8 +512,10 @@ function createSearchChildAgeFields() {
         return;
     }
 
+
     agesSection.style.display =
         "block";
+
 
     for (
         let index = 0;
@@ -346,27 +528,34 @@ function createSearchChildAgeFields() {
                 "div"
             );
 
+
         const label =
             document.createElement(
                 "label"
             );
+
 
         const select =
             document.createElement(
                 "select"
             );
 
+
         select.id =
             `searchChildAge${index + 1}`;
+
 
         select.className =
             "search-child-age";
 
+
         label.htmlFor =
             select.id;
 
+
         label.textContent =
             `Child ${index + 1} age`;
+
 
         for (
             let age = 0;
@@ -379,16 +568,22 @@ function createSearchChildAgeFields() {
                     "option"
                 );
 
+
             option.value =
                 String(age);
+
 
             option.textContent =
                 age === 0
                     ? "Under 1"
                     : String(age);
 
-            select.appendChild(option);
+
+            select.appendChild(
+                option
+            );
         }
+
 
         if (
             savedAges[index] !==
@@ -396,11 +591,21 @@ function createSearchChildAgeFields() {
         ) {
 
             select.value =
-                String(savedAges[index]);
+                String(
+                    savedAges[index]
+                );
         }
 
-        wrapper.appendChild(label);
-        wrapper.appendChild(select);
+
+        wrapper.appendChild(
+            label
+        );
+
+
+        wrapper.appendChild(
+            select
+        );
+
 
         fieldsContainer.appendChild(
             wrapper
@@ -416,16 +621,24 @@ function getSavedChildAges() {
             "childAges"
         );
 
+
     if (!stored) {
+
         return [];
     }
+
 
     try {
 
         const ages =
-            JSON.parse(stored);
+            JSON.parse(
+                stored
+            );
 
-        return Array.isArray(ages)
+
+        return Array.isArray(
+            ages
+        )
             ? ages
             : [];
 
@@ -442,15 +655,20 @@ function getSavedChildAges() {
 
 function handleDepartureDateChange() {
 
+    syncReturnDateMinimum();
+
+
     const departureInput =
         document.getElementById(
             "searchDepartureDate"
         );
 
+
     const returnInput =
         document.getElementById(
             "searchReturnDate"
         );
+
 
     if (
         !departureInput ||
@@ -459,14 +677,6 @@ function handleDepartureDateChange() {
         return;
     }
 
-    const today =
-        formatDateForInput(
-            new Date()
-        );
-
-    returnInput.min =
-        departureInput.value ||
-        today;
 
     if (
         returnInput.value &&
@@ -475,10 +685,53 @@ function handleDepartureDateChange() {
             departureInput.value
     ) {
 
-        returnInput.value = "";
+        returnInput.value =
+            "";
     }
 
+
     updateSearchDuration();
+}
+
+
+function syncReturnDateMinimum() {
+
+    const departureInput =
+        document.getElementById(
+            "searchDepartureDate"
+        );
+
+
+    const returnInput =
+        document.getElementById(
+            "searchReturnDate"
+        );
+
+
+    if (
+        !departureInput ||
+        !returnInput
+    ) {
+        return;
+    }
+
+
+    if (!departureInput.value) {
+
+        returnInput.min =
+            formatDateForInput(
+                new Date()
+            );
+
+        return;
+    }
+
+
+    returnInput.min =
+        addDaysToDateString(
+            departureInput.value,
+            1
+        );
 }
 
 
@@ -489,25 +742,33 @@ function updateSearchDuration() {
             "searchDuration"
         );
 
+
     if (!durationBox) {
         return;
     }
 
+
     const nights =
         calculateSearchNights();
+
 
     if (!nights) {
 
         durationBox.style.display =
             "none";
 
-        durationBox.textContent = "";
+
+        durationBox.textContent =
+            "";
+
 
         return;
     }
 
+
     durationBox.style.display =
         "block";
+
 
     durationBox.textContent =
         `${nights} ${
@@ -525,10 +786,12 @@ function calculateSearchNights() {
             "searchDepartureDate"
         );
 
+
     const returnElement =
         document.getElementById(
             "searchReturnDate"
         );
+
 
     if (
         !departureElement ||
@@ -537,36 +800,48 @@ function calculateSearchNights() {
         return 0;
     }
 
+
     const departureValue =
         departureElement.value;
 
+
     const returnValue =
         returnElement.value;
+
 
     if (
         !departureValue ||
         !returnValue
     ) {
+
         return 0;
     }
+
 
     const departureDate =
         new Date(
             `${departureValue}T00:00:00`
         );
 
+
     const returnDate =
         new Date(
             `${returnValue}T00:00:00`
         );
 
+
     const difference =
         returnDate.getTime() -
         departureDate.getTime();
 
-    if (difference <= 0) {
+
+    if (
+        difference <= 0
+    ) {
+
         return 0;
     }
+
 
     return Math.round(
         difference /
@@ -581,28 +856,38 @@ function calculateSearchNights() {
 
 
 // ======================================================
-// UPDATED SEARCH
+// UPDATE MAIN SEARCH
 // ======================================================
 
-async function handleUpdatedSearch(event) {
+async function handleUpdatedSearch(
+    event
+) {
 
     event.preventDefault();
 
+
     hideRefineError();
+
 
     const departureDate =
         document.getElementById(
             "searchDepartureDate"
         ).value;
 
+
     const returnDate =
         document.getElementById(
             "searchReturnDate"
         ).value;
 
+
     if (
-        Boolean(departureDate) !==
-        Boolean(returnDate)
+        Boolean(
+            departureDate
+        ) !==
+        Boolean(
+            returnDate
+        )
     ) {
 
         showRefineError(
@@ -612,8 +897,10 @@ async function handleUpdatedSearch(event) {
         return;
     }
 
+
     const nights =
         calculateSearchNights();
+
 
     if (
         departureDate &&
@@ -628,16 +915,45 @@ async function handleUpdatedSearch(event) {
         return;
     }
 
-    saveMainSearch(nights);
+
+    const today =
+        formatDateForInput(
+            new Date()
+        );
+
+
+    if (
+        departureDate &&
+        departureDate < today
+    ) {
+
+        showRefineError(
+            "Please choose a departure date from today onwards."
+        );
+
+        return;
+    }
+
+
+    saveMainSearch(
+        nights
+    );
+
+
     syncMaximumPriceFilter();
+
     clearSecondaryFiltersOnly();
+
     updateSearchSummary();
+
 
     await loadHolidayResults();
 }
 
 
-function saveMainSearch(nights) {
+function saveMainSearch(
+    nights
+) {
 
     const childAges =
         Array.from(
@@ -646,8 +962,11 @@ function saveMainSearch(nights) {
             )
         ).map(
             select =>
-                Number(select.value)
+                Number(
+                    select.value
+                )
         );
+
 
     localStorage.setItem(
         "airport",
@@ -656,12 +975,14 @@ function saveMainSearch(nights) {
         ).value
     );
 
+
     localStorage.setItem(
         "destination",
         document.getElementById(
             "searchDestination"
         ).value
     );
+
 
     localStorage.setItem(
         "departureDate",
@@ -670,6 +991,7 @@ function saveMainSearch(nights) {
         ).value
     );
 
+
     localStorage.setItem(
         "returnDate",
         document.getElementById(
@@ -677,10 +999,14 @@ function saveMainSearch(nights) {
         ).value
     );
 
+
     localStorage.setItem(
         "nights",
-        String(nights || "")
+        String(
+            nights || ""
+        )
     );
+
 
     localStorage.setItem(
         "adults",
@@ -689,6 +1015,7 @@ function saveMainSearch(nights) {
         ).value
     );
 
+
     localStorage.setItem(
         "children",
         document.getElementById(
@@ -696,10 +1023,14 @@ function saveMainSearch(nights) {
         ).value
     );
 
+
     localStorage.setItem(
         "childAges",
-        JSON.stringify(childAges)
+        JSON.stringify(
+            childAges
+        )
     );
+
 
     localStorage.setItem(
         "board",
@@ -707,6 +1038,7 @@ function saveMainSearch(nights) {
             "searchBoard"
         ).value
     );
+
 
     localStorage.setItem(
         "budget",
@@ -728,30 +1060,34 @@ function syncMaximumPriceFilter() {
             "searchBudget"
         );
 
-    const sidebarMaximumPrice =
+
+    const maximumPrice =
         document.getElementById(
             "maximumPriceFilter"
         );
 
+
     if (
         !mainBudget ||
-        !sidebarMaximumPrice
+        !maximumPrice
     ) {
         return;
     }
 
-    sidebarMaximumPrice.value =
+
+    maximumPrice.value =
         mainBudget.value || "";
 }
 
 
 // ======================================================
-// RESET SEARCH
+// RESET MAIN SEARCH
 // ======================================================
 
 async function resetMainSearch() {
 
     const keys = [
+
         "airport",
         "destination",
         "departureDate",
@@ -762,58 +1098,80 @@ async function resetMainSearch() {
         "childAges",
         "board",
         "budget"
+
     ];
+
 
     keys.forEach(
         key =>
-            localStorage.removeItem(key)
+            localStorage.removeItem(
+                key
+            )
     );
+
 
     setElementValue(
         "searchAirport",
         ""
     );
 
+
     setElementValue(
         "searchDestination",
         ""
     );
+
 
     setElementValue(
         "searchDepartureDate",
         ""
     );
 
+
     setElementValue(
         "searchReturnDate",
         ""
     );
+
 
     setElementValue(
         "searchAdults",
         "2"
     );
 
+
     setElementValue(
         "searchChildren",
         "0"
     );
+
 
     setElementValue(
         "searchBoard",
         ""
     );
 
+
     setElementValue(
         "searchBudget",
         ""
     );
 
+
+    setMinimumSearchDates();
+
+    syncReturnDateMinimum();
+
     createSearchChildAgeFields();
+
     updateSearchDuration();
+
     syncMaximumPriceFilter();
+
     clearSecondaryFiltersOnly();
+
     updateSearchSummary();
+
 
     await loadHolidayResults();
 }
@@ -828,22 +1186,30 @@ function updateSearchSummary() {
     const airport =
         localStorage.getItem(
             "airport"
-        ) || "Any UK airport";
+        ) ||
+        "Any UK airport";
+
 
     const destination =
         localStorage.getItem(
             "destination"
-        ) || "Anywhere";
+        ) ||
+        "Anywhere";
+
 
     const departureDate =
         localStorage.getItem(
             "departureDate"
-        ) || "";
+        ) ||
+        "";
+
 
     const returnDate =
         localStorage.getItem(
             "returnDate"
-        ) || "";
+        ) ||
+        "";
+
 
     const nights =
         Number(
@@ -852,30 +1218,43 @@ function updateSearchSummary() {
             )
         ) || 0;
 
+
     const adults =
         localStorage.getItem(
             "adults"
-        ) || "2";
+        ) ||
+        "2";
+
 
     const children =
         localStorage.getItem(
             "children"
-        ) || "0";
+        ) ||
+        "0";
+
 
     const board =
         localStorage.getItem(
             "board"
-        ) || "Any board basis";
+        ) ||
+        "Any board basis";
+
 
     const budget =
         localStorage.getItem(
             "budget"
-        ) || "";
+        ) ||
+        "";
+
 
     const summaryParts = [
+
         `From ${airport}`,
+
         `to ${destination}`
+
     ];
+
 
     if (
         departureDate &&
@@ -890,11 +1269,15 @@ function updateSearchSummary() {
             )}`
         );
 
+
         summaryParts.push(
             `Flexible ±${PRIMARY_DATE_FLEX_DAYS} days`
         );
 
-        if (nights > 0) {
+
+        if (
+            nights > 0
+        ) {
 
             summaryParts.push(
                 `${nights} ${
@@ -912,6 +1295,7 @@ function updateSearchSummary() {
         );
     }
 
+
     summaryParts.push(
         `${adults} ${
             Number(adults) === 1
@@ -920,8 +1304,11 @@ function updateSearchSummary() {
         }`
     );
 
+
     if (
-        Number(children) > 0
+        Number(
+            children
+        ) > 0
     ) {
 
         summaryParts.push(
@@ -933,7 +1320,11 @@ function updateSearchSummary() {
         );
     }
 
-    summaryParts.push(board);
+
+    summaryParts.push(
+        board
+    );
+
 
     summaryParts.push(
         budget
@@ -943,26 +1334,31 @@ function updateSearchSummary() {
             : "Any budget"
     );
 
+
     const summary =
         document.getElementById(
             "searchSummary"
         );
 
+
     if (summary) {
 
         summary.textContent =
-            summaryParts.join(" • ");
+            summaryParts.join(
+                " • "
+            );
     }
 }
 
 
 // ======================================================
-// LOAD DATABASE RESULTS
+// LOAD DATABASE DATA
 // ======================================================
 
 async function loadHolidayResults() {
 
     showLoadingMessage();
+
 
     try {
 
@@ -972,52 +1368,133 @@ async function loadHolidayResults() {
             suppliersResponse
         ] = await Promise.all([
 
-            window.db
-                .from("hotels")
-                .select("*"),
+
+            // IMPORTANT:
+            // Only published hotels are public.
 
             window.db
-                .from("holiday_offers")
-                .select("*")
+                .from(
+                    "hotels"
+                )
+                .select(
+                    "*"
+                )
+                .eq(
+                    "published",
+                    true
+                ),
+
+
+            // Offers are filtered against
+            // the ACTIVE supplier list below.
+
+            window.db
+                .from(
+                    "holiday_offers"
+                )
+                .select(
+                    "*"
+                )
                 .order(
                     "price",
                     {
-                        ascending: true
+                        ascending:
+                            true
                     }
                 ),
 
+
+            // IMPORTANT:
+            // Only active suppliers are public.
+
             window.db
-                .from("suppliers")
+                .from(
+                    "suppliers"
+                )
                 .select(
                     "id, name, slug, website_url, logo_url, active"
                 )
+                .eq(
+                    "active",
+                    true
+                )
+
         ]);
 
-        if (hotelsResponse.error) {
+
+        if (
+            hotelsResponse.error
+        ) {
+
             throw hotelsResponse.error;
         }
 
-        if (offersResponse.error) {
+
+        if (
+            offersResponse.error
+        ) {
+
             throw offersResponse.error;
         }
 
-        if (suppliersResponse.error) {
+
+        if (
+            suppliersResponse.error
+        ) {
+
             throw suppliersResponse.error;
         }
 
-        allHotels =
-            hotelsResponse.data || [];
 
-        allOffers =
-            offersResponse.data || [];
+        allHotels =
+            hotelsResponse.data ||
+            [];
+
 
         allSuppliers =
-            suppliersResponse.data || [];
+            suppliersResponse.data ||
+            [];
+
+
+        // Build an approved supplier-name list.
+
+        const activeSupplierNames =
+            new Set(
+                allSuppliers
+                    .map(
+                        supplier =>
+                            normaliseText(
+                                supplier.name
+                            )
+                    )
+                    .filter(
+                        Boolean
+                    )
+            );
+
+
+        // Only offers belonging to an ACTIVE
+        // supplier are allowed onto public pages.
+
+        allOffers =
+            (
+                offersResponse.data ||
+                []
+            ).filter(
+                offer =>
+                    activeSupplierNames.has(
+                        normaliseText(
+                            offer.supplier
+                        )
+                    )
+            );
+
 
         supplierMap =
             createSupplierMap(
                 allSuppliers
             );
+
 
         groupedResults =
             createGroupedResults(
@@ -1025,9 +1502,14 @@ async function loadHolidayResults() {
                 allOffers
             );
 
-        if (groupedResults.length > 0) {
 
-            resultsMode = "matches";
+        if (
+            groupedResults.length >
+            0
+        ) {
+
+            resultsMode =
+                "matches";
 
         } else {
 
@@ -1037,13 +1519,16 @@ async function loadHolidayResults() {
                     allOffers
                 );
 
+
             resultsMode =
                 groupedResults.length > 0
                     ? "alternatives"
                     : "none";
         }
 
+
         populateResultFilterOptions();
+
 
         if (
             resultsMode ===
@@ -1053,7 +1538,9 @@ async function loadHolidayResults() {
             clearAlternativeMaximumPriceFilter();
         }
 
+
         applyResultFilters();
+
 
     } catch (error) {
 
@@ -1061,6 +1548,11 @@ async function loadHolidayResults() {
             "Holiday results error:",
             error
         );
+
+
+        resultsMode =
+            "none";
+
 
         showResultsMessage(
             "Unable to load holidays",
@@ -1071,7 +1563,7 @@ async function loadHolidayResults() {
 
 
 // ======================================================
-// GROUP NORMAL HOTEL RESULTS
+// GROUP NORMAL MATCHES
 // ======================================================
 
 function createGroupedResults(
@@ -1082,6 +1574,7 @@ function createGroupedResults(
     const search =
         getCurrentSearch();
 
+
     const matchedOffers =
         offers.filter(
             offer =>
@@ -1091,80 +1584,18 @@ function createGroupedResults(
                 )
         );
 
-    const hotelMap =
-        createHotelMap(hotels);
 
-    const groupedMap =
-        new Map();
-
-    matchedOffers.forEach(offer => {
-
-        const hotelId =
-            String(
-                offer.hotel_id || ""
-            );
-
-        const hotel =
-            hotelMap.get(hotelId);
-
-        if (!hotel) {
-            return;
-        }
-
-        if (
-            search.destination &&
-            !hotelMatchesDestination(
-                hotel,
-                search.destination
-            )
-        ) {
-            return;
-        }
-
-        if (
-            !groupedMap.has(hotelId)
-        ) {
-
-            groupedMap.set(
-                hotelId,
-                {
-                    hotel,
-                    offers: [],
-                    isAlternative: false
-                }
-            );
-        }
-
-        groupedMap
-            .get(hotelId)
-            .offers
-            .push(offer);
-    });
-
-    return Array.from(
-        groupedMap.values()
-    ).map(group => {
-
-        group.offers.sort(
-            (first, second) =>
-                Number(
-                    first.price || 0
-                ) -
-                Number(
-                    second.price || 0
-                )
-        );
-
-        group.cheapestOffer =
-            group.offers[0];
-
-        return group;
-    });
+    return groupOffersByHotel(
+        hotels,
+        matchedOffers,
+        search,
+        false
+    );
 }
 
 
 // ======================================================
-// ALTERNATIVE RESULTS
+// GROUP CLOSEST ALTERNATIVES
 // ======================================================
 
 function createAlternativeGroupedResults(
@@ -1175,183 +1606,332 @@ function createAlternativeGroupedResults(
     const search =
         getCurrentSearch();
 
+
     const hotelMap =
-        createHotelMap(hotels);
+        createHotelMap(
+            hotels
+        );
+
 
     const groupedMap =
         new Map();
 
-    offers.forEach(originalOffer => {
 
-        const hotelId =
-            String(
-                originalOffer.hotel_id || ""
-            );
+    offers.forEach(
+        originalOffer => {
 
-        const hotel =
-            hotelMap.get(hotelId);
+            const hotelId =
+                String(
+                    originalOffer.hotel_id ||
+                    ""
+                );
 
-        if (!hotel) {
-            return;
-        }
 
-        if (
-            search.destination &&
-            !hotelMatchesDestination(
-                hotel,
-                search.destination
-            )
-        ) {
-            return;
-        }
+            const hotel =
+                hotelMap.get(
+                    hotelId
+                );
 
-        if (
-            search.airport &&
-            normaliseText(
-                originalOffer.airport
-            ) !==
-            normaliseText(
-                search.airport
-            )
-        ) {
-            return;
-        }
 
-        if (
-            search.board &&
-            normaliseText(
-                originalOffer.board_basis
-            ) !==
-            normaliseText(
-                search.board
-            )
-        ) {
-            return;
-        }
+            if (!hotel) {
+                return;
+            }
 
-        const alternativeInfo =
-            calculateAlternativeInfo(
-                originalOffer,
-                search
-            );
 
-        if (
-            !alternativeInfo.allowed
-        ) {
-            return;
-        }
-
-        const offer = {
-            ...originalOffer,
-
-            _alternativeScore:
-                alternativeInfo.score,
-
-            _alternativeReasons:
-                alternativeInfo.reasons,
-
-            _dateDifference:
-                alternativeInfo.dateDifference,
-
-            _nightDifference:
-                alternativeInfo.nightDifference,
-
-            _budgetDifference:
-                alternativeInfo.budgetDifference
-        };
-
-        if (
-            !groupedMap.has(hotelId)
-        ) {
-
-            groupedMap.set(
-                hotelId,
-                {
+            if (
+                search.destination &&
+                !hotelMatchesDestination(
                     hotel,
-                    offers: [],
-                    isAlternative: true
-                }
-            );
-        }
+                    search.destination
+                )
+            ) {
+                return;
+            }
 
-        groupedMap
-            .get(hotelId)
-            .offers
-            .push(offer);
-    });
+
+            if (
+                search.airport &&
+                normaliseText(
+                    originalOffer.airport
+                ) !==
+                normaliseText(
+                    search.airport
+                )
+            ) {
+                return;
+            }
+
+
+            if (
+                search.board &&
+                normaliseText(
+                    originalOffer.board_basis
+                ) !==
+                normaliseText(
+                    search.board
+                )
+            ) {
+                return;
+            }
+
+
+            const alternativeInfo =
+                calculateAlternativeInfo(
+                    originalOffer,
+                    search
+                );
+
+
+            if (
+                !alternativeInfo.allowed
+            ) {
+                return;
+            }
+
+
+            const offer = {
+
+                ...originalOffer,
+
+                _alternativeScore:
+                    alternativeInfo.score,
+
+                _alternativeReasons:
+                    alternativeInfo.reasons,
+
+                _dateDifference:
+                    alternativeInfo.dateDifference,
+
+                _nightDifference:
+                    alternativeInfo.nightDifference,
+
+                _budgetDifference:
+                    alternativeInfo.budgetDifference
+
+            };
+
+
+            if (
+                !groupedMap.has(
+                    hotelId
+                )
+            ) {
+
+                groupedMap.set(
+                    hotelId,
+                    {
+                        hotel,
+                        offers: [],
+                        isAlternative:
+                            true
+                    }
+                );
+            }
+
+
+            groupedMap
+                .get(
+                    hotelId
+                )
+                .offers
+                .push(
+                    offer
+                );
+        }
+    );
+
 
     const groups =
         Array.from(
             groupedMap.values()
         );
 
-    groups.forEach(group => {
 
-        group.offers.sort(
-            (first, second) => {
+    groups.forEach(
+        group => {
 
-                const scoreDifference =
-                    Number(
-                        first._alternativeScore || 0
-                    ) -
-                    Number(
-                        second._alternativeScore || 0
-                    );
-
-                if (scoreDifference !== 0) {
-                    return scoreDifference;
-                }
-
-                return (
-                    Number(
-                        first.price || 0
-                    ) -
-                    Number(
-                        second.price || 0
-                    )
-                );
-            }
-        );
-
-        group.cheapestOffer =
-            group.offers[0];
-
-        group.alternativeScore =
-            Number(
-                group.cheapestOffer
-                    ._alternativeScore || 0
+            group.offers.sort(
+                sortAlternativeOffers
             );
-    });
+
+
+            group.cheapestOffer =
+                group.offers[0];
+
+
+            group.alternativeScore =
+                Number(
+                    group.cheapestOffer
+                        ?._alternativeScore ||
+                    0
+                );
+        }
+    );
+
 
     groups.sort(
-        (first, second) => {
+        (
+            first,
+            second
+        ) => {
 
             const scoreDifference =
                 Number(
-                    first.alternativeScore || 0
+                    first.alternativeScore ||
+                    0
                 ) -
                 Number(
-                    second.alternativeScore || 0
+                    second.alternativeScore ||
+                    0
                 );
 
-            if (scoreDifference !== 0) {
+
+            if (
+                scoreDifference !==
+                0
+            ) {
+
                 return scoreDifference;
             }
 
+
             return (
                 Number(
-                    first.cheapestOffer.price || 0
+                    first.cheapestOffer
+                        ?.price ||
+                    0
                 ) -
                 Number(
-                    second.cheapestOffer.price || 0
+                    second.cheapestOffer
+                        ?.price ||
+                    0
                 )
             );
         }
     );
 
+
     return groups;
 }
 
+
+// ======================================================
+// STANDARD HOTEL GROUPING
+// ======================================================
+
+function groupOffersByHotel(
+    hotels,
+    offers,
+    search,
+    isAlternative
+) {
+
+    const hotelMap =
+        createHotelMap(
+            hotels
+        );
+
+
+    const groupedMap =
+        new Map();
+
+
+    offers.forEach(
+        offer => {
+
+            const hotelId =
+                String(
+                    offer.hotel_id ||
+                    ""
+                );
+
+
+            const hotel =
+                hotelMap.get(
+                    hotelId
+                );
+
+
+            if (!hotel) {
+                return;
+            }
+
+
+            if (
+                search.destination &&
+                !hotelMatchesDestination(
+                    hotel,
+                    search.destination
+                )
+            ) {
+
+                return;
+            }
+
+
+            if (
+                !groupedMap.has(
+                    hotelId
+                )
+            ) {
+
+                groupedMap.set(
+                    hotelId,
+                    {
+                        hotel,
+                        offers: [],
+                        isAlternative
+                    }
+                );
+            }
+
+
+            groupedMap
+                .get(
+                    hotelId
+                )
+                .offers
+                .push(
+                    offer
+                );
+        }
+    );
+
+
+    return Array.from(
+        groupedMap.values()
+    ).map(
+        group => {
+
+            group.offers.sort(
+                (
+                    first,
+                    second
+                ) =>
+                    Number(
+                        first.price ||
+                        0
+                    ) -
+                    Number(
+                        second.price ||
+                        0
+                    )
+            );
+
+
+            group.cheapestOffer =
+                group.offers[0];
+
+
+            return group;
+        }
+    );
+}
+
+
+// ======================================================
+// ALTERNATIVE CALCULATION
+// ======================================================
 
 function calculateAlternativeInfo(
     offer,
@@ -1360,13 +1940,26 @@ function calculateAlternativeInfo(
 
     let score = 0;
 
-    const reasons = [];
 
-    let dateDifference = 0;
-    let nightDifference = 0;
-    let budgetDifference = 0;
+    const reasons =
+        [];
 
-    if (search.departureDate) {
+
+    let dateDifference =
+        0;
+
+
+    let nightDifference =
+        0;
+
+
+    let budgetDifference =
+        0;
+
+
+    if (
+        search.departureDate
+    ) {
 
         dateDifference =
             getSignedDateDifference(
@@ -1374,29 +1967,45 @@ function calculateAlternativeInfo(
                 search.departureDate
             );
 
-        if (dateDifference === null) {
+
+        if (
+            dateDifference ===
+            null
+        ) {
 
             return {
-                allowed: false,
-                score: 0,
-                reasons: []
+                allowed:
+                    false,
+                score:
+                    0,
+                reasons:
+                    []
             };
         }
 
+
         if (
-            Math.abs(dateDifference) >
+            Math.abs(
+                dateDifference
+            ) >
             ALTERNATIVE_DATE_FLEX_DAYS
         ) {
 
             return {
-                allowed: false,
-                score: 0,
-                reasons: []
+                allowed:
+                    false,
+                score:
+                    0,
+                reasons:
+                    []
             };
         }
 
+
         if (
-            Math.abs(dateDifference) >
+            Math.abs(
+                dateDifference
+            ) >
             PRIMARY_DATE_FLEX_DAYS
         ) {
 
@@ -1407,45 +2016,68 @@ function calculateAlternativeInfo(
             );
         }
 
+
         score +=
-            Math.abs(dateDifference) *
+            Math.abs(
+                dateDifference
+            ) *
             10;
     }
 
-    if (search.nights) {
+
+    if (
+        search.nights
+    ) {
 
         const offerNights =
             Number(
-                offer.nights || 0
+                offer.nights ||
+                0
             );
 
-        if (!offerNights) {
+
+        if (
+            !offerNights
+        ) {
 
             return {
-                allowed: false,
-                score: 0,
-                reasons: []
+                allowed:
+                    false,
+                score:
+                    0,
+                reasons:
+                    []
             };
         }
+
 
         nightDifference =
             offerNights -
             search.nights;
 
+
         if (
-            Math.abs(nightDifference) >
+            Math.abs(
+                nightDifference
+            ) >
             ALTERNATIVE_NIGHT_FLEX
         ) {
 
             return {
-                allowed: false,
-                score: 0,
-                reasons: []
+                allowed:
+                    false,
+                score:
+                    0,
+                reasons:
+                    []
             };
         }
 
+
         if (
-            Math.abs(nightDifference) >
+            Math.abs(
+                nightDifference
+            ) >
             PRIMARY_NIGHT_FLEX
         ) {
 
@@ -1456,29 +2088,42 @@ function calculateAlternativeInfo(
             );
         }
 
+
         score +=
-            Math.abs(nightDifference) *
+            Math.abs(
+                nightDifference
+            ) *
             8;
     }
 
-    if (search.budget) {
+
+    if (
+        search.budget
+    ) {
 
         const offerPrice =
             Number(
-                offer.price || 0
+                offer.price ||
+                0
             );
+
 
         budgetDifference =
             offerPrice -
             search.budget;
 
-        if (budgetDifference > 0) {
+
+        if (
+            budgetDifference > 0
+        ) {
 
             const maximumOverspend =
                 Math.max(
                     1000,
-                    search.budget * 0.35
+                    search.budget *
+                    0.35
                 );
+
 
             if (
                 budgetDifference >
@@ -1486,11 +2131,15 @@ function calculateAlternativeInfo(
             ) {
 
                 return {
-                    allowed: false,
-                    score: 0,
-                    reasons: []
+                    allowed:
+                        false,
+                    score:
+                        0,
+                    reasons:
+                        []
                 };
             }
+
 
             reasons.push(
                 `£${formatNumber(
@@ -1498,22 +2147,29 @@ function calculateAlternativeInfo(
                 )} over budget`
             );
 
+
             score +=
                 budgetDifference /
                 20;
         }
     }
 
-    if (reasons.length === 0) {
+
+    if (
+        reasons.length ===
+        0
+    ) {
 
         reasons.push(
             "Closest available alternative"
         );
     }
 
+
     return {
 
-        allowed: true,
+        allowed:
+            true,
 
         score,
 
@@ -1524,7 +2180,46 @@ function calculateAlternativeInfo(
         nightDifference,
 
         budgetDifference
+
     };
+}
+
+
+function sortAlternativeOffers(
+    first,
+    second
+) {
+
+    const scoreDifference =
+        Number(
+            first._alternativeScore ||
+            0
+        ) -
+        Number(
+            second._alternativeScore ||
+            0
+        );
+
+
+    if (
+        scoreDifference !==
+        0
+    ) {
+
+        return scoreDifference;
+    }
+
+
+    return (
+        Number(
+            first.price ||
+            0
+        ) -
+        Number(
+            second.price ||
+            0
+        )
+    );
 }
 
 
@@ -1533,9 +2228,14 @@ function createDateDifferenceLabel(
 ) {
 
     const absolute =
-        Math.abs(difference);
+        Math.abs(
+            difference
+        );
 
-    if (difference > 0) {
+
+    if (
+        difference > 0
+    ) {
 
         return `${absolute} ${
             absolute === 1
@@ -1543,6 +2243,7 @@ function createDateDifferenceLabel(
                 : "days"
         } later`;
     }
+
 
     return `${absolute} ${
         absolute === 1
@@ -1557,9 +2258,14 @@ function createNightDifferenceLabel(
 ) {
 
     const absolute =
-        Math.abs(difference);
+        Math.abs(
+            difference
+        );
 
-    if (difference > 0) {
+
+    if (
+        difference > 0
+    ) {
 
         return `${absolute} ${
             absolute === 1
@@ -1567,6 +2273,7 @@ function createNightDifferenceLabel(
                 : "nights"
         } longer`;
     }
+
 
     return `${absolute} ${
         absolute === 1
@@ -1583,30 +2290,44 @@ function getSignedDateDifference(
 
     const offerDateValue =
         String(
-            offerValue || ""
-        ).slice(0, 10);
+            offerValue ||
+            ""
+        ).slice(
+            0,
+            10
+        );
+
 
     const requestedDateValue =
         String(
-            requestedValue || ""
-        ).slice(0, 10);
+            requestedValue ||
+            ""
+        ).slice(
+            0,
+            10
+        );
+
 
     if (
         !offerDateValue ||
         !requestedDateValue
     ) {
+
         return null;
     }
+
 
     const offerDate =
         new Date(
             `${offerDateValue}T00:00:00`
         );
 
+
     const requestedDate =
         new Date(
             `${requestedDateValue}T00:00:00`
         );
+
 
     if (
         Number.isNaN(
@@ -1616,14 +2337,17 @@ function getSignedDateDifference(
             requestedDate.getTime()
         )
     ) {
+
         return null;
     }
+
 
     const millisecondsPerDay =
         1000 *
         60 *
         60 *
         24;
+
 
     return Math.round(
         (
@@ -1635,62 +2359,64 @@ function getSignedDateDifference(
 }
 
 
-function clearAlternativeMaximumPriceFilter() {
-
-    const maximumPriceFilter =
-        document.getElementById(
-            "maximumPriceFilter"
-        );
-
-    if (maximumPriceFilter) {
-
-        maximumPriceFilter.value =
-            "";
-    }
-}
-
-
 // ======================================================
-// SUPPLIER MAP
+// SUPPLIERS
 // ======================================================
 
-function createSupplierMap(suppliers) {
+function createSupplierMap(
+    suppliers
+) {
 
     const map =
         new Map();
 
-    suppliers.forEach(supplier => {
 
-        const key =
-            normaliseText(
-                supplier.name
+    suppliers.forEach(
+        supplier => {
+
+            const key =
+                normaliseText(
+                    supplier.name
+                );
+
+
+            if (!key) {
+                return;
+            }
+
+
+            map.set(
+                key,
+                supplier
             );
-
-        if (!key) {
-            return;
         }
+    );
 
-        map.set(
-            key,
-            supplier
-        );
-    });
 
     return map;
 }
 
 
-function getSupplierData(name) {
+function getSupplierData(
+    name
+) {
 
     const key =
-        normaliseText(name);
+        normaliseText(
+            name
+        );
+
 
     if (!key) {
+
         return null;
     }
 
+
     return (
-        supplierMap.get(key) ||
+        supplierMap.get(
+            key
+        ) ||
         null
     );
 }
@@ -1706,28 +2432,37 @@ function createSupplierLogo(
             supplierName
         );
 
+
     if (!supplier) {
+
         return "";
     }
 
+
     const logoUrl =
-        createSafeBookingUrl(
+        getSafeHttpUrl(
             supplier.logo_url
         );
 
+
     if (!logoUrl) {
+
         return "";
     }
+
 
     const className =
         size === "large"
             ? "supplier-logo supplier-logo-large"
             : "supplier-logo supplier-logo-small";
 
+
     return `
         <img
             class="${className}"
-            src="${logoUrl}"
+            src="${escapeAttribute(
+                logoUrl
+            )}"
             alt="${escapeAttribute(
                 supplier.name ||
                 supplierName ||
@@ -1744,25 +2479,33 @@ function createSupplierLogo(
 // HOTEL MAP
 // ======================================================
 
-function createHotelMap(hotels) {
+function createHotelMap(
+    hotels
+) {
 
-    const hotelMap =
+    const map =
         new Map();
 
-    hotels.forEach(hotel => {
 
-        hotelMap.set(
-            String(hotel.id),
-            hotel
-        );
-    });
+    hotels.forEach(
+        hotel => {
 
-    return hotelMap;
+            map.set(
+                String(
+                    hotel.id
+                ),
+                hotel
+            );
+        }
+    );
+
+
+    return map;
 }
 
 
 // ======================================================
-// MAIN SEARCH MATCHING
+// CURRENT MAIN SEARCH
 // ======================================================
 
 function getCurrentSearch() {
@@ -1773,33 +2516,38 @@ function getCurrentSearch() {
             (
                 localStorage.getItem(
                     "airport"
-                ) || ""
+                ) ||
+                ""
             ).trim(),
 
         destination:
             (
                 localStorage.getItem(
                     "destination"
-                ) || ""
+                ) ||
+                ""
             ).trim(),
 
         departureDate:
             localStorage.getItem(
                 "departureDate"
-            ) || "",
+            ) ||
+            "",
 
         nights:
             Number(
                 localStorage.getItem(
                     "nights"
                 )
-            ) || 0,
+            ) ||
+            0,
 
         board:
             (
                 localStorage.getItem(
                     "board"
-                ) || ""
+                ) ||
+                ""
             ).trim(),
 
         budget:
@@ -1807,10 +2555,16 @@ function getCurrentSearch() {
                 localStorage.getItem(
                     "budget"
                 )
-            ) || 0
+            ) ||
+            0
+
     };
 }
 
+
+// ======================================================
+// PRIMARY OFFER MATCHING
+// ======================================================
 
 function offerMatchesSearch(
     offer,
@@ -1826,8 +2580,10 @@ function offerMatchesSearch(
             search.airport
         )
     ) {
+
         return false;
     }
+
 
     if (
         search.board &&
@@ -1838,67 +2594,91 @@ function offerMatchesSearch(
             search.board
         )
     ) {
+
         return false;
     }
+
 
     if (
         search.budget &&
         Number(
-            offer.price || 0
+            offer.price ||
+            0
         ) >
         search.budget
     ) {
+
         return false;
     }
 
-    if (search.nights) {
+
+    if (
+        search.nights
+    ) {
 
         const offerNights =
             Number(
-                offer.nights || 0
+                offer.nights ||
+                0
             );
 
-        if (!offerNights) {
+
+        if (
+            !offerNights
+        ) {
+
             return false;
         }
 
-        const nightDifference =
+
+        const difference =
             Math.abs(
                 offerNights -
                 search.nights
             );
 
+
         if (
-            nightDifference >
+            difference >
             PRIMARY_NIGHT_FLEX
         ) {
+
             return false;
         }
     }
 
-    if (search.departureDate) {
 
-        const differenceInDays =
+    if (
+        search.departureDate
+    ) {
+
+        const difference =
             getSignedDateDifference(
                 offer.departure_date,
                 search.departureDate
             );
 
+
         if (
-            differenceInDays === null
+            difference ===
+            null
         ) {
+
             return false;
         }
 
+
         if (
             Math.abs(
-                differenceInDays
+                difference
             ) >
             PRIMARY_DATE_FLEX_DAYS
         ) {
+
             return false;
         }
     }
+
 
     return true;
 }
@@ -1914,30 +2694,51 @@ function hotelMatchesDestination(
 ) {
 
     const selected =
-        normaliseText(destination);
+        normaliseText(
+            destination
+        );
+
 
     const values = [
+
         hotel.country,
+
         hotel.destination,
+
         hotel.region,
+
         hotel.location
+
     ];
 
-    return values.some(value => {
 
-        const normalised =
-            normaliseText(value);
+    return values.some(
+        value => {
 
-        if (!normalised) {
-            return false;
+            const normalised =
+                normaliseText(
+                    value
+                );
+
+
+            if (!normalised) {
+
+                return false;
+            }
+
+
+            return (
+                normalised ===
+                    selected ||
+                normalised.includes(
+                    selected
+                ) ||
+                selected.includes(
+                    normalised
+                )
+            );
         }
-
-        return (
-            normalised === selected ||
-            normalised.includes(selected) ||
-            selected.includes(normalised)
-        );
-    });
+    );
 }
 
 
@@ -1949,16 +2750,20 @@ function populateResultFilterOptions() {
 
     populateSelectOptions(
         "destinationFilter",
+
         groupedResults.map(
             group =>
                 group.hotel.destination ||
                 group.hotel.country
         ),
+
         "All destinations"
     );
 
+
     populateSelectOptions(
         "supplierFilter",
+
         groupedResults.flatMap(
             group =>
                 group.offers.map(
@@ -1966,11 +2771,14 @@ function populateResultFilterOptions() {
                         offer.supplier
                 )
         ),
+
         "All suppliers"
     );
 
+
     populateSelectOptions(
         "boardFilter",
+
         groupedResults.flatMap(
             group =>
                 group.offers.map(
@@ -1978,6 +2786,7 @@ function populateResultFilterOptions() {
                         offer.board_basis
                 )
         ),
+
         "All board types"
     );
 }
@@ -1994,56 +2803,88 @@ function populateSelectOptions(
             selectId
         );
 
+
     if (!select) {
+
         return;
     }
 
+
     const previousValue =
         select.value;
+
 
     const uniqueValues =
         Array.from(
             new Set(
                 values
-                    .filter(Boolean)
+                    .filter(
+                        Boolean
+                    )
                     .map(
                         value =>
-                            String(value).trim()
+                            String(
+                                value
+                            ).trim()
                     )
             )
         ).sort(
-            (first, second) =>
-                first.localeCompare(second)
+            (
+                first,
+                second
+            ) =>
+                first.localeCompare(
+                    second
+                )
         );
 
-    select.innerHTML = "";
+
+    select.innerHTML =
+        "";
+
 
     const defaultOption =
         document.createElement(
             "option"
         );
 
-    defaultOption.value = "";
+
+    defaultOption.value =
+        "";
+
 
     defaultOption.textContent =
         defaultLabel;
+
 
     select.appendChild(
         defaultOption
     );
 
-    uniqueValues.forEach(value => {
 
-        const option =
-            document.createElement(
-                "option"
+    uniqueValues.forEach(
+        value => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                value;
+
+
+            option.textContent =
+                value;
+
+
+            select.appendChild(
+                option
             );
+        }
+    );
 
-        option.value = value;
-        option.textContent = value;
-
-        select.appendChild(option);
-    });
 
     if (
         uniqueValues.includes(
@@ -2063,190 +2904,180 @@ function populateSelectOptions(
 
 function applyResultFilters() {
 
-    const destinationElement =
-        document.getElementById(
+    const destination =
+        getElementValue(
             "destinationFilter"
         );
 
-    const supplierElement =
-        document.getElementById(
+
+    const supplier =
+        getElementValue(
             "supplierFilter"
         );
 
-    const boardElement =
-        document.getElementById(
+
+    const board =
+        getElementValue(
             "boardFilter"
         );
 
-    const maximumPriceElement =
-        document.getElementById(
-            "maximumPriceFilter"
-        );
-
-    const destination =
-        destinationElement
-            ? destinationElement.value
-            : "";
-
-    const supplier =
-        supplierElement
-            ? supplierElement.value
-            : "";
-
-    const board =
-        boardElement
-            ? boardElement.value
-            : "";
 
     const maximumPrice =
-        maximumPriceElement
-            ? Number(
-                maximumPriceElement.value
-            ) || 0
-            : 0;
+        Number(
+            getElementValue(
+                "maximumPriceFilter"
+            )
+        ) ||
+        0;
+
 
     visibleResults =
         groupedResults
-            .map(group => {
+            .map(
+                group => {
 
-                let filteredOffers =
-                    [...group.offers];
+                    let filteredOffers =
+                        [
+                            ...group.offers
+                        ];
 
-                if (supplier) {
 
-                    filteredOffers =
-                        filteredOffers.filter(
-                            offer =>
-                                normaliseText(
-                                    offer.supplier
-                                ) ===
-                                normaliseText(
-                                    supplier
-                                )
-                        );
-                }
+                    if (
+                        supplier
+                    ) {
 
-                if (board) {
-
-                    filteredOffers =
-                        filteredOffers.filter(
-                            offer =>
-                                normaliseText(
-                                    offer.board_basis
-                                ) ===
-                                normaliseText(
-                                    board
-                                )
-                        );
-                }
-
-                if (maximumPrice) {
-
-                    filteredOffers =
-                        filteredOffers.filter(
-                            offer =>
-                                Number(
-                                    offer.price || 0
-                                ) <=
-                                maximumPrice
-                        );
-                }
-
-                if (
-                    filteredOffers.length ===
-                    0
-                ) {
-                    return null;
-                }
-
-                const hotelDestination =
-                    group.hotel.destination ||
-                    group.hotel.country ||
-                    "";
-
-                if (
-                    destination &&
-                    normaliseText(
-                        hotelDestination
-                    ) !==
-                    normaliseText(
-                        destination
-                    )
-                ) {
-                    return null;
-                }
-
-                if (
-                    group.isAlternative
-                ) {
-
-                    filteredOffers.sort(
-                        (first, second) => {
-
-                            const scoreDifference =
-                                Number(
-                                    first._alternativeScore ||
-                                    0
-                                ) -
-                                Number(
-                                    second._alternativeScore ||
-                                    0
-                                );
-
-                            if (
-                                scoreDifference !== 0
-                            ) {
-                                return scoreDifference;
-                            }
-
-                            return (
-                                Number(
-                                    first.price || 0
-                                ) -
-                                Number(
-                                    second.price || 0
-                                )
+                        filteredOffers =
+                            filteredOffers.filter(
+                                offer =>
+                                    normaliseText(
+                                        offer.supplier
+                                    ) ===
+                                    normaliseText(
+                                        supplier
+                                    )
                             );
-                        }
-                    );
+                    }
 
-                } else {
 
-                    filteredOffers.sort(
-                        (first, second) =>
-                            Number(
-                                first.price || 0
-                            ) -
-                            Number(
-                                second.price || 0
-                            )
-                    );
-                }
+                    if (
+                        board
+                    ) {
 
-                return {
+                        filteredOffers =
+                            filteredOffers.filter(
+                                offer =>
+                                    normaliseText(
+                                        offer.board_basis
+                                    ) ===
+                                    normaliseText(
+                                        board
+                                    )
+                            );
+                    }
 
-                    hotel:
-                        group.hotel,
 
-                    offers:
-                        filteredOffers,
+                    if (
+                        maximumPrice
+                    ) {
 
-                    cheapestOffer:
-                        filteredOffers[0],
+                        filteredOffers =
+                            filteredOffers.filter(
+                                offer =>
+                                    Number(
+                                        offer.price ||
+                                        0
+                                    ) <=
+                                    maximumPrice
+                            );
+                    }
 
-                    isAlternative:
-                        Boolean(
-                            group.isAlternative
-                        ),
 
-                    alternativeScore:
-                        Number(
-                            filteredOffers[0]
-                                ._alternativeScore || 0
+                    if (
+                        filteredOffers.length ===
+                        0
+                    ) {
+
+                        return null;
+                    }
+
+
+                    const hotelDestination =
+                        group.hotel.destination ||
+                        group.hotel.country ||
+                        "";
+
+
+                    if (
+                        destination &&
+                        normaliseText(
+                            hotelDestination
+                        ) !==
+                        normaliseText(
+                            destination
                         )
-                };
-            })
-            .filter(Boolean);
+                    ) {
+
+                        return null;
+                    }
+
+
+                    if (
+                        group.isAlternative
+                    ) {
+
+                        filteredOffers.sort(
+                            sortAlternativeOffers
+                        );
+
+                    } else {
+
+                        filteredOffers.sort(
+                            (
+                                first,
+                                second
+                            ) =>
+                                Number(
+                                    first.price ||
+                                    0
+                                ) -
+                                Number(
+                                    second.price ||
+                                    0
+                                )
+                        );
+                    }
+
+
+                    return {
+
+                        hotel:
+                            group.hotel,
+
+                        offers:
+                            filteredOffers,
+
+                        cheapestOffer:
+                            filteredOffers[0],
+
+                        isAlternative:
+                            Boolean(
+                                group.isAlternative
+                            ),
+
+                        alternativeScore:
+                            Number(
+                                filteredOffers[0]
+                                    ?._alternativeScore ||
+                                0
+                            )
+
+                    };
+                }
+            )
+            .filter(
+                Boolean
+            );
+
 
     sortAndRenderResults();
 }
@@ -2256,6 +3087,7 @@ function clearResultFilters() {
 
     clearSecondaryFiltersOnly();
 
+
     if (
         resultsMode ===
         "alternatives"
@@ -2263,6 +3095,7 @@ function clearResultFilters() {
 
         clearAlternativeMaximumPriceFilter();
     }
+
 
     visibleResults =
         groupedResults.map(
@@ -2272,7 +3105,9 @@ function clearResultFilters() {
                     group.hotel,
 
                 offers:
-                    [...group.offers],
+                    [
+                        ...group.offers
+                    ],
 
                 cheapestOffer:
                     group.cheapestOffer,
@@ -2284,10 +3119,13 @@ function clearResultFilters() {
 
                 alternativeScore:
                     Number(
-                        group.alternativeScore || 0
+                        group.alternativeScore ||
+                        0
                     )
+
             })
         );
+
 
     sortAndRenderResults();
 }
@@ -2295,60 +3133,75 @@ function clearResultFilters() {
 
 function clearSecondaryFiltersOnly() {
 
-    const destinationFilter =
-        document.getElementById(
-            "destinationFilter"
-        );
+    setElementValue(
+        "destinationFilter",
+        ""
+    );
 
-    const supplierFilter =
-        document.getElementById(
-            "supplierFilter"
-        );
 
-    const boardFilter =
-        document.getElementById(
-            "boardFilter"
-        );
+    setElementValue(
+        "supplierFilter",
+        ""
+    );
+
+
+    setElementValue(
+        "boardFilter",
+        ""
+    );
+
 
     const maximumPriceFilter =
         document.getElementById(
             "maximumPriceFilter"
         );
 
-    if (destinationFilter) {
-        destinationFilter.value = "";
+
+    if (
+        !maximumPriceFilter
+    ) {
+
+        return;
     }
 
-    if (supplierFilter) {
-        supplierFilter.value = "";
+
+    if (
+        resultsMode ===
+        "alternatives"
+    ) {
+
+        maximumPriceFilter.value =
+            "";
+
+        return;
     }
 
-    if (boardFilter) {
-        boardFilter.value = "";
-    }
 
-    if (maximumPriceFilter) {
+    const mainBudget =
+        document.getElementById(
+            "searchBudget"
+        );
 
-        if (
-            resultsMode ===
-            "alternatives"
-        ) {
 
-            maximumPriceFilter.value =
-                "";
+    maximumPriceFilter.value =
+        mainBudget
+            ? mainBudget.value
+            : "";
+}
 
-        } else {
 
-            const mainBudget =
-                document.getElementById(
-                    "searchBudget"
-                );
+function clearAlternativeMaximumPriceFilter() {
 
-            maximumPriceFilter.value =
-                mainBudget
-                    ? mainBudget.value
-                    : "";
-        }
+    const filter =
+        document.getElementById(
+            "maximumPriceFilter"
+        );
+
+
+    if (filter) {
+
+        filter.value =
+            "";
     }
 }
 
@@ -2359,81 +3212,108 @@ function clearSecondaryFiltersOnly() {
 
 function sortAndRenderResults() {
 
-    const sortElement =
-        document.getElementById(
-            "sortResults"
-        );
-
     const sortValue =
-        sortElement
-            ? sortElement.value
-            : "price-low";
+        getElementValue(
+            "sortResults"
+        ) ||
+        "price-low";
+
 
     const sortedResults =
-        [...visibleResults];
+        [
+            ...visibleResults
+        ];
 
-    switch (sortValue) {
+
+    switch (
+        sortValue
+    ) {
 
         case "price-high":
 
             sortedResults.sort(
-                (first, second) =>
+                (
+                    first,
+                    second
+                ) =>
                     Number(
-                        second.cheapestOffer.price ||
+                        second.cheapestOffer
+                            ?.price ||
                         0
                     ) -
                     Number(
-                        first.cheapestOffer.price ||
+                        first.cheapestOffer
+                            ?.price ||
                         0
                     )
             );
 
             break;
+
 
         case "rating-high":
 
             sortedResults.sort(
-                (first, second) =>
+                (
+                    first,
+                    second
+                ) =>
                     Number(
-                        second.hotel.rating || 0
+                        second.hotel.rating ||
+                        0
                     ) -
                     Number(
-                        first.hotel.rating || 0
+                        first.hotel.rating ||
+                        0
                     )
             );
 
             break;
+
 
         case "stars-high":
 
             sortedResults.sort(
-                (first, second) =>
+                (
+                    first,
+                    second
+                ) =>
                     Number(
-                        second.hotel.stars || 0
+                        second.hotel.stars ||
+                        0
                     ) -
                     Number(
-                        first.hotel.stars || 0
+                        first.hotel.stars ||
+                        0
                     )
             );
 
             break;
 
+
         case "name":
 
             sortedResults.sort(
-                (first, second) =>
+                (
+                    first,
+                    second
+                ) =>
                     String(
-                        first.hotel.name || ""
+                        first.hotel.name ||
+                        ""
                     ).localeCompare(
                         String(
-                            second.hotel.name || ""
+                            second.hotel.name ||
+                            ""
                         )
                     )
             );
 
             break;
 
+
         case "price-low":
+
         default:
 
             if (
@@ -2442,35 +3322,44 @@ function sortAndRenderResults() {
             ) {
 
                 sortedResults.sort(
-                    (first, second) => {
+                    (
+                        first,
+                        second
+                    ) => {
 
                         const scoreDifference =
                             Number(
                                 first.alternativeScore ||
                                 first.cheapestOffer
-                                    ._alternativeScore ||
+                                    ?._alternativeScore ||
                                 0
                             ) -
                             Number(
                                 second.alternativeScore ||
                                 second.cheapestOffer
-                                    ._alternativeScore ||
+                                    ?._alternativeScore ||
                                 0
                             );
 
+
                         if (
-                            scoreDifference !== 0
+                            scoreDifference !==
+                            0
                         ) {
+
                             return scoreDifference;
                         }
 
+
                         return (
                             Number(
-                                first.cheapestOffer.price ||
+                                first.cheapestOffer
+                                    ?.price ||
                                 0
                             ) -
                             Number(
-                                second.cheapestOffer.price ||
+                                second.cheapestOffer
+                                    ?.price ||
                                 0
                             )
                         );
@@ -2480,13 +3369,18 @@ function sortAndRenderResults() {
             } else {
 
                 sortedResults.sort(
-                    (first, second) =>
+                    (
+                        first,
+                        second
+                    ) =>
                         Number(
-                            first.cheapestOffer.price ||
+                            first.cheapestOffer
+                                ?.price ||
                             0
                         ) -
                         Number(
-                            second.cheapestOffer.price ||
+                            second.cheapestOffer
+                                ?.price ||
                             0
                         )
                 );
@@ -2495,7 +3389,10 @@ function sortAndRenderResults() {
             break;
     }
 
-    renderResults(sortedResults);
+
+    renderResults(
+        sortedResults
+    );
 }
 
 
@@ -2503,23 +3400,31 @@ function sortAndRenderResults() {
 // RENDER RESULTS
 // ======================================================
 
-function renderResults(results) {
+function renderResults(
+    results
+) {
 
     const container =
         document.getElementById(
             "resultsContainer"
         );
 
+
     const countElement =
         document.getElementById(
             "resultsCount"
         );
 
+
     if (!container) {
+
         return;
     }
 
-    if (countElement) {
+
+    if (
+        countElement
+    ) {
 
         if (
             resultsMode ===
@@ -2544,15 +3449,20 @@ function renderResults(results) {
         }
     }
 
-    if (results.length === 0) {
+
+    if (
+        results.length ===
+        0
+    ) {
 
         showResultsMessage(
             "No matching holidays found",
-            "We could not find suitable holidays for this search. Try changing your airport, destination, dates, board basis or budget."
+            "We could not find suitable holidays for this search. Try changing your airport, destination, dates, board basis, supplier or budget."
         );
 
         return;
     }
+
 
     const alternativeNotice =
         resultsMode ===
@@ -2560,16 +3470,27 @@ function renderResults(results) {
             ? createAlternativeResultsNotice()
             : "";
 
+
     container.innerHTML =
         alternativeNotice +
-        results.map(
-            createHotelCard
-        ).join("");
+        results
+            .map(
+                createHotelCard
+            )
+            .join(
+                ""
+            );
+
 
     attachComparisonButtons();
+
     attachOutboundDealTracking();
 }
 
+
+// ======================================================
+// ALTERNATIVE RESULTS NOTICE
+// ======================================================
 
 function createAlternativeResultsNotice() {
 
@@ -2583,13 +3504,14 @@ function createAlternativeResultsNotice() {
             <div>
 
                 <h2>
-                    No exact flexible matches — here are the closest alternatives
+                    No close matches — here are the nearest alternatives
                 </h2>
 
                 <p>
-                    These holidays fall outside one or more parts of your original search.
-                    We have kept your destination, departure airport and board basis where selected,
-                    and clearly highlighted what is different.
+                    These holidays fall outside one or more parts
+                    of your original search. Where selected, we
+                    have kept your destination, departure airport
+                    and board basis and highlighted the difference.
                 </p>
 
             </div>
@@ -2599,39 +3521,72 @@ function createAlternativeResultsNotice() {
 }
 
 
-function createAffiliateDisclosureMarkup(extraClass = "") {
+// ======================================================
+// AFFILIATE DISCLOSURE
+// ======================================================
+
+function createAffiliateDisclosureMarkup(
+    extraClass = ""
+) {
 
     const className =
         extraClass
             ? `affiliate-disclosure ${extraClass}`
             : "affiliate-disclosure";
 
+
     return `
         <p class="${className}">
-            We may earn a commission if you book through a supplier link.
-            This does not change the price you pay.
+            We may earn a commission if you book through a
+            supplier link. This does not change the price you pay.
         </p>
     `;
 }
 
 
-function createHotelCard(group) {
+// ======================================================
+// HOTEL CARD
+// ======================================================
+
+function createHotelCard(
+    group
+) {
 
     const hotel =
         group.hotel;
 
+
     const cheapest =
         group.cheapestOffer;
 
+
+    if (
+        !hotel ||
+        !cheapest
+    ) {
+
+        return "";
+    }
+
+
     const hotelId =
-        escapeAttribute(
-            String(hotel.id)
+        String(
+            hotel.id ||
+            ""
         );
+
+
+    const safeHotelId =
+        escapeAttribute(
+            hotelId
+        );
+
 
     const hotelDetailsUrl =
         `hotel.html?id=${encodeURIComponent(
-            String(hotel.id || "")
+            hotelId
         )}`;
+
 
     const hotelName =
         escapeHtml(
@@ -2639,23 +3594,34 @@ function createHotelCard(group) {
             "Hotel"
         );
 
+
     const location =
         [
             hotel.destination,
             hotel.country
         ]
-            .filter(Boolean)
-            .join(", ");
+            .filter(
+                Boolean
+            )
+            .join(
+                ", "
+            );
+
 
     const stars =
         createStars(
             Number(
-                hotel.stars || 0
+                hotel.stars ||
+                0
             )
         );
 
+
     const image =
-        getHotelImage(hotel);
+        getHotelImage(
+            hotel
+        );
+
 
     const description =
         escapeHtml(
@@ -2663,16 +3629,33 @@ function createHotelCard(group) {
             "Package holiday offers available for this hotel."
         );
 
+
     const bookingUrl =
-        createSafeBookingUrl(
+        getSafeHttpUrl(
             cheapest.booking_url
         );
 
+
+    const supplierName =
+        String(
+            cheapest.supplier ||
+            "Supplier"
+        );
+
+
+    const offerId =
+        String(
+            cheapest.id ||
+            ""
+        );
+
+
     const supplierLogo =
         createSupplierLogo(
-            cheapest.supplier,
+            supplierName,
             "large"
         );
+
 
     const demoBadge =
         DEMO_MODE
@@ -2683,38 +3666,33 @@ function createHotelCard(group) {
             `
             : "";
 
+
     const alternativeBadge =
         createAlternativeBadge(
             group
         );
 
-    const supplierName =
-        String(
-            cheapest.supplier ||
-            "Supplier"
-        );
-
-    const offerId =
-        String(
-            cheapest.id || ""
-        );
 
     const hasBookableOffer =
         group.offers.some(
             offer =>
                 Boolean(
-                    createSafeBookingUrl(
+                    getSafeHttpUrl(
                         offer.booking_url
                     )
                 )
         );
 
+
     const bookingButton =
-        bookingUrl && offerId
+        bookingUrl &&
+        offerId
             ? `
                 <a
                     class="book-button"
-                    href="${bookingUrl}"
+                    href="${escapeAttribute(
+                        bookingUrl
+                    )}"
                     target="_blank"
                     rel="sponsored noopener"
                     aria-label="View Deal with ${escapeAttribute(
@@ -2740,19 +3718,22 @@ function createHotelCard(group) {
                 </span>
             `;
 
-    const cheapestAffiliateDisclosure =
+
+    const priceDisclosure =
         bookingUrl
             ? createAffiliateDisclosureMarkup(
                 "price-panel-disclosure"
             )
             : "";
 
-    const comparisonAffiliateDisclosure =
+
+    const comparisonDisclosure =
         hasBookableOffer
             ? createAffiliateDisclosureMarkup(
                 "comparison-disclosure"
             )
             : "";
+
 
     return `
         <article class="hotel-result-card">
@@ -2763,12 +3744,16 @@ function createHotelCard(group) {
 
                     <img
                         class="hotel-image"
-                        src="${escapeAttribute(image)}"
+                        src="${escapeAttribute(
+                            image
+                        )}"
                         alt="${hotelName}"
+                        loading="lazy"
                         onerror="useFallbackImage(this)"
                     >
 
                 </div>
+
 
                 <div class="hotel-details">
 
@@ -2779,22 +3764,29 @@ function createHotelCard(group) {
                         )}
                     </div>
 
+
                     <h2 class="hotel-name">
                         ${hotelName}
                     </h2>
+
 
                     ${alternativeBadge}
 
                     ${demoBadge}
 
+
                     <div class="hotel-stars">
                         ${stars}
                     </div>
 
+
                     <div class="offer-information">
 
                         <div>
-                            <strong>Departure:</strong>
+                            <strong>
+                                Departure:
+                            </strong>
+
                             ${escapeHtml(
                                 formatDisplayDate(
                                     cheapest.departure_date
@@ -2802,16 +3794,24 @@ function createHotelCard(group) {
                             )}
                         </div>
 
+
                         <div>
-                            <strong>Airport:</strong>
+                            <strong>
+                                Airport:
+                            </strong>
+
                             ${escapeHtml(
                                 cheapest.airport ||
-                                "Any airport"
+                                "Not stated"
                             )}
                         </div>
 
+
                         <div>
-                            <strong>Duration:</strong>
+                            <strong>
+                                Duration:
+                            </strong>
+
                             ${escapeHtml(
                                 String(
                                     cheapest.nights ||
@@ -2821,25 +3821,38 @@ function createHotelCard(group) {
                             nights
                         </div>
 
+
                         <div>
-                            <strong>Board:</strong>
+                            <strong>
+                                Board:
+                            </strong>
+
                             ${escapeHtml(
                                 cheapest.board_basis ||
                                 "Not stated"
                             )}
                         </div>
 
+
                         <div>
-                            <strong>Room:</strong>
+                            <strong>
+                                Room:
+                            </strong>
+
                             ${escapeHtml(
                                 cheapest.room_type ||
                                 "Standard room"
                             )}
                         </div>
 
+
                         <div>
-                            <strong>Offers:</strong>
+                            <strong>
+                                Offers:
+                            </strong>
+
                             ${group.offers.length}
+
                             ${
                                 group.offers.length === 1
                                     ? "supplier"
@@ -2849,9 +3862,11 @@ function createHotelCard(group) {
 
                     </div>
 
+
                     <p class="hotel-description">
                         ${description}
                     </p>
+
 
                     <a
                         class="hotel-details-button"
@@ -2864,11 +3879,13 @@ function createHotelCard(group) {
 
                 </div>
 
+
                 <div class="price-panel">
 
                     <div>
 
                         <div class="cheapest-label">
+
                             ${
                                 group.isAlternative
                                     ? "Closest alternative"
@@ -2876,39 +3893,52 @@ function createHotelCard(group) {
                                         ? "Example offer"
                                         : "Cheapest offer"
                             }
+
                         </div>
+
 
                         <div class="supplier-brand">
+
                             ${supplierLogo}
 
+
                             <div class="supplier-name">
+
                                 ${escapeHtml(
-                                    cheapest.supplier ||
-                                    "Supplier"
+                                    supplierName
                                 )}
+
                             </div>
+
                         </div>
 
+
                         <div class="price">
+
                             £${formatNumber(
                                 cheapest.price
                             )}
+
                         </div>
 
+
                         <div class="total-price-label">
+
                             ${
                                 DEMO_MODE
                                     ? "Example test price"
                                     : "Total package price"
                             }
+
                         </div>
 
                     </div>
 
+
                     <button
                         type="button"
                         class="compare-button"
-                        data-hotel-id="${hotelId}"
+                        data-hotel-id="${safeHotelId}"
                     >
                         Compare ${group.offers.length}
                         ${
@@ -2918,22 +3948,25 @@ function createHotelCard(group) {
                         }
                     </button>
 
+
                     ${bookingButton}
 
-                    ${cheapestAffiliateDisclosure}
+                    ${priceDisclosure}
 
                 </div>
 
             </div>
 
+
             <div
-                id="comparison-${hotelId}"
+                id="comparison-${safeHotelId}"
                 class="supplier-comparison"
             >
 
                 <h3>
                     Compare supplier offers
                 </h3>
+
 
                 <div class="supplier-table-wrap">
 
@@ -2942,25 +3975,55 @@ function createHotelCard(group) {
                         <thead>
 
                             <tr>
-                                <th>Supplier</th>
-                                <th>Departure</th>
-                                <th>Airport</th>
-                                <th>Nights</th>
-                                <th>Board</th>
-                                <th>Price</th>
-                                <th>Difference</th>
-                                <th>Book</th>
+
+                                <th>
+                                    Supplier
+                                </th>
+
+                                <th>
+                                    Departure
+                                </th>
+
+                                <th>
+                                    Airport
+                                </th>
+
+                                <th>
+                                    Nights
+                                </th>
+
+                                <th>
+                                    Board
+                                </th>
+
+                                <th>
+                                    Price
+                                </th>
+
+                                <th>
+                                    Difference
+                                </th>
+
+                                <th>
+                                    Book
+                                </th>
+
                             </tr>
 
                         </thead>
 
+
                         <tbody>
 
-                            ${group.offers
-                                .map(
-                                    createSupplierOfferRow
-                                )
-                                .join("")}
+                            ${
+                                group.offers
+                                    .map(
+                                        createSupplierOfferRow
+                                    )
+                                    .join(
+                                        ""
+                                    )
+                            }
 
                         </tbody>
 
@@ -2968,7 +4031,8 @@ function createHotelCard(group) {
 
                 </div>
 
-                ${comparisonAffiliateDisclosure}
+
+                ${comparisonDisclosure}
 
             </div>
 
@@ -2977,14 +4041,22 @@ function createHotelCard(group) {
 }
 
 
-function createAlternativeBadge(group) {
+// ======================================================
+// ALTERNATIVE BADGE
+// ======================================================
+
+function createAlternativeBadge(
+    group
+) {
 
     if (
         !group.isAlternative ||
         !group.cheapestOffer
     ) {
+
         return "";
     }
+
 
     const reasons =
         Array.isArray(
@@ -2995,11 +4067,15 @@ function createAlternativeBadge(group) {
                 ._alternativeReasons
             : [];
 
+
     if (
-        reasons.length === 0
+        reasons.length ===
+        0
     ) {
+
         return "";
     }
+
 
     return `
         <div class="alternative-match-box">
@@ -3008,17 +4084,24 @@ function createAlternativeBadge(group) {
                 Closest alternative:
             </strong>
 
+
             <div class="alternative-match-tags">
 
-                ${reasons
-                    .map(
-                        reason => `
-                            <span class="alternative-match-tag">
-                                ${escapeHtml(reason)}
-                            </span>
-                        `
-                    )
-                    .join("")}
+                ${
+                    reasons
+                        .map(
+                            reason => `
+                                <span class="alternative-match-tag">
+                                    ${escapeHtml(
+                                        reason
+                                    )}
+                                </span>
+                            `
+                        )
+                        .join(
+                            ""
+                        )
+                }
 
             </div>
 
@@ -3027,18 +4110,19 @@ function createAlternativeBadge(group) {
 }
 
 
-function createSupplierOfferRow(offer) {
+// ======================================================
+// SUPPLIER TABLE ROW
+// ======================================================
+
+function createSupplierOfferRow(
+    offer
+) {
 
     const bookingUrl =
-        createSafeBookingUrl(
+        getSafeHttpUrl(
             offer.booking_url
         );
 
-    const supplierLogo =
-        createSupplierLogo(
-            offer.supplier,
-            "small"
-        );
 
     const supplierName =
         String(
@@ -3046,17 +4130,30 @@ function createSupplierOfferRow(offer) {
             "Supplier"
         );
 
+
     const offerId =
         String(
-            offer.id || ""
+            offer.id ||
+            ""
         );
 
+
+    const supplierLogo =
+        createSupplierLogo(
+            supplierName,
+            "small"
+        );
+
+
     const bookingLink =
-        bookingUrl && offerId
+        bookingUrl &&
+        offerId
             ? `
                 <a
                     class="small-book-link"
-                    href="${bookingUrl}"
+                    href="${escapeAttribute(
+                        bookingUrl
+                    )}"
                     target="_blank"
                     rel="sponsored noopener"
                     aria-label="View Deal with ${escapeAttribute(
@@ -3082,84 +4179,111 @@ function createSupplierOfferRow(offer) {
                 </span>
             `;
 
+
     const differenceText =
         Array.isArray(
             offer._alternativeReasons
         ) &&
-        offer._alternativeReasons.length > 0
+        offer._alternativeReasons.length >
+        0
             ? offer._alternativeReasons
-                .join(", ")
+                .join(
+                    ", "
+                )
             : "Matches search";
+
 
     return `
         <tr>
 
             <td>
+
                 <div class="supplier-table-brand">
 
                     ${supplierLogo}
 
                     <span>
                         ${escapeHtml(
-                            offer.supplier ||
-                            "Supplier"
+                            supplierName
                         )}
                     </span>
 
                 </div>
+
             </td>
 
+
             <td>
+
                 ${escapeHtml(
                     formatDisplayDate(
                         offer.departure_date
                     )
                 )}
+
             </td>
 
+
             <td>
+
                 ${escapeHtml(
                     offer.airport ||
                     "-"
                 )}
+
             </td>
 
+
             <td>
+
                 ${escapeHtml(
                     String(
                         offer.nights ||
                         "-"
                     )
                 )}
+
             </td>
 
+
             <td>
+
                 ${escapeHtml(
                     offer.board_basis ||
                     "-"
                 )}
+
             </td>
 
+
             <td class="supplier-price">
+
                 £${formatNumber(
                     offer.price
                 )}
+
             </td>
 
+
             <td>
+
                 ${
                     resultsMode ===
                     "alternatives"
                         ? `
                             <span class="supplier-difference">
+
                                 ${escapeHtml(
                                     differenceText
                                 )}
+
                             </span>
                         `
                         : "—"
                 }
+
             </td>
+
 
             <td>
                 ${bookingLink}
@@ -3171,7 +4295,7 @@ function createSupplierOfferRow(offer) {
 
 
 // ======================================================
-// OUTBOUND DEAL CLICK TRACKING
+// OUTBOUND CLICK TRACKING
 // ======================================================
 
 function attachOutboundDealTracking() {
@@ -3181,39 +4305,53 @@ function attachOutboundDealTracking() {
             'a[data-outbound="true"][data-offer-id]'
         );
 
-    links.forEach(link => {
 
-        if (
-            link.dataset.trackingBound ===
-            "true"
-        ) {
-            return;
-        }
+    links.forEach(
+        link => {
 
-        link.dataset.trackingBound =
-            "true";
+            if (
+                link.dataset
+                    .trackingBound ===
+                "true"
+            ) {
 
-        link.addEventListener(
-            "click",
-            () => {
-
-                const offerId =
-                    String(
-                        link.dataset.offerId ||
-                        ""
-                    ).trim();
-
-                if (!offerId) {
-                    return;
-                }
-
-                trackDealClick(
-                    offerId,
-                    "results"
-                );
+                return;
             }
-        );
-    });
+
+
+            link.dataset
+                .trackingBound =
+                "true";
+
+
+            link.addEventListener(
+                "click",
+                () => {
+
+                    const offerId =
+                        String(
+                            link.dataset
+                                .offerId ||
+                            ""
+                        ).trim();
+
+
+                    if (
+                        !offerId
+                    ) {
+
+                        return;
+                    }
+
+
+                    trackDealClick(
+                        offerId,
+                        "results"
+                    );
+                }
+            );
+        }
+    );
 }
 
 
@@ -3226,30 +4364,40 @@ async function trackDealClick(
         !window.db ||
         !offerId
     ) {
+
         return;
     }
 
+
     try {
 
-        const { error } =
+        const {
+            error
+        } =
             await window.db.rpc(
                 "track_deal_click",
                 {
+
                     p_offer_id:
                         offerId,
 
                     p_source_page:
                         sourcePage
+
                 }
             );
 
-        if (error) {
+
+        if (
+            error
+        ) {
 
             console.warn(
                 "Deal click tracking failed:",
                 error
             );
         }
+
 
     } catch (error) {
 
@@ -3272,55 +4420,112 @@ function attachComparisonButtons() {
             ".compare-button"
         );
 
-    buttons.forEach(button => {
 
-        button.addEventListener(
-            "click",
-            () => {
+    buttons.forEach(
+        button => {
 
-                const hotelId =
-                    button.dataset.hotelId;
+            button.addEventListener(
+                "click",
+                () => {
 
-                const comparison =
-                    document.getElementById(
-                        `comparison-${hotelId}`
-                    );
+                    const hotelId =
+                        button.dataset
+                            .hotelId;
 
-                if (!comparison) {
-                    return;
+
+                    const comparison =
+                        document.getElementById(
+                            `comparison-${hotelId}`
+                        );
+
+
+                    if (
+                        !comparison
+                    ) {
+
+                        return;
+                    }
+
+
+                    comparison.classList
+                        .toggle(
+                            "open"
+                        );
+
+
+                    const isOpen =
+                        comparison.classList
+                            .contains(
+                                "open"
+                            );
+
+
+                    const offerCount =
+                        comparison
+                            .querySelectorAll(
+                                "tbody tr"
+                            )
+                            .length;
+
+
+                    button.textContent =
+                        isOpen
+                            ? "Hide offers"
+                            : `Compare ${offerCount} ${
+                                offerCount === 1
+                                    ? "offer"
+                                    : "offers"
+                            }`;
                 }
-
-                comparison.classList.toggle(
-                    "open"
-                );
-
-                const isOpen =
-                    comparison.classList.contains(
-                        "open"
-                    );
-
-                const offerCount =
-                    comparison.querySelectorAll(
-                        "tbody tr"
-                    ).length;
-
-                button.textContent =
-                    isOpen
-                        ? "Hide offers"
-                        : `Compare ${offerCount} ${
-                            offerCount === 1
-                                ? "offer"
-                                : "offers"
-                        }`;
-            }
-        );
-    });
+            );
+        }
+    );
 }
 
 
 // ======================================================
 // MOBILE REFINE SEARCH
 // ======================================================
+
+function initialiseMobileRefineState() {
+
+    const form =
+        document.getElementById(
+            "refineSearchForm"
+        );
+
+
+    const button =
+        document.getElementById(
+            "refineToggle"
+        );
+
+
+    if (
+        !form ||
+        !button
+    ) {
+
+        return;
+    }
+
+
+    if (
+        window.matchMedia(
+            "(max-width: 820px)"
+        ).matches
+    ) {
+
+        form.classList.add(
+            "mobile-hidden"
+        );
+
+
+        button.textContent =
+            "Show Search";
+    }
+}
+
 
 function toggleRefineSearch() {
 
@@ -3329,26 +4534,32 @@ function toggleRefineSearch() {
             "refineSearchForm"
         );
 
+
     const button =
         document.getElementById(
             "refineToggle"
         );
 
+
     if (
         !form ||
         !button
     ) {
+
         return;
     }
+
 
     form.classList.toggle(
         "mobile-hidden"
     );
 
+
     const hidden =
         form.classList.contains(
             "mobile-hidden"
         );
+
 
     button.textContent =
         hidden
@@ -3358,7 +4569,7 @@ function toggleRefineSearch() {
 
 
 // ======================================================
-// DEMO NOTICE AND EXTRA STYLES
+// DEMO NOTICE + EXTRA STYLES
 // ======================================================
 
 function injectResultEnhancementStyles() {
@@ -3368,18 +4579,23 @@ function injectResultEnhancementStyles() {
             "resultEnhancementStyles"
         )
     ) {
+
         return;
     }
+
 
     const style =
         document.createElement(
             "style"
         );
 
+
     style.id =
         "resultEnhancementStyles";
 
+
     style.textContent = `
+
         .demo-mode-notice {
             margin: 0 0 22px;
             padding: 14px 16px;
@@ -3554,10 +4770,15 @@ function injectResultEnhancementStyles() {
             .alternative-results-notice {
                 flex-direction: column;
             }
+
         }
+
     `;
 
-    document.head.appendChild(style);
+
+    document.head.appendChild(
+        style
+    );
 }
 
 
@@ -3568,41 +4789,60 @@ function showDemoModeNotice() {
             ".page-shell"
         );
 
+
     if (!pageShell) {
+
         return;
     }
+
 
     const existingNotice =
         document.getElementById(
             "demoModeNotice"
         );
 
-    if (!DEMO_MODE) {
 
-        if (existingNotice) {
+    if (
+        !DEMO_MODE
+    ) {
+
+        if (
+            existingNotice
+        ) {
+
             existingNotice.remove();
         }
 
+
         return;
     }
 
-    if (existingNotice) {
+
+    if (
+        existingNotice
+    ) {
+
         return;
     }
+
 
     const notice =
         document.createElement(
             "div"
         );
 
+
     notice.id =
         "demoModeNotice";
+
 
     notice.className =
         "demo-mode-notice";
 
+
     notice.textContent =
         "Demo mode: the holidays, supplier names and prices currently shown are test data. They are not live prices or confirmed availability.";
+
 
     pageShell.insertBefore(
         notice,
@@ -3612,7 +4852,7 @@ function showDemoModeNotice() {
 
 
 // ======================================================
-// DISPLAY HELPERS
+// LOADING + MESSAGES
 // ======================================================
 
 function showLoadingMessage() {
@@ -3622,18 +4862,25 @@ function showLoadingMessage() {
             "resultsCount"
         );
 
+
     const container =
         document.getElementById(
             "resultsContainer"
         );
 
-    if (count) {
+
+    if (
+        count
+    ) {
 
         count.textContent =
             "Loading results...";
     }
 
-    if (container) {
+
+    if (
+        container
+    ) {
 
         container.innerHTML = `
             <div class="loading-box">
@@ -3643,7 +4890,8 @@ function showLoadingMessage() {
                 </h2>
 
                 <p>
-                    We are checking the latest offers in the database.
+                    We are checking the available offers
+                    in the database.
                 </p>
 
             </div>
@@ -3662,33 +4910,43 @@ function showResultsMessage(
             "resultsContainer"
         );
 
-    if (!container) {
-        return;
-    }
 
     const count =
         document.getElementById(
             "resultsCount"
         );
 
+
     if (
-        count &&
-        resultsMode === "none"
+        count
     ) {
 
         count.textContent =
             "0 hotels found";
     }
 
+
+    if (
+        !container
+    ) {
+
+        return;
+    }
+
+
     container.innerHTML = `
         <div class="message-box">
 
             <h2>
-                ${escapeHtml(title)}
+                ${escapeHtml(
+                    title
+                )}
             </h2>
 
             <p>
-                ${escapeHtml(message)}
+                ${escapeHtml(
+                    message
+                )}
             </p>
 
         </div>
@@ -3696,22 +4954,45 @@ function showResultsMessage(
 }
 
 
-function showRefineError(message) {
+// ======================================================
+// REFINE ERROR
+// ======================================================
+
+function showRefineError(
+    message
+) {
 
     const errorBox =
         document.getElementById(
             "refineError"
         );
 
-    if (!errorBox) {
+
+    if (
+        !errorBox
+    ) {
+
         return;
     }
+
 
     errorBox.textContent =
         message;
 
+
     errorBox.style.display =
         "block";
+
+
+    errorBox.scrollIntoView({
+
+        behavior:
+            "smooth",
+
+        block:
+            "center"
+
+    });
 }
 
 
@@ -3722,11 +5003,18 @@ function hideRefineError() {
             "refineError"
         );
 
-    if (!errorBox) {
+
+    if (
+        !errorBox
+    ) {
+
         return;
     }
 
-    errorBox.textContent = "";
+
+    errorBox.textContent =
+        "";
+
 
     errorBox.style.display =
         "none";
@@ -3737,22 +5025,31 @@ function hideRefineError() {
 // IMAGE HANDLING
 // ======================================================
 
-function getHotelImage(hotel) {
+function getHotelImage(
+    hotel
+) {
 
     const image =
         String(
-            hotel.main_image || ""
+            hotel.main_image ||
+            ""
         ).trim();
 
-    if (image) {
+
+    if (
+        image
+    ) {
+
         return image;
     }
+
 
     const destination =
         normaliseText(
             hotel.country ||
             hotel.destination
         );
+
 
     const destinationImages = {
 
@@ -3782,22 +5079,34 @@ function getHotelImage(hotel) {
 
         bulgaria:
             "images/bulgaria.jpg"
+
     };
 
+
     return (
-        destinationImages[destination] ||
+        destinationImages[
+            destination
+        ] ||
         createFallbackImageDataUrl()
     );
 }
 
 
-function useFallbackImage(imageElement) {
+function useFallbackImage(
+    imageElement
+) {
 
-    if (!imageElement) {
+    if (
+        !imageElement
+    ) {
+
         return;
     }
 
-    imageElement.onerror = null;
+
+    imageElement.onerror =
+        null;
+
 
     imageElement.src =
         createFallbackImageDataUrl();
@@ -3889,133 +5198,249 @@ function createFallbackImageDataUrl() {
         </svg>
     `;
 
+
     return (
         "data:image/svg+xml;charset=UTF-8," +
-        encodeURIComponent(svg)
+        encodeURIComponent(
+            svg
+        )
     );
 }
 
 
 // ======================================================
-// FORMATTING HELPERS
+// GENERAL HELPERS
 // ======================================================
 
-function createStars(starCount) {
+function getElementValue(
+    id
+) {
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    return element
+        ? String(
+            element.value ||
+            ""
+        ).trim()
+        : "";
+}
+
+
+function createStars(
+    starCount
+) {
 
     const safeCount =
         Math.max(
             0,
             Math.min(
                 5,
-                Math.round(starCount)
+                Math.round(
+                    starCount
+                )
             )
         );
 
-    if (safeCount === 0) {
+
+    if (
+        safeCount ===
+        0
+    ) {
+
         return "Unrated";
     }
 
-    return "★".repeat(safeCount);
+
+    return "★".repeat(
+        safeCount
+    );
 }
 
 
-function formatNumber(value) {
+function formatNumber(
+    value
+) {
 
     const number =
-        Number(value || 0);
+        Number(
+            value ||
+            0
+        );
+
 
     return number.toLocaleString(
         "en-GB",
         {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2
+            minimumFractionDigits:
+                0,
+
+            maximumFractionDigits:
+                2
         }
     );
 }
 
 
-function formatDisplayDate(value) {
+function formatDisplayDate(
+    value
+) {
 
-    if (!value) {
+    if (
+        !value
+    ) {
+
         return "Date unavailable";
     }
 
+
     const date =
         new Date(
-            `${String(value)
-                .slice(0, 10)}T00:00:00`
+            `${String(
+                value
+            ).slice(
+                0,
+                10
+            )}T00:00:00`
         );
+
 
     if (
         Number.isNaN(
             date.getTime()
         )
     ) {
-        return String(value);
+
+        return String(
+            value
+        );
     }
+
 
     return date.toLocaleDateString(
         "en-GB",
         {
-            day: "numeric",
-            month: "short",
-            year: "numeric"
+            day:
+                "numeric",
+
+            month:
+                "short",
+
+            year:
+                "numeric"
         }
     );
 }
 
 
-function formatDateForInput(date) {
+function formatDateForInput(
+    date
+) {
 
     const year =
         date.getFullYear();
 
+
     const month =
         String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
+            date.getMonth() +
+            1
+        ).padStart(
+            2,
+            "0"
+        );
+
 
     const day =
         String(
             date.getDate()
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
-    return `${year}-${month}-${day}`;
+
+    return (
+        `${year}-${month}-${day}`
+    );
 }
 
 
-function normaliseText(value) {
+function addDaysToDateString(
+    dateString,
+    days
+) {
+
+    const date =
+        new Date(
+            `${dateString}T00:00:00`
+        );
+
+
+    date.setDate(
+        date.getDate() +
+        days
+    );
+
+
+    return formatDateForInput(
+        date
+    );
+}
+
+
+function normaliseText(
+    value
+) {
 
     return String(
-        value || ""
+        value ||
+        ""
     )
         .trim()
         .toLowerCase();
 }
 
 
-function createSafeBookingUrl(value) {
+function getSafeHttpUrl(
+    value
+) {
 
     const url =
         String(
-            value || ""
+            value ||
+            ""
         ).trim();
 
+
     if (
-        url.startsWith("https://") ||
-        url.startsWith("http://")
+        url.startsWith(
+            "https://"
+        ) ||
+        url.startsWith(
+            "http://"
+        )
     ) {
-        return escapeAttribute(url);
+
+        return url;
     }
+
 
     return "";
 }
 
 
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
     return String(
-        value ?? ""
+        value ??
+        ""
     )
         .replace(
             /&/g,
@@ -4040,7 +5465,11 @@ function escapeHtml(value) {
 }
 
 
-function escapeAttribute(value) {
+function escapeAttribute(
+    value
+) {
 
-    return escapeHtml(value);
+    return escapeHtml(
+        value
+    );
 }
