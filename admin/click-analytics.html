@@ -110,6 +110,19 @@
 
 
         /* ==========================================
+           CONVERSION SUMMARY
+        ========================================== */
+
+        .conversion-stat {
+            border-top: 4px solid #00a86b;
+        }
+
+        .conversion-stat-value {
+            color: #007a4d;
+        }
+
+
+        /* ==========================================
            CLICK TREND CHART
         ========================================== */
 
@@ -255,10 +268,224 @@
             font-weight: 800;
         }
 
+
+        /* ==========================================
+           CONVERSION BADGES
+        ========================================== */
+
+        .conversion-badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .conversion-badge.confirmed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .conversion-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .conversion-badge.cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .conversion-badge.none {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+
+        /* ==========================================
+           ACTION BUTTONS
+        ========================================== */
+
+        .analytics-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 34px;
+            padding: 7px 11px;
+            border: 0;
+            border-radius: 7px;
+            background: #0066cc;
+            color: #ffffff;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .analytics-action-btn:hover {
+            background: #0055aa;
+        }
+
+        .analytics-action-btn.secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .analytics-action-btn.secondary:hover {
+            background: #cbd5e1;
+        }
+
+        .analytics-action-btn.danger {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .analytics-action-btn.danger:hover {
+            background: #b91c1c;
+        }
+
+
+        /* ==========================================
+           CONVERSION MODAL
+        ========================================== */
+
+        .conversion-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background:
+                rgba(15, 23, 42, 0.6);
+        }
+
+        .conversion-modal.open {
+            display: flex;
+        }
+
+        .conversion-modal-card {
+            width: min(620px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow:
+                0 20px 60px
+                rgba(15, 23, 42, 0.25);
+        }
+
+        .conversion-modal-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 22px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .conversion-modal-header h2 {
+            margin: 0 0 5px;
+        }
+
+        .conversion-modal-header p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .conversion-modal-close {
+            width: 36px;
+            height: 36px;
+            flex: 0 0 36px;
+            border: 0;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .conversion-form {
+            padding: 24px;
+        }
+
+        .conversion-click-summary {
+            margin-bottom: 20px;
+            padding: 14px;
+            border-radius: 9px;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .conversion-form-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .conversion-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .conversion-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .conversion-field label {
+            color: #334155;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .conversion-field input,
+        .conversion-field select,
+        .conversion-field textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #ffffff;
+            font: inherit;
+        }
+
+        .conversion-field textarea {
+            min-height: 95px;
+            resize: vertical;
+        }
+
+        .conversion-form-message {
+            min-height: 20px;
+            margin: 16px 0 0;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .conversion-form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .conversion-form-actions-right {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .analytics-message {
             margin-top: 15px;
             color: #64748b;
         }
+
 
         @media (max-width: 1000px) {
 
@@ -268,6 +495,7 @@
             }
 
         }
+
 
         @media (max-width: 600px) {
 
@@ -292,6 +520,26 @@
             .chart-column {
                 flex-basis: 38px;
                 min-width: 38px;
+            }
+
+            .conversion-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .conversion-field.full {
+                grid-column: auto;
+            }
+
+            .conversion-form-actions {
+                flex-direction: column;
+            }
+
+            .conversion-form-actions-right {
+                flex-direction: column;
+            }
+
+            .conversion-form-actions button {
+                width: 100%;
             }
 
         }
@@ -359,8 +607,8 @@
                     </h1>
 
                     <p>
-                        Track outbound supplier deal clicks
-                        from PackageHolidayCompare.
+                        Track outbound supplier deal clicks,
+                        bookings and commission.
                     </p>
 
                 </div>
@@ -435,7 +683,7 @@
 
 
             <!-- ======================================
-                 SUMMARY
+                 CLICK SUMMARY
             ======================================= -->
 
             <section class="analytics-grid">
@@ -500,6 +748,90 @@
                     <p
                         id="hotelClicks"
                         class="analytics-stat-value"
+                    >
+                        -
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- ======================================
+                 CONVERSION SUMMARY
+            ======================================= -->
+
+            <section class="analytics-grid">
+
+                <div class="analytics-stat conversion-stat">
+
+                    <p class="analytics-stat-label">
+                        Confirmed Bookings
+                    </p>
+
+                    <p
+                        id="confirmedBookings"
+                        class="
+                            analytics-stat-value
+                            conversion-stat-value
+                        "
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="analytics-stat conversion-stat">
+
+                    <p class="analytics-stat-label">
+                        Conversion Rate
+                    </p>
+
+                    <p
+                        id="conversionRate"
+                        class="
+                            analytics-stat-value
+                            conversion-stat-value
+                        "
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="analytics-stat conversion-stat">
+
+                    <p class="analytics-stat-label">
+                        Booking Value
+                    </p>
+
+                    <p
+                        id="bookingValue"
+                        class="
+                            analytics-stat-value
+                            conversion-stat-value
+                        "
+                    >
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="analytics-stat conversion-stat">
+
+                    <p class="analytics-stat-label">
+                        Commission Earned
+                    </p>
+
+                    <p
+                        id="commissionValue"
+                        class="
+                            analytics-stat-value
+                            conversion-stat-value
+                        "
                     >
                         -
                     </p>
@@ -686,6 +1018,80 @@
 
 
             <!-- ======================================
+                 BOOKING CONVERSIONS
+            ======================================= -->
+
+            <section class="card analytics-section">
+
+                <h2>
+                    Booking Conversions
+                </h2>
+
+                <p>
+                    Confirmed, pending and cancelled bookings
+                    linked to outbound supplier clicks.
+                </p>
+
+                <div class="analytics-table-wrapper">
+
+                    <table class="analytics-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Supplier
+                                </th>
+
+                                <th>
+                                    Hotel
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Booking Value
+                                </th>
+
+                                <th>
+                                    Commission
+                                </th>
+
+                                <th>
+                                    Booked
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="conversionStatsBody">
+
+                            <tr>
+
+                                <td colspan="7">
+                                    Loading conversions...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ======================================
                  RECENT CLICKS
             ======================================= -->
 
@@ -696,8 +1102,8 @@
                 </h2>
 
                 <p>
-                    Most recent supplier clicks recorded
-                    within the selected date range.
+                    Mark an outbound supplier click as a booking
+                    when a conversion is confirmed.
                 </p>
 
                 <div class="analytics-table-wrapper">
@@ -724,6 +1130,14 @@
                                     Date & Time
                                 </th>
 
+                                <th>
+                                    Conversion
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
                             </tr>
 
                         </thead>
@@ -732,7 +1146,7 @@
 
                             <tr>
 
-                                <td colspan="4">
+                                <td colspan="6">
                                     Loading recent clicks...
                                 </td>
 
@@ -758,7 +1172,214 @@
     </div>
 
 
-    <script src="../js/click-analytics.js?v=20261020-4"></script>
+    <!-- ==========================================
+         CONVERSION MODAL
+    =========================================== -->
+
+    <div
+        id="conversionModal"
+        class="conversion-modal"
+        aria-hidden="true"
+    >
+
+        <div class="conversion-modal-card">
+
+            <div class="conversion-modal-header">
+
+                <div>
+
+                    <h2 id="conversionModalTitle">
+                        Mark Booking
+                    </h2>
+
+                    <p>
+                        Record a conversion against this supplier click.
+                    </p>
+
+                </div>
+
+                <button
+                    id="closeConversionModal"
+                    class="conversion-modal-close"
+                    type="button"
+                    aria-label="Close conversion form"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <form
+                id="conversionForm"
+                class="conversion-form"
+            >
+
+                <input
+                    id="conversionClickId"
+                    type="hidden"
+                >
+
+                <input
+                    id="conversionId"
+                    type="hidden"
+                >
+
+
+                <div
+                    id="conversionClickSummary"
+                    class="conversion-click-summary"
+                >
+                    Select a deal click to record a booking.
+                </div>
+
+
+                <div class="conversion-form-grid">
+
+                    <div class="conversion-field">
+
+                        <label for="conversionStatus">
+                            Status
+                        </label>
+
+                        <select
+                            id="conversionStatus"
+                            required
+                        >
+
+                            <option value="confirmed">
+                                Confirmed
+                            </option>
+
+                            <option value="pending">
+                                Pending
+                            </option>
+
+                            <option value="cancelled">
+                                Cancelled
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="conversion-field">
+
+                        <label for="conversionBookedAt">
+                            Booking Date
+                        </label>
+
+                        <input
+                            id="conversionBookedAt"
+                            type="datetime-local"
+                        >
+
+                    </div>
+
+
+                    <div class="conversion-field">
+
+                        <label for="conversionBookingValue">
+                            Booking Value (£)
+                        </label>
+
+                        <input
+                            id="conversionBookingValue"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                        >
+
+                    </div>
+
+
+                    <div class="conversion-field">
+
+                        <label for="conversionCommissionValue">
+                            Commission (£)
+                        </label>
+
+                        <input
+                            id="conversionCommissionValue"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                        >
+
+                    </div>
+
+
+                    <div class="conversion-field full">
+
+                        <label for="conversionNotes">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="conversionNotes"
+                            placeholder="Optional booking reference or notes"
+                        ></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <p
+                    id="conversionFormMessage"
+                    class="conversion-form-message"
+                    aria-live="polite"
+                ></p>
+
+
+                <div class="conversion-form-actions">
+
+                    <button
+                        id="deleteConversionButton"
+                        class="analytics-action-btn danger"
+                        type="button"
+                        hidden
+                    >
+                        Delete Conversion
+                    </button>
+
+
+                    <div class="conversion-form-actions-right">
+
+                        <button
+                            id="cancelConversionButton"
+                            class="
+                                analytics-action-btn
+                                secondary
+                            "
+                            type="button"
+                        >
+                            Cancel
+                        </button>
+
+                        <button
+                            id="saveConversionButton"
+                            class="analytics-action-btn"
+                            type="submit"
+                        >
+                            Save Booking
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script src="../js/click-analytics.js?v=20261020-5"></script>
 
 </body>
 

@@ -1,11 +1,15 @@
 // ======================================================
 // PackageHolidayCompare
 // Admin Click Analytics
-// Version: 2026-10-20-4
+// Version: 2026-10-20-5
 // ======================================================
 
 let allDealClicks = [];
 let filteredDealClicks = [];
+
+let allDealConversions = [];
+let filteredDealConversions = [];
+
 let hotelNames = {};
 
 
@@ -53,10 +57,14 @@ async function initialiseClickAnalytics() {
 
         attachDateFilter();
 
+        attachConversionControls();
+
 
         await loadHotels();
 
         await loadDealClicks();
+
+        await loadDealConversions();
 
 
         applyDateFilter();
@@ -87,7 +95,7 @@ async function initialiseClickAnalytics() {
 
 
 // ======================================================
-// DATE FILTER EVENT
+// DATE FILTER
 // ======================================================
 
 function attachDateFilter() {
@@ -106,6 +114,122 @@ function attachDateFilter() {
     filter.addEventListener(
         "change",
         applyDateFilter
+    );
+
+}
+
+
+// ======================================================
+// CONVERSION CONTROLS
+// ======================================================
+
+function attachConversionControls() {
+
+    const form =
+        document.getElementById(
+            "conversionForm"
+        );
+
+
+    const closeButton =
+        document.getElementById(
+            "closeConversionModal"
+        );
+
+
+    const cancelButton =
+        document.getElementById(
+            "cancelConversionButton"
+        );
+
+
+    const deleteButton =
+        document.getElementById(
+            "deleteConversionButton"
+        );
+
+
+    const modal =
+        document.getElementById(
+            "conversionModal"
+        );
+
+
+    if (form) {
+
+        form.addEventListener(
+            "submit",
+            saveConversion
+        );
+
+    }
+
+
+    if (closeButton) {
+
+        closeButton.addEventListener(
+            "click",
+            closeConversionModal
+        );
+
+    }
+
+
+    if (cancelButton) {
+
+        cancelButton.addEventListener(
+            "click",
+            closeConversionModal
+        );
+
+    }
+
+
+    if (deleteButton) {
+
+        deleteButton.addEventListener(
+            "click",
+            deleteConversion
+        );
+
+    }
+
+
+    if (modal) {
+
+        modal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    modal
+                ) {
+
+                    closeConversionModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Escape"
+            ) {
+
+                closeConversionModal();
+
+            }
+
+        }
     );
 
 }
@@ -139,6 +263,28 @@ function applyDateFilter() {
         );
 
 
+    const filteredClickIds =
+        new Set(
+            filteredDealClicks.map(
+                click =>
+                    String(
+                        click.id
+                    )
+            )
+        );
+
+
+    filteredDealConversions =
+        allDealConversions.filter(
+            conversion =>
+                filteredClickIds.has(
+                    String(
+                        conversion.click_id
+                    )
+                )
+        );
+
+
     updateDateRangeText(
         selectedRange
     );
@@ -151,6 +297,8 @@ function applyDateFilter() {
 
     renderSummaryCards();
 
+    renderConversionSummary();
+
     renderClickTrendChart(
         selectedRange
     );
@@ -158,6 +306,8 @@ function applyDateFilter() {
     renderSupplierStats();
 
     renderHotelStats();
+
+    renderConversionStats();
 
     renderRecentClicks();
 
@@ -427,7 +577,7 @@ async function waitForAdminSession() {
 
 
 // ======================================================
-// SMALL DELAY
+// DELAY
 // ======================================================
 
 function delay(
@@ -510,7 +660,7 @@ async function loadHotels() {
 
 
 // ======================================================
-// LOAD ALL DEAL CLICKS
+// LOAD DEAL CLICKS
 // ======================================================
 
 async function loadDealClicks() {
@@ -572,6 +722,95 @@ async function loadDealClicks() {
 
 
         allDealClicks.push(
+            ...rows
+        );
+
+
+        if (
+            rows.length <
+            pageSize
+        ) {
+            break;
+        }
+
+
+        from +=
+            pageSize;
+
+    }
+
+}
+
+
+// ======================================================
+// LOAD CONVERSIONS
+// ======================================================
+
+async function loadDealConversions() {
+
+    allDealConversions = [];
+
+
+    const pageSize =
+        1000;
+
+
+    let from =
+        0;
+
+
+    while (true) {
+
+        const to =
+            from +
+            pageSize -
+            1;
+
+
+        const {
+            data,
+            error
+        } =
+            await window.db
+                .from(
+                    "deal_conversions"
+                )
+                .select(`
+                    id,
+                    click_id,
+                    status,
+                    booking_value,
+                    commission_value,
+                    currency,
+                    booked_at,
+                    notes,
+                    created_at,
+                    updated_at
+                `)
+                .order(
+                    "booked_at",
+                    {
+                        ascending: false
+                    }
+                )
+                .range(
+                    from,
+                    to
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        const rows =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        allDealConversions.push(
             ...rows
         );
 
@@ -655,6 +894,95 @@ function renderSummaryCards() {
         "hotelClicks",
         formatNumber(
             hotelClicks
+        )
+    );
+
+}
+
+
+// ======================================================
+// CONVERSION SUMMARY
+// ======================================================
+
+function renderConversionSummary() {
+
+    const confirmed =
+        filteredDealConversions.filter(
+            conversion =>
+                conversion.status ===
+                "confirmed"
+        );
+
+
+    const confirmedBookings =
+        confirmed.length;
+
+
+    const conversionRate =
+        filteredDealClicks.length > 0
+            ? (
+                confirmedBookings /
+                filteredDealClicks.length
+            ) * 100
+            : 0;
+
+
+    const bookingValue =
+        confirmed.reduce(
+            (
+                total,
+                conversion
+            ) =>
+                total +
+                safeNumber(
+                    conversion.booking_value
+                ),
+            0
+        );
+
+
+    const commissionValue =
+        confirmed.reduce(
+            (
+                total,
+                conversion
+            ) =>
+                total +
+                safeNumber(
+                    conversion.commission_value
+                ),
+            0
+        );
+
+
+    setText(
+        "confirmedBookings",
+        formatNumber(
+            confirmedBookings
+        )
+    );
+
+
+    setText(
+        "conversionRate",
+        `${conversionRate.toFixed(
+            1
+        )}%`
+    );
+
+
+    setText(
+        "bookingValue",
+        formatMoney(
+            bookingValue
+        )
+    );
+
+
+    setText(
+        "commissionValue",
+        formatMoney(
+            commissionValue
         )
     );
 
@@ -978,23 +1306,31 @@ function buildHourlyChartData() {
     ) {
 
         data.push({
+
             key:
-                String(hour),
+                String(
+                    hour
+                ),
 
             label:
-                `${String(hour).padStart(
+                `${String(
+                    hour
+                ).padStart(
                     2,
                     "0"
                 )}:00`,
 
             fullLabel:
-                `${String(hour).padStart(
+                `${String(
+                    hour
+                ).padStart(
                     2,
                     "0"
                 )}:00 today`,
 
             count:
                 0
+
         });
 
     }
@@ -1081,6 +1417,7 @@ function buildDailyChartData(
 
 
         data.push({
+
             key:
                 getLocalDateKey(
                     date
@@ -1098,6 +1435,7 @@ function buildDailyChartData(
 
             count:
                 0
+
         });
 
     }
@@ -1132,15 +1470,11 @@ function buildDailyChartData(
             }
 
 
-            const key =
-                getLocalDateKey(
-                    date
-                );
-
-
             const item =
                 lookup.get(
-                    key
+                    getLocalDateKey(
+                        date
+                    )
                 );
 
 
@@ -1228,8 +1562,7 @@ function buildAllTimeChartData() {
 
 
     if (
-        spanDays <=
-        31
+        spanDays <= 31
     ) {
 
         return buildAllTimeDailyData(
@@ -1249,7 +1582,7 @@ function buildAllTimeChartData() {
 
 
 // ======================================================
-// ALL TIME DAILY DATA
+// ALL TIME DAILY
 // ======================================================
 
 function buildAllTimeDailyData(
@@ -1300,6 +1633,7 @@ function buildAllTimeDailyData(
     ) {
 
         data.push({
+
             key:
                 getLocalDateKey(
                     current
@@ -1317,6 +1651,7 @@ function buildAllTimeDailyData(
 
             count:
                 0
+
         });
 
 
@@ -1412,6 +1747,7 @@ function buildMonthlyChartData(
     ) {
 
         data.push({
+
             key:
                 getMonthKey(
                     current
@@ -1423,7 +1759,6 @@ function buildMonthlyChartData(
                     {
                         month:
                             "short",
-
                         year:
                             "2-digit"
                     }
@@ -1437,7 +1772,6 @@ function buildMonthlyChartData(
                     {
                         month:
                             "long",
-
                         year:
                             "numeric"
                     }
@@ -1447,6 +1781,7 @@ function buildMonthlyChartData(
 
             count:
                 0
+
         });
 
 
@@ -1573,118 +1908,6 @@ function updateChartDescription(
 
 
 // ======================================================
-// LOCAL DATE KEY
-// ======================================================
-
-function getLocalDateKey(
-    date
-) {
-
-    const year =
-        date.getFullYear();
-
-
-    const month =
-        String(
-            date.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const day =
-        String(
-            date.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    return `${year}-${month}-${day}`;
-
-}
-
-
-// ======================================================
-// MONTH KEY
-// ======================================================
-
-function getMonthKey(
-    date
-) {
-
-    const year =
-        date.getFullYear();
-
-
-    const month =
-        String(
-            date.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    return `${year}-${month}`;
-
-}
-
-
-// ======================================================
-// SHORT CHART DATE
-// ======================================================
-
-function formatShortChartDate(
-    date
-) {
-
-    return new Intl.DateTimeFormat(
-        "en-GB",
-        {
-            day:
-                "2-digit",
-
-            month:
-                "short"
-        }
-    ).format(
-        date
-    );
-
-}
-
-
-// ======================================================
-// LONG CHART DATE
-// ======================================================
-
-function formatLongChartDate(
-    date
-) {
-
-    return new Intl.DateTimeFormat(
-        "en-GB",
-        {
-            day:
-                "2-digit",
-
-            month:
-                "long",
-
-            year:
-                "numeric"
-        }
-    ).format(
-        date
-    );
-
-}
-
-
-// ======================================================
 // SUPPLIER STATS
 // ======================================================
 
@@ -1710,35 +1933,11 @@ function renderSupplierStats() {
         0
     ) {
 
-        const row =
-            document.createElement(
-                "tr"
-            );
-
-
-        const cell =
-            document.createElement(
-                "td"
-            );
-
-
-        cell.colSpan =
-            4;
-
-
-        cell.textContent =
-            "No deal clicks were recorded in this date range.";
-
-
-        row.appendChild(
-            cell
+        appendEmptyRow(
+            table,
+            4,
+            "No deal clicks were recorded in this date range."
         );
-
-
-        table.appendChild(
-            row
-        );
-
 
         return;
 
@@ -1781,7 +1980,9 @@ function renderSupplierStats() {
             }
 
 
-            stats[supplier].total++;
+            stats[
+                supplier
+            ].total++;
 
 
             if (
@@ -1789,8 +1990,9 @@ function renderSupplierStats() {
                 "results"
             ) {
 
-                stats[supplier]
-                    .results++;
+                stats[
+                    supplier
+                ].results++;
 
             }
 
@@ -1800,8 +2002,9 @@ function renderSupplierStats() {
                 "hotel"
             ) {
 
-                stats[supplier]
-                    .hotel++;
+                stats[
+                    supplier
+                ].hotel++;
 
             }
 
@@ -1900,35 +2103,11 @@ function renderHotelStats() {
         0
     ) {
 
-        const row =
-            document.createElement(
-                "tr"
-            );
-
-
-        const cell =
-            document.createElement(
-                "td"
-            );
-
-
-        cell.colSpan =
-            4;
-
-
-        cell.textContent =
-            "No hotel clicks were recorded in this date range.";
-
-
-        row.appendChild(
-            cell
+        appendEmptyRow(
+            table,
+            4,
+            "No hotel clicks were recorded in this date range."
         );
-
-
-        table.appendChild(
-            row
-        );
-
 
         return;
 
@@ -2107,6 +2286,165 @@ function renderHotelStats() {
 
 
 // ======================================================
+// CONVERSION TABLE
+// ======================================================
+
+function renderConversionStats() {
+
+    const table =
+        document.getElementById(
+            "conversionStatsBody"
+        );
+
+
+    if (!table) {
+        return;
+    }
+
+
+    table.innerHTML =
+        "";
+
+
+    if (
+        filteredDealConversions.length ===
+        0
+    ) {
+
+        appendEmptyRow(
+            table,
+            7,
+            "No booking conversions have been recorded in this date range."
+        );
+
+        return;
+
+    }
+
+
+    const sortedConversions =
+        [
+            ...filteredDealConversions
+        ].sort(
+            (
+                first,
+                second
+            ) =>
+                new Date(
+                    second.booked_at ||
+                    second.created_at ||
+                    0
+                ).getTime() -
+                new Date(
+                    first.booked_at ||
+                    first.created_at ||
+                    0
+                ).getTime()
+        );
+
+
+    sortedConversions.forEach(
+        conversion => {
+
+            const click =
+                getClickById(
+                    conversion.click_id
+                );
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            appendTextCell(
+                row,
+                click?.supplier ||
+                "Unknown supplier",
+                true
+            );
+
+
+            appendTextCell(
+                row,
+                getClickHotelName(
+                    click
+                )
+            );
+
+
+            appendStatusCell(
+                row,
+                conversion.status
+            );
+
+
+            appendTextCell(
+                row,
+                formatMoney(
+                    conversion.booking_value
+                )
+            );
+
+
+            appendTextCell(
+                row,
+                formatMoney(
+                    conversion.commission_value
+                )
+            );
+
+
+            appendTextCell(
+                row,
+                formatDateTime(
+                    conversion.booked_at
+                )
+            );
+
+
+            const actionCell =
+                document.createElement(
+                    "td"
+                );
+
+
+            const button =
+                createActionButton(
+                    "Edit",
+                    () => {
+
+                        openConversionModal(
+                            click,
+                            conversion
+                        );
+
+                    }
+                );
+
+
+            actionCell.appendChild(
+                button
+            );
+
+
+            row.appendChild(
+                actionCell
+            );
+
+
+            table.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+// ======================================================
 // RECENT CLICKS
 // ======================================================
 
@@ -2132,35 +2470,11 @@ function renderRecentClicks() {
         0
     ) {
 
-        const row =
-            document.createElement(
-                "tr"
-            );
-
-
-        const cell =
-            document.createElement(
-                "td"
-            );
-
-
-        cell.colSpan =
-            4;
-
-
-        cell.textContent =
-            "No deal clicks were recorded in this date range.";
-
-
-        row.appendChild(
-            cell
+        appendEmptyRow(
+            table,
+            6,
+            "No deal clicks were recorded in this date range."
         );
-
-
-        table.appendChild(
-            row
-        );
-
 
         return;
 
@@ -2176,6 +2490,12 @@ function renderRecentClicks() {
 
     recentClicks.forEach(
         click => {
+
+            const conversion =
+                getConversionForClick(
+                    click.id
+                );
+
 
             const row =
                 document.createElement(
@@ -2223,20 +2543,11 @@ function renderRecentClicks() {
             );
 
 
-            const hotelName =
-                click.hotel_id
-                    ? hotelNames[
-                        String(
-                            click.hotel_id
-                        )
-                    ] ||
-                    "Unknown hotel"
-                    : "Hotel removed";
-
-
             appendTextCell(
                 row,
-                hotelName
+                getClickHotelName(
+                    click
+                )
             );
 
 
@@ -2248,12 +2559,839 @@ function renderRecentClicks() {
             );
 
 
+            appendStatusCell(
+                row,
+                conversion
+                    ? conversion.status
+                    : "none"
+            );
+
+
+            const actionCell =
+                document.createElement(
+                    "td"
+                );
+
+
+            const button =
+                createActionButton(
+                    conversion
+                        ? "Edit Booking"
+                        : "Mark Booking",
+                    () => {
+
+                        openConversionModal(
+                            click,
+                            conversion
+                        );
+
+                    }
+                );
+
+
+            actionCell.appendChild(
+                button
+            );
+
+
+            row.appendChild(
+                actionCell
+            );
+
+
             table.appendChild(
                 row
             );
 
         }
     );
+
+}
+
+
+// ======================================================
+// OPEN CONVERSION MODAL
+// ======================================================
+
+function openConversionModal(
+    click,
+    conversion = null
+) {
+
+    if (!click) {
+
+        alert(
+            "The original deal click could not be found."
+        );
+
+        return;
+    }
+
+
+    const modal =
+        document.getElementById(
+            "conversionModal"
+        );
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    setInputValue(
+        "conversionClickId",
+        click.id
+    );
+
+
+    setInputValue(
+        "conversionId",
+        conversion?.id ||
+        ""
+    );
+
+
+    setInputValue(
+        "conversionStatus",
+        conversion?.status ||
+        "confirmed"
+    );
+
+
+    setInputValue(
+        "conversionBookingValue",
+        conversion?.booking_value ??
+        ""
+    );
+
+
+    setInputValue(
+        "conversionCommissionValue",
+        conversion?.commission_value ??
+        ""
+    );
+
+
+    setInputValue(
+        "conversionNotes",
+        conversion?.notes ||
+        ""
+    );
+
+
+    setInputValue(
+        "conversionBookedAt",
+        conversion?.booked_at
+            ? formatDateTimeLocal(
+                conversion.booked_at
+            )
+            : formatDateTimeLocal(
+                new Date().toISOString()
+            )
+    );
+
+
+    setText(
+        "conversionModalTitle",
+        conversion
+            ? "Edit Booking"
+            : "Mark Booking"
+    );
+
+
+    const summary =
+        document.getElementById(
+            "conversionClickSummary"
+        );
+
+
+    if (summary) {
+
+        summary.textContent =
+            `${click.supplier || "Unknown supplier"} • ` +
+            `${getClickHotelName(click)} • ` +
+            `${formatDateTime(click.clicked_at)}`;
+
+    }
+
+
+    const deleteButton =
+        document.getElementById(
+            "deleteConversionButton"
+        );
+
+
+    if (deleteButton) {
+
+        deleteButton.hidden =
+            !conversion;
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "saveConversionButton"
+        );
+
+
+    if (saveButton) {
+
+        saveButton.textContent =
+            conversion
+                ? "Save Changes"
+                : "Save Booking";
+
+        saveButton.disabled =
+            false;
+
+    }
+
+
+    setConversionFormMessage(
+        ""
+    );
+
+
+    modal.classList.add(
+        "open"
+    );
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+}
+
+
+// ======================================================
+// CLOSE CONVERSION MODAL
+// ======================================================
+
+function closeConversionModal() {
+
+    const modal =
+        document.getElementById(
+            "conversionModal"
+        );
+
+
+    if (!modal) {
+        return;
+    }
+
+
+    modal.classList.remove(
+        "open"
+    );
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    setConversionFormMessage(
+        ""
+    );
+
+}
+
+
+// ======================================================
+// SAVE CONVERSION
+// ======================================================
+
+async function saveConversion(
+    event
+) {
+
+    event.preventDefault();
+
+
+    const clickId =
+        getInputValue(
+            "conversionClickId"
+        );
+
+
+    const conversionId =
+        getInputValue(
+            "conversionId"
+        );
+
+
+    const status =
+        getInputValue(
+            "conversionStatus"
+        );
+
+
+    const bookingValueText =
+        getInputValue(
+            "conversionBookingValue"
+        );
+
+
+    const commissionValueText =
+        getInputValue(
+            "conversionCommissionValue"
+        );
+
+
+    const bookedAtText =
+        getInputValue(
+            "conversionBookedAt"
+        );
+
+
+    const notes =
+        getInputValue(
+            "conversionNotes"
+        ).trim();
+
+
+    if (!clickId) {
+
+        setConversionFormMessage(
+            "The deal click could not be identified."
+        );
+
+        return;
+    }
+
+
+    if (
+        ![
+            "pending",
+            "confirmed",
+            "cancelled"
+        ].includes(
+            status
+        )
+    ) {
+
+        setConversionFormMessage(
+            "Please choose a valid booking status."
+        );
+
+        return;
+    }
+
+
+    const bookingValue =
+        parseOptionalMoney(
+            bookingValueText
+        );
+
+
+    const commissionValue =
+        parseOptionalMoney(
+            commissionValueText
+        );
+
+
+    if (
+        bookingValue ===
+        false
+    ) {
+
+        setConversionFormMessage(
+            "Booking value must be a valid positive amount."
+        );
+
+        return;
+    }
+
+
+    if (
+        commissionValue ===
+        false
+    ) {
+
+        setConversionFormMessage(
+            "Commission must be a valid positive amount."
+        );
+
+        return;
+    }
+
+
+    let bookedAt =
+        new Date().toISOString();
+
+
+    if (
+        bookedAtText
+    ) {
+
+        const date =
+            new Date(
+                bookedAtText
+            );
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            setConversionFormMessage(
+                "Please enter a valid booking date."
+            );
+
+            return;
+        }
+
+
+        bookedAt =
+            date.toISOString();
+
+    }
+
+
+    const payload = {
+
+        click_id:
+            Number(
+                clickId
+            ),
+
+        status,
+
+        booking_value:
+            bookingValue,
+
+        commission_value:
+            commissionValue,
+
+        currency:
+            "GBP",
+
+        booked_at:
+            bookedAt,
+
+        notes:
+            notes ||
+            null,
+
+        updated_at:
+            new Date().toISOString()
+
+    };
+
+
+    const saveButton =
+        document.getElementById(
+            "saveConversionButton"
+        );
+
+
+    if (saveButton) {
+        saveButton.disabled = true;
+    }
+
+
+    setConversionFormMessage(
+        conversionId
+            ? "Saving changes..."
+            : "Saving booking..."
+    );
+
+
+    try {
+
+        let error;
+
+
+        if (
+            conversionId
+        ) {
+
+            const result =
+                await window.db
+                    .from(
+                        "deal_conversions"
+                    )
+                    .update(
+                        payload
+                    )
+                    .eq(
+                        "id",
+                        conversionId
+                    );
+
+
+            error =
+                result.error;
+
+        } else {
+
+            const result =
+                await window.db
+                    .from(
+                        "deal_conversions"
+                    )
+                    .insert(
+                        payload
+                    );
+
+
+            error =
+                result.error;
+
+        }
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        await loadDealConversions();
+
+
+        applyDateFilter();
+
+
+        setAnalyticsMessage(
+            conversionId
+                ? "Booking conversion updated successfully."
+                : "Booking conversion recorded successfully."
+        );
+
+
+        closeConversionModal();
+
+    } catch (error) {
+
+        console.error(
+            "Could not save conversion:",
+            error
+        );
+
+
+        setConversionFormMessage(
+            error?.message ||
+            "The booking conversion could not be saved."
+        );
+
+
+        if (saveButton) {
+            saveButton.disabled = false;
+        }
+
+    }
+
+}
+
+
+// ======================================================
+// DELETE CONVERSION
+// ======================================================
+
+async function deleteConversion() {
+
+    const conversionId =
+        getInputValue(
+            "conversionId"
+        );
+
+
+    if (!conversionId) {
+        return;
+    }
+
+
+    const confirmed =
+        window.confirm(
+            "Delete this booking conversion?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const deleteButton =
+        document.getElementById(
+            "deleteConversionButton"
+        );
+
+
+    if (deleteButton) {
+        deleteButton.disabled = true;
+    }
+
+
+    setConversionFormMessage(
+        "Deleting conversion..."
+    );
+
+
+    try {
+
+        const {
+            error
+        } =
+            await window.db
+                .from(
+                    "deal_conversions"
+                )
+                .delete()
+                .eq(
+                    "id",
+                    conversionId
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        await loadDealConversions();
+
+
+        applyDateFilter();
+
+
+        setAnalyticsMessage(
+            "Booking conversion deleted."
+        );
+
+
+        closeConversionModal();
+
+    } catch (error) {
+
+        console.error(
+            "Could not delete conversion:",
+            error
+        );
+
+
+        setConversionFormMessage(
+            error?.message ||
+            "The booking conversion could not be deleted."
+        );
+
+
+        if (deleteButton) {
+            deleteButton.disabled = false;
+        }
+
+    }
+
+}
+
+
+// ======================================================
+// FIND CONVERSION FOR CLICK
+// ======================================================
+
+function getConversionForClick(
+    clickId
+) {
+
+    return allDealConversions.find(
+        conversion =>
+            String(
+                conversion.click_id
+            ) ===
+            String(
+                clickId
+            )
+    ) || null;
+
+}
+
+
+// ======================================================
+// FIND CLICK
+// ======================================================
+
+function getClickById(
+    clickId
+) {
+
+    return allDealClicks.find(
+        click =>
+            String(
+                click.id
+            ) ===
+            String(
+                clickId
+            )
+    ) || null;
+
+}
+
+
+// ======================================================
+// HOTEL NAME FROM CLICK
+// ======================================================
+
+function getClickHotelName(
+    click
+) {
+
+    if (!click) {
+        return "Unknown hotel";
+    }
+
+
+    if (
+        !click.hotel_id
+    ) {
+        return "Hotel removed";
+    }
+
+
+    return (
+        hotelNames[
+            String(
+                click.hotel_id
+            )
+        ] ||
+        "Unknown hotel"
+    );
+
+}
+
+
+// ======================================================
+// STATUS CELL
+// ======================================================
+
+function appendStatusCell(
+    row,
+    status
+) {
+
+    const cell =
+        document.createElement(
+            "td"
+        );
+
+
+    const badge =
+        document.createElement(
+            "span"
+        );
+
+
+    const cleanStatus =
+        [
+            "confirmed",
+            "pending",
+            "cancelled"
+        ].includes(
+            status
+        )
+            ? status
+            : "none";
+
+
+    badge.className =
+        `conversion-badge ${cleanStatus}`;
+
+
+    badge.textContent =
+        formatConversionStatus(
+            cleanStatus
+        );
+
+
+    cell.appendChild(
+        badge
+    );
+
+
+    row.appendChild(
+        cell
+    );
+
+}
+
+
+// ======================================================
+// CONVERSION STATUS LABEL
+// ======================================================
+
+function formatConversionStatus(
+    status
+) {
+
+    if (
+        status ===
+        "confirmed"
+    ) {
+        return "Confirmed";
+    }
+
+
+    if (
+        status ===
+        "pending"
+    ) {
+        return "Pending";
+    }
+
+
+    if (
+        status ===
+        "cancelled"
+    ) {
+        return "Cancelled";
+    }
+
+
+    return "Not Booked";
+
+}
+
+
+// ======================================================
+// ACTION BUTTON
+// ======================================================
+
+function createActionButton(
+    label,
+    handler
+) {
+
+    const button =
+        document.createElement(
+            "button"
+        );
+
+
+    button.type =
+        "button";
+
+
+    button.className =
+        "analytics-action-btn";
+
+
+    button.textContent =
+        label;
+
+
+    button.addEventListener(
+        "click",
+        handler
+    );
+
+
+    return button;
 
 }
 
@@ -2270,9 +3408,7 @@ function formatSourcePage(
         source ===
         "results"
     ) {
-
         return "Results";
-
     }
 
 
@@ -2280,9 +3416,7 @@ function formatSourcePage(
         source ===
         "hotel"
     ) {
-
         return "Hotel";
-
     }
 
 
@@ -2339,7 +3473,112 @@ function isToday(
 
 
 // ======================================================
-// FORMAT DATE AND TIME
+// LOCAL DATE KEY
+// ======================================================
+
+function getLocalDateKey(
+    date
+) {
+
+    const year =
+        date.getFullYear();
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+// ======================================================
+// MONTH KEY
+// ======================================================
+
+function getMonthKey(
+    date
+) {
+
+    const year =
+        date.getFullYear();
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return `${year}-${month}`;
+
+}
+
+
+// ======================================================
+// CHART DATE
+// ======================================================
+
+function formatShortChartDate(
+    date
+) {
+
+    return new Intl.DateTimeFormat(
+        "en-GB",
+        {
+            day:
+                "2-digit",
+            month:
+                "short"
+        }
+    ).format(
+        date
+    );
+
+}
+
+
+function formatLongChartDate(
+    date
+) {
+
+    return new Intl.DateTimeFormat(
+        "en-GB",
+        {
+            day:
+                "2-digit",
+            month:
+                "long",
+            year:
+                "numeric"
+        }
+    ).format(
+        date
+    );
+
+}
+
+
+// ======================================================
+// FORMAT DATE TIME
 // ======================================================
 
 function formatDateTime(
@@ -2373,28 +3612,92 @@ function formatDateTime(
     return new Intl.DateTimeFormat(
         "en-GB",
         {
-
             day:
                 "2-digit",
-
             month:
                 "short",
-
             year:
                 "numeric",
-
             hour:
                 "2-digit",
-
             minute:
                 "2-digit",
-
             second:
                 "2-digit"
-
         }
     ).format(
         date
+    );
+
+}
+
+
+// ======================================================
+// DATETIME LOCAL VALUE
+// ======================================================
+
+function formatDateTimeLocal(
+    dateValue
+) {
+
+    const date =
+        new Date(
+            dateValue
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return "";
+    }
+
+
+    const year =
+        date.getFullYear();
+
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const hours =
+        String(
+            date.getHours()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const minutes =
+        String(
+            date.getMinutes()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    return (
+        `${year}-${month}-${day}` +
+        `T${hours}:${minutes}`
     );
 
 }
@@ -2414,6 +3717,108 @@ function formatNumber(
         Number(
             value
         ) || 0
+    );
+
+}
+
+
+// ======================================================
+// FORMAT MONEY
+// ======================================================
+
+function formatMoney(
+    value
+) {
+
+    return new Intl.NumberFormat(
+        "en-GB",
+        {
+            style:
+                "currency",
+            currency:
+                "GBP"
+        }
+    ).format(
+        safeNumber(
+            value
+        )
+    );
+
+}
+
+
+// ======================================================
+// SAFE NUMBER
+// ======================================================
+
+function safeNumber(
+    value
+) {
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        )
+    ) {
+        return 0;
+    }
+
+
+    return number;
+
+}
+
+
+// ======================================================
+// OPTIONAL MONEY
+// ======================================================
+
+function parseOptionalMoney(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        String(
+            value
+        ).trim() ===
+        ""
+    ) {
+
+        return null;
+
+    }
+
+
+    const number =
+        Number(
+            value
+        );
+
+
+    if (
+        !Number.isFinite(
+            number
+        ) ||
+        number < 0
+    ) {
+
+        return false;
+
+    }
+
+
+    return Number(
+        number.toFixed(
+            2
+        )
     );
 
 }
@@ -2469,6 +3874,95 @@ function appendTextCell(
 
 
 // ======================================================
+// EMPTY TABLE ROW
+// ======================================================
+
+function appendEmptyRow(
+    table,
+    colspan,
+    message
+) {
+
+    const row =
+        document.createElement(
+            "tr"
+        );
+
+
+    const cell =
+        document.createElement(
+            "td"
+        );
+
+
+    cell.colSpan =
+        colspan;
+
+
+    cell.textContent =
+        message;
+
+
+    row.appendChild(
+        cell
+    );
+
+
+    table.appendChild(
+        row
+    );
+
+}
+
+
+// ======================================================
+// INPUT HELPERS
+// ======================================================
+
+function getInputValue(
+    id
+) {
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if (!element) {
+        return "";
+    }
+
+
+    return element.value ??
+        "";
+
+}
+
+
+function setInputValue(
+    id,
+    value
+) {
+
+    const element =
+        document.getElementById(
+            id
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    element.value =
+        value ?? "";
+
+}
+
+
+// ======================================================
 // SET TEXT
 // ======================================================
 
@@ -2490,6 +3984,31 @@ function setText(
 
     element.textContent =
         value;
+
+}
+
+
+// ======================================================
+// CONVERSION FORM MESSAGE
+// ======================================================
+
+function setConversionFormMessage(
+    message
+) {
+
+    const element =
+        document.getElementById(
+            "conversionFormMessage"
+        );
+
+
+    if (!element) {
+        return;
+    }
+
+
+    element.textContent =
+        message;
 
 }
 
@@ -2549,6 +4068,12 @@ function showAnalyticsError(
         );
 
 
+    const conversionTable =
+        document.getElementById(
+            "conversionStatsBody"
+        );
+
+
     const recentTable =
         document.getElementById(
             "recentClicksBody"
@@ -2561,74 +4086,81 @@ function showAnalyticsError(
         );
 
 
-    if (
-        supplierTable
-    ) {
+    if (supplierTable) {
 
-        supplierTable.innerHTML = `
+        supplierTable.innerHTML = "";
 
-            <tr>
-
-                <td colspan="4">
-                    Analytics could not be loaded.
-                </td>
-
-            </tr>
-
-        `;
+        appendEmptyRow(
+            supplierTable,
+            4,
+            "Analytics could not be loaded."
+        );
 
     }
 
 
-    if (
-        hotelTable
-    ) {
+    if (hotelTable) {
 
-        hotelTable.innerHTML = `
+        hotelTable.innerHTML = "";
 
-            <tr>
-
-                <td colspan="4">
-                    Hotel analytics could not be loaded.
-                </td>
-
-            </tr>
-
-        `;
+        appendEmptyRow(
+            hotelTable,
+            4,
+            "Hotel analytics could not be loaded."
+        );
 
     }
 
 
-    if (
-        recentTable
-    ) {
+    if (conversionTable) {
 
-        recentTable.innerHTML = `
+        conversionTable.innerHTML = "";
 
-            <tr>
-
-                <td colspan="4">
-                    Analytics could not be loaded.
-                </td>
-
-            </tr>
-
-        `;
+        appendEmptyRow(
+            conversionTable,
+            7,
+            "Conversion analytics could not be loaded."
+        );
 
     }
 
 
-    if (
-        chart
-    ) {
+    if (recentTable) {
 
-        chart.innerHTML = `
+        recentTable.innerHTML = "";
 
-            <div class="chart-empty">
-                Chart could not be loaded.
-            </div>
+        appendEmptyRow(
+            recentTable,
+            6,
+            "Analytics could not be loaded."
+        );
 
-        `;
+    }
+
+
+    if (chart) {
+
+        chart.innerHTML =
+            "";
+
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+
+        empty.className =
+            "chart-empty";
+
+
+        empty.textContent =
+            "Chart could not be loaded.";
+
+
+        chart.appendChild(
+            empty
+        );
 
     }
 
