@@ -1,7 +1,7 @@
 // ======================================================
 // PackageHolidayCompare
 // Public Hotel Details Page
-// Version: 2026-10-20-2
+// Version: 2026-10-25-1
 // ======================================================
 
 let currentHotel = null;
@@ -3223,7 +3223,7 @@ function getSupplierRecord(
 
 
 // ======================================================
-// DOCUMENT TITLE
+// HOTEL SEO
 // ======================================================
 
 function updateDocumentTitle() {
@@ -3236,8 +3236,529 @@ function updateDocumentTitle() {
     }
 
 
+    // ==================================================
+    // HOTEL SEO VALUES
+    // ==================================================
+
+    const hotelName =
+        String(
+            currentHotel.name ||
+            ""
+        ).trim();
+
+
+    const destination =
+        String(
+            currentHotel.destination ||
+            ""
+        ).trim();
+
+
+    const country =
+        String(
+            currentHotel.country ||
+            ""
+        ).trim();
+
+
+    const seoTitle =
+        String(
+            currentHotel.seo_title ||
+            ""
+        ).trim();
+
+
+    const seoDescription =
+        String(
+            currentHotel.seo_description ||
+            ""
+        ).trim();
+
+
+    const hotelDescription =
+        String(
+            currentHotel.description ||
+            ""
+        )
+            .replace(
+                /\s+/g,
+                " "
+            )
+            .trim();
+
+
+    // ==================================================
+    // PAGE TITLE
+    // ==================================================
+
+    const defaultTitle =
+        destination
+            ? `${hotelName} Holidays in ${destination} | PackageHolidayCompare`
+            : `${hotelName} Holidays | PackageHolidayCompare`;
+
+
+    const pageTitle =
+        seoTitle ||
+        defaultTitle;
+
+
     document.title =
-        `${currentHotel.name} | PackageHolidayCompare`;
+        pageTitle;
+
+
+    // ==================================================
+    // META DESCRIPTION
+    // ==================================================
+
+    let defaultDescription =
+        `Compare package holiday offers for ${hotelName}`;
+
+
+    if (
+        destination ||
+        country
+    ) {
+
+        const location =
+            [
+                destination,
+                country
+            ]
+                .filter(
+                    Boolean
+                )
+                .join(
+                    ", "
+                );
+
+
+        defaultDescription +=
+            ` in ${location}`;
+    }
+
+
+    defaultDescription +=
+        ". View hotel details, facilities, room types and available supplier deals.";
+
+
+    const description =
+        (
+            seoDescription ||
+            hotelDescription ||
+            defaultDescription
+        )
+            .replace(
+                /\s+/g,
+                " "
+            )
+            .trim()
+            .slice(
+                0,
+                160
+            );
+
+
+    // ==================================================
+    // CANONICAL URL
+    // ==================================================
+
+    let canonicalUrl =
+        `${window.location.origin}/hotel.html`;
+
+
+    if (
+        currentHotel.slug
+    ) {
+
+        canonicalUrl +=
+            `?slug=${encodeURIComponent(
+                currentHotel.slug
+            )}`;
+
+
+    } else if (
+        currentHotel.id
+    ) {
+
+        canonicalUrl +=
+            `?id=${encodeURIComponent(
+                currentHotel.id
+            )}`;
+    }
+
+
+    // ==================================================
+    // MAIN SEO IMAGE
+    // ==================================================
+
+    const imageUrls =
+        [];
+
+
+    if (
+        isValidHttpUrl(
+            currentHotel.main_image
+        )
+    ) {
+
+        imageUrls.push(
+            currentHotel.main_image
+        );
+    }
+
+
+    currentImages.forEach(
+        image => {
+
+            if (
+                isValidHttpUrl(
+                    image?.image_url
+                ) &&
+                !imageUrls.includes(
+                    image.image_url
+                )
+            ) {
+
+                imageUrls.push(
+                    image.image_url
+                );
+            }
+        }
+    );
+
+
+    const mainImage =
+        imageUrls[0] ||
+        "";
+
+
+    // ==================================================
+    // META HELPER
+    // ==================================================
+
+    function setMetaTag(
+        attribute,
+        key,
+        content
+    ) {
+
+        if (
+            !content
+        ) {
+
+            return;
+        }
+
+
+        let tag =
+            document.head.querySelector(
+                `meta[${attribute}="${key}"]`
+            );
+
+
+        if (
+            !tag
+        ) {
+
+            tag =
+                document.createElement(
+                    "meta"
+                );
+
+
+            tag.setAttribute(
+                attribute,
+                key
+            );
+
+
+            document.head.appendChild(
+                tag
+            );
+        }
+
+
+        tag.setAttribute(
+            "content",
+            content
+        );
+    }
+
+
+    // ==================================================
+    // STANDARD SEO
+    // ==================================================
+
+    setMetaTag(
+        "name",
+        "description",
+        description
+    );
+
+
+    setMetaTag(
+        "name",
+        "robots",
+        "index, follow"
+    );
+
+
+    // ==================================================
+    // CANONICAL
+    // ==================================================
+
+    let canonical =
+        document.head.querySelector(
+            'link[rel="canonical"]'
+        );
+
+
+    if (
+        !canonical
+    ) {
+
+        canonical =
+            document.createElement(
+                "link"
+            );
+
+
+        canonical.rel =
+            "canonical";
+
+
+        document.head.appendChild(
+            canonical
+        );
+    }
+
+
+    canonical.href =
+        canonicalUrl;
+
+
+    // ==================================================
+    // OPEN GRAPH
+    // ==================================================
+
+    setMetaTag(
+        "property",
+        "og:type",
+        "website"
+    );
+
+
+    setMetaTag(
+        "property",
+        "og:site_name",
+        "PackageHolidayCompare"
+    );
+
+
+    setMetaTag(
+        "property",
+        "og:title",
+        pageTitle
+    );
+
+
+    setMetaTag(
+        "property",
+        "og:description",
+        description
+    );
+
+
+    setMetaTag(
+        "property",
+        "og:url",
+        canonicalUrl
+    );
+
+
+    if (
+        mainImage
+    ) {
+
+        setMetaTag(
+            "property",
+            "og:image",
+            mainImage
+        );
+    }
+
+
+    // ==================================================
+    // TWITTER / X
+    // ==================================================
+
+    setMetaTag(
+        "name",
+        "twitter:card",
+        mainImage
+            ? "summary_large_image"
+            : "summary"
+    );
+
+
+    setMetaTag(
+        "name",
+        "twitter:title",
+        pageTitle
+    );
+
+
+    setMetaTag(
+        "name",
+        "twitter:description",
+        description
+    );
+
+
+    if (
+        mainImage
+    ) {
+
+        setMetaTag(
+            "name",
+            "twitter:image",
+            mainImage
+        );
+    }
+
+
+    // ==================================================
+    // HOTEL STRUCTURED DATA
+    // ==================================================
+
+    const existingStructuredData =
+        document.getElementById(
+            "hotelStructuredData"
+        );
+
+
+    if (
+        existingStructuredData
+    ) {
+
+        existingStructuredData.remove();
+    }
+
+
+    const structuredData = {
+
+        "@context":
+            "https://schema.org",
+
+        "@type":
+            "Hotel",
+
+        name:
+            hotelName,
+
+        url:
+            canonicalUrl,
+
+        description:
+            description
+
+    };
+
+
+    if (
+        imageUrls.length > 0
+    ) {
+
+        structuredData.image =
+            imageUrls;
+    }
+
+
+    if (
+        destination ||
+        country
+    ) {
+
+        structuredData.address = {
+
+            "@type":
+                "PostalAddress"
+
+        };
+
+
+        if (
+            destination
+        ) {
+
+            structuredData.address.addressLocality =
+                destination;
+        }
+
+
+        if (
+            country
+        ) {
+
+            structuredData.address.addressCountry =
+                country;
+        }
+    }
+
+
+    const stars =
+        Number(
+            currentHotel.stars
+        );
+
+
+    if (
+        Number.isFinite(
+            stars
+        ) &&
+        stars > 0 &&
+        stars <= 5
+    ) {
+
+        structuredData.starRating = {
+
+            "@type":
+                "Rating",
+
+            ratingValue:
+                stars,
+
+            bestRating:
+                5
+
+        };
+    }
+
+
+    const structuredDataScript =
+        document.createElement(
+            "script"
+        );
+
+
+    structuredDataScript.id =
+        "hotelStructuredData";
+
+
+    structuredDataScript.type =
+        "application/ld+json";
+
+
+    structuredDataScript.textContent =
+        JSON.stringify(
+            structuredData
+        );
+
+
+    document.head.appendChild(
+        structuredDataScript
+    );
+
 }
 
 
