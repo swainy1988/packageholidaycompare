@@ -1,0 +1,4 @@
+RewriteEngine On
+
+RewriteCond %{HTTP_HOST} ^packageholidaycompare\.co\.uk$ [NC]
+RewriteRule ^ https://www.packageholidaycompare.co.uk%{REQUEST_URI} [R=301,L]
