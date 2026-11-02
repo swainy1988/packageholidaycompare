@@ -29,5 +29,6 @@ deployment:
     - /bin/cp winter-sun-holidays-from-manchester.html "$DEPLOYPATH"
     - /bin/cp egypt-holidays-from-manchester.html "$DEPLOYPATH"
     - /bin/cp hurghada-holidays-from-manchester.html "$DEPLOYPATH"
+    - /bin/cp sharm-el-sheikh-holidays-from-manchester.html "$DEPLOYPATH"
     - /bin/cp robots.txt "$DEPLOYPATH"
     - /bin/cp sitemap.xml "$DEPLOYPATH"
