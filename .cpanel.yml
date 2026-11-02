@@ -23,5 +23,6 @@ deployment:
     - /bin/cp terms.html "$DEPLOYPATH"
     - /bin/cp affiliate-disclosure.html "$DEPLOYPATH"
     - /bin/cp package-holidays-from-manchester.html "$DEPLOYPATH"
+    - /bin/cp all-inclusive-holidays-from-manchester.html "$DEPLOYPATH"
     - /bin/cp robots.txt "$DEPLOYPATH"
     - /bin/cp sitemap.xml "$DEPLOYPATH"
