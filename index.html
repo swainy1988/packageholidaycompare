@@ -819,6 +819,71 @@
 
 
         /* ==========================================
+           HOLIDAY GUIDES
+        ========================================== */
+
+        .guides-section {
+            margin-bottom: 70px;
+        }
+
+        .guide-card {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 24px;
+
+            padding: 28px;
+
+            border:
+                1px solid
+                #dbeafe;
+
+            border-radius: 16px;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 8px 25px
+                rgba(15, 23, 42, 0.06);
+        }
+
+        .guide-card h3 {
+            margin: 0 0 8px;
+            color: #0f172a;
+            font-size: 23px;
+        }
+
+        .guide-card p {
+            margin: 0;
+            color: #64748b;
+            line-height: 1.65;
+        }
+
+        .guide-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 46px;
+            padding: 12px 18px;
+
+            border-radius: 9px;
+
+            background: #0066cc;
+            color: #ffffff;
+
+            font-size: 14px;
+            font-weight: 900;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .guide-link:hover {
+            background: #0059b3;
+        }
+
+
+        /* ==========================================
            COMPARISON INFORMATION
         ========================================== */
 
@@ -980,6 +1045,14 @@
                 grid-template-columns: 1fr;
             }
 
+            .guide-card {
+                grid-template-columns: 1fr;
+            }
+
+            .guide-link {
+                width: 100%;
+            }
+
             .footer-top {
                 flex-direction: column;
             }
@@ -1094,6 +1167,10 @@
 
                 <a href="#why-use-us">
                     Why Compare?
+                </a>
+
+                <a href="package-holidays-from-manchester.html">
+                    Manchester Holidays
                 </a>
 
                 <a href="about.html">
@@ -1892,6 +1969,53 @@
 
 
         <!-- ==========================================
+             HOLIDAY GUIDES
+        =========================================== -->
+
+        <section class="section guides-section">
+
+            <div class="section-heading">
+
+                <h2>
+                    Holiday guides
+                </h2>
+
+                <p>
+                    Explore useful guides for planning and
+                    comparing your next package holiday.
+                </p>
+
+            </div>
+
+            <article class="guide-card">
+
+                <div>
+
+                    <h3>
+                        Package Holidays from Manchester
+                    </h3>
+
+                    <p>
+                        Compare holiday types, destinations,
+                        budgets and useful planning tips for
+                        package holidays departing from Manchester.
+                    </p>
+
+                </div>
+
+                <a
+                    href="package-holidays-from-manchester.html"
+                    class="guide-link"
+                >
+                    Read Manchester guide
+                </a>
+
+            </article>
+
+        </section>
+
+
+        <!-- ==========================================
              COMPARISON INFORMATION
         =========================================== -->
 
@@ -1956,6 +2080,10 @@
                     class="footer-links"
                     aria-label="Footer navigation"
                 >
+
+                    <a href="package-holidays-from-manchester.html">
+                        Manchester Holidays
+                    </a>
 
                     <a href="about.html">
                         About
